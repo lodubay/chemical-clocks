@@ -1,0 +1,6 @@
+# Don't track TeX temporaries
+*latexindent*
+
+# Don't track LaTeX products
+ms.pdf
+ms.synctex.gz

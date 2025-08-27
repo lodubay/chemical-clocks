@@ -1,0 +1,20 @@
+# Snakemake temporaries
+**/.snakemake
+**/.showyourwork*
+
+# Latex output files
+ms.pdf
+report.html
+arxiv.tar.gz
+ms.synctex.gz
+
+# Spyder project directory
+.spyproject/
+
+# Miscellaneous
+__pycache__
+.virtual_documents/
+
+# Mac nonsense
+**.DS_STORE
+
