@@ -56,7 +56,7 @@ def main():
 
     # Red giants only
     mwm_rgb = mwm_good[
-        (mwm_good['logg'] > 1.0) & (mwm_good['logg'] < 3.5) &
+        (mwm_good['logg'] > 1.0) & (mwm_good['logg'] < 3.7) &
         (mwm_good['teff'] < 5500) & (mwm_good['teff'] > 3500)
     ].copy()
 
