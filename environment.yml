@@ -12,6 +12,7 @@ dependencies:
     - scipy
     - gsl
     - galpy
+    - gala
     - pip
     - pip:
         - vice>=1.3.1
