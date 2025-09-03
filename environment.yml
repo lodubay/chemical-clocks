@@ -10,8 +10,10 @@ dependencies:
     - astropy
     - jupyterlab
     - scipy
-    - gsl
+    - conda-forge::gsl
     - galpy
+    - tqdm
+    - numba
     - pip
     - pip:
         - vice>=1.3.1
