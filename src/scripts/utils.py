@@ -3,9 +3,11 @@ Utility functions and classes for many scripts.
 """
 
 import numpy as np
+from numpy.random import default_rng
 import pandas as pd
 from astropy.table import Table
 
+from _globals import RANDOM_SEED
 
 # =============================================================================
 # DATA UTILITY FUNCTIONS
@@ -90,6 +92,40 @@ def box_smooth(hist, bins, width):
     box = np.ones(box_width) / box_width
     hist_smooth = np.convolve(hist, box, mode='same')
     return hist_smooth
+
+
+def sample_rows(df, n, weights=None, reset=True, seed=RANDOM_SEED):
+    """
+    Randomly sample n unique rows from a pandas DataFrame.
+
+    Parameters
+    ----------
+    df : pandas DataFrame
+    n : int
+        Number of random samples to draw
+    weights : array, optional
+        Probability weights of the given DataFrame
+    reset : bool, optional
+        If True, reset sample DataFrame index
+
+    Returns
+    -------
+    pandas DataFrame
+        Re-indexed DataFrame of n sampled rows
+    """
+    if isinstance(df, pd.DataFrame):
+        # Number of samples can't exceed length of DataFrame
+        n = min(n, df.shape[0])
+        # Initialize default numpy random number generator
+        rng = default_rng(seed)
+        # Randomly sample without replacement
+        rand_indices = rng.choice(df.index, size=n, replace=False, p=weights)
+        sample = df.loc[rand_indices]
+        if reset:
+            sample.reset_index(inplace=True, drop=True)
+        return sample
+    else:
+        raise TypeError('Expected pandas DataFrame.')
 
 # =============================================================================
 # PLOTTING FUNCTIONS
