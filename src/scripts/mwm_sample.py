@@ -6,7 +6,12 @@ import numpy as np
 import pandas as pd
 from astropy.io import fits
 import astropy.units as u
-import astropy.coordinates as coords
+import astropy.coordinates as coord
+from galpy.orbit import Orbit
+from galpy.potential import MWPotential2014
+from galpy.actionAngle import estimateDeltaStaeckel
+import gala.dynamics as gd
+import gala.potential as gp
 
 from utils import fits_to_pandas
 import paths
@@ -46,6 +51,8 @@ def main():
     mwm_good['mg_fe'], mwm_good['e_mg_fe'] = abundance_ratio(mwm_good, 'mg', 'fe')
     mwm_good['ce_mg'], mwm_good['e_ce_mg'] = abundance_ratio(mwm_good, 'ce', 'mg')
     mwm_good['c_n'], mwm_good['e_c_n'] = abundance_ratio(mwm_good, 'c', 'n')
+    # Require Gaia distances
+    mwm_good.dropna(axis=0, how='any', subset=['r_med_photogeo'], inplace=True)
     # Calculate galactocentric coordinates based on galactic l, b and Gaia dist
     galr, galphi, galz = galactic_to_galactocentric(
         mwm_good['l'], mwm_good['b'], mwm_good['r_med_photogeo']/1000
@@ -53,7 +60,16 @@ def main():
     mwm_good['gal_r'] = galr # kpc
     mwm_good['gal_phi'] = galphi # deg
     mwm_good['gal_z'] = galz # kpc
-
+    print('Computing orbits...')
+    rguide, zmax, ecc, energy, Lz = orbit_dynamics(
+        mwm_good['ra'], mwm_good['dec'], mwm_good['r_med_photogeo']/1000,
+        mwm_good['pmra'], mwm_good['pmde'], mwm_good['v_rad']
+    )
+    mwm_good['galpy_r_guide'] = rguide
+    mwm_good['galpy_z_max'] = zmax
+    mwm_good['galpy_ecc'] = ecc
+    mwm_good['galpy_E'] = energy
+    mwm_good['galpy_Lz'] = Lz
     # Red giants only
     mwm_rgb = mwm_good[
         (mwm_good['logg'] > 1.0) & (mwm_good['logg'] < 3.7) &
@@ -133,8 +149,11 @@ def galactic_to_galactocentric(l, b, distance):
             b *= u.deg
         if not isinstance(d, u.quantity.Quantity):
             d *= u.kpc
-        galactic = coords.SkyCoord(l=l, b=b, distance=d, frame=coords.Galactic())
-        galactocentric = galactic.transform_to(frame=coords.Galactocentric())
+        # Define galactocentric coordinate frame
+        with coord.galactocentric_frame_defaults.set('v4.0'):
+            galcen_frame = coord.Galactocentric()
+        galactic = coord.SkyCoord(l=l, b=b, distance=d, frame=coord.Galactic())
+        galactocentric = galactic.transform_to(frame=galcen_frame)
         galactocentric.representation_type = 'cylindrical'
         galr = galactocentric.rho.to(u.kpc).value
         galphi = galactocentric.phi.to(u.deg).value
@@ -142,6 +161,75 @@ def galactic_to_galactocentric(l, b, distance):
         return galr, galphi, galz
     else:
         raise ValueError('Arrays must be of same length.')
+    
+
+def orbit_dynamics(ra, dec, dist, pmra, pmdec, vrad, approx='staeckel'):
+    """
+    Integrate orbits and compute orbital dynamics with galpy.
+
+    Parameters
+    ----------
+    ra : array-like
+        Right ascension in degrees.
+    dec : array-like
+        Declination in degrees.
+    dist : array-like
+        Distance from Sun in kpc.
+    pmra : array-like
+        Proper motion in RA in mas/yr.
+    pmdec : array-like
+        Proper motion in Dec in mas/yr.
+    vrad : array-like
+        Radial velocity in km/s.
+    approx : str, optional [default: 'staeckel']
+        Type of analytic approximation to use. Passed to galpy methods.
+    """
+    ra = np.array(ra)
+    dec = np.array(dec)
+    dist = np.array(dist)
+    pmra = np.array(pmra)
+    pmdec = np.array(pmdec)
+    vrad = np.array(vrad)
+    args = [ra, dec, dist, pmra, pmdec, vrad]
+    if [ra.shape == a.shape for a in args[1:]]:
+        # Define galactocentric coordinate frame
+        with coord.galactocentric_frame_defaults.set('v4.0'):
+            galcen_frame = coord.Galactocentric()
+        sky_coords = coord.SkyCoord(
+            ra=ra*u.deg, 
+            dec=dec*u.deg, 
+            distance=dist*u.kpc,
+            pm_ra_cosdec=pmra*u.mas/u.yr, 
+            pm_dec=pmdec*u.mas/u.yr,
+            radial_velocity=vrad*u.km/u.s,
+            frame=coord.ICRS()
+        )
+        galcen_coords = sky_coords.transform_to(galcen_frame)
+        orbits = Orbit(galcen_coords)
+        galcen_coords.representation_type = 'cylindrical'
+        delta = estimateDeltaStaeckel(
+            MWPotential2014, 
+            galcen_coords.rho, 
+            galcen_coords.z, 
+            no_median=True
+        )
+        kwargs = dict(pot=MWPotential2014, type=approx, delta=delta)
+        rguide = orbits.rguiding(**kwargs)
+        zmax = orbits.zmax(analytic=True, **kwargs)
+        ecc = orbits.e(analytic=True, **kwargs)
+        energies = orbits.E(pot=MWPotential2014)
+        Lz = orbits.L(pot=MWPotential2014)[:,2]
+        # stars_w0 = gd.PhaseSpacePosition(galcen_coords.data)
+        # mw_potential = gp.MilkyWayPotential()
+        # stars_orbit = mw_potential.integrate_orbit(stars_w0, dt=0.5 * u.Myr, t1=0, t2=4 * u.Gyr, cython_if_possible=True)
+        # rguide = stars_orbit[0].guiding_radius().value
+        # zmax = stars_orbit.zmax().value
+        # ecc = stars_orbit.eccentricity()
+        # energies = stars_orbit.energy()[0].to(u.km**2/u.s**2)
+        # Lz = stars_orbit.angular_momentum()[2,0].to(u.km*u.kpc/u.s)
+        return rguide, zmax, ecc, energies, Lz
+    else:
+        raise ValueError('Input arrays must have the same length.')
     
 
 if __name__ == '__main__':
