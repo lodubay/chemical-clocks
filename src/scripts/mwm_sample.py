@@ -68,16 +68,18 @@ def main():
     mwm_good['gal_r'] = galr # kpc
     mwm_good['gal_phi'] = galphi # deg
     mwm_good['gal_z'] = galz # kpc
-    print('Computing orbits...')
-    rguide, zmax, ecc, energy, Lz = orbit_dynamics(
-        mwm_good['ra'], mwm_good['dec'], mwm_good['r_med_photogeo']/1000,
-        mwm_good['pmra'], mwm_good['pmde'], mwm_good['v_rad']
-    )
-    mwm_good['galpy_r_guide'] = rguide
-    mwm_good['galpy_z_max'] = zmax
-    mwm_good['galpy_ecc'] = ecc
-    mwm_good['galpy_E'] = energy
-    mwm_good['galpy_Lz'] = Lz
+    print('Joining with orbit parameters...')
+    mwm_good = add_kinematics(mwm_good, id_name='gaia_dr3_source_id', verbose=True)
+    # print('Computing orbits...')
+    # rguide, zmax, ecc, energy, Lz = orbit_dynamics(
+    #     mwm_good['ra'], mwm_good['dec'], mwm_good['r_med_photogeo']/1000,
+    #     mwm_good['pmra'], mwm_good['pmde'], mwm_good['v_rad']
+    # )
+    # mwm_good['galpy_r_guide'] = rguide
+    # mwm_good['galpy_z_max'] = zmax
+    # mwm_good['galpy_ecc'] = ecc
+    # mwm_good['galpy_E'] = energy
+    # mwm_good['galpy_Lz'] = Lz
     # Red giants only
     mwm_rgb = mwm_good[
         (mwm_good['logg'] > 1.0) & (mwm_good['logg'] < 3.7) &
@@ -238,6 +240,86 @@ def orbit_dynamics(ra, dec, dist, pmra, pmdec, vrad, approx='staeckel'):
         return rguide, zmax, ecc, energies, Lz
     else:
         raise ValueError('Input arrays must have the same length.')
+
+
+def add_kinematics(df, id_name='source_id', verbose=False):
+    """
+    Join catalog with orbital parameters for Gaia source IDs.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        DataFrame to join to the Gaia orbit catalog.
+    id_name : str, optional
+        Column name of Gaia source IDs in df. Default is 'source_id'.
+    verbose : bool, optional
+        If True, print verbose output to terminal.
+
+    Returns
+    -------
+    df : pandas.DataFrame
+        Input DataFrame merged with Gaia orbit parameters.
+    """
+    data = fits.open(
+        paths.data / 'MWM' / 'dr3-rv-good-plx-MilkyWayPotential2022-joined.fits'
+    )
+    kinematic = data[1].data
+    if verbose: print('Finished reading in data!')
+    ids = pd.DataFrame(kinematic.source_id, columns=['source_id'])
+    checklist = ids['source_id'].isin(df[id_name])
+    if verbose: print('Finished matching source id, total %d stars'%(sum(checklist)))
+    kinematic_dr3 = kinematic[checklist]
+    print(list(kinematic_dr3.columns))
+    
+    # DataFrame with kinematic data
+    kinematic_dr3 = pd.DataFrame(
+        np.array((
+            kinematic_dr3.source_id,
+            kinematic_dr3.xyz[:,0],
+            kinematic_dr3.xyz[:,1],
+            kinematic_dr3.xyz[:,2],
+            kinematic_dr3.vxyz[:,0],
+            kinematic_dr3.vxyz[:,1],
+            kinematic_dr3.vxyz[:,2],
+            kinematic_dr3.actions[:,0],
+            kinematic_dr3.actions[:,1],
+            kinematic_dr3.actions[:,2],
+            kinematic_dr3.E,
+            kinematic_dr3.L[:,0],
+            kinematic_dr3.L[:,1],
+            kinematic_dr3.L[:,2],
+            kinematic_dr3.ecc,
+            kinematic_dr3.parallax,
+            kinematic_dr3.ra,
+            kinematic_dr3.dec,
+            kinematic_dr3.phot_g_mean_mag,
+            kinematic_dr3.phot_bp_mean_mag,
+            kinematic_dr3.phot_rp_mean_mag,
+            kinematic_dr3.ruwe,
+            kinematic_dr3.z_max,
+            kinematic_dr3.r_apo/2+kinematic_dr3.r_per/2
+        ), dtype=str).T,
+        columns=[
+            'source_id','x','y','z',
+            'vx','vy','vz','Jx','Jy',
+            'Jz','E','Lx','Ly','Lz','e',
+            'parallax','ra','dec','phot_g_mean_mag',
+            'phot_bp_mean_mag','phot_rp_mean_mag',
+            'ruwe','z_max','Rg']
+    )
+    
+    for i in kinematic_dr3.columns:
+        if i=='source_id':
+            kinematic_dr3[i] = [int(j) for j in kinematic_dr3[i]]
+            continue
+        kinematic_dr3[i] = [float(j) for j in kinematic_dr3[i]]
+        
+    df = pd.merge(
+        df, kinematic_dr3,
+        left_on=id_name, right_on='source_id', how='left'
+    )
+    
+    return df
     
 
 if __name__ == '__main__':
