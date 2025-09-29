@@ -58,6 +58,7 @@ def main():
     print('Calculating abundance ratios and coordinates...')
     mwm_good['mg_fe'], mwm_good['e_mg_fe'] = abundance_ratio(mwm_good, 'mg', 'fe')
     mwm_good['ce_mg'], mwm_good['e_ce_mg'] = abundance_ratio(mwm_good, 'ce', 'mg')
+    mwm_good['ce_fe'], mwm_good['e_ce_fe'] = abundance_ratio(mwm_good, 'ce', 'fe')
     mwm_good['c_n'], mwm_good['e_c_n'] = abundance_ratio(mwm_good, 'c', 'n')
     # Require Gaia distances
     mwm_good.dropna(axis=0, how='any', subset=['r_med_photogeo'], inplace=True)
@@ -269,7 +270,6 @@ def add_kinematics(df, id_name='source_id', verbose=False):
     checklist = ids['source_id'].isin(df[id_name])
     if verbose: print('Finished matching source id, total %d stars'%(sum(checklist)))
     kinematic_dr3 = kinematic[checklist]
-    print(list(kinematic_dr3.columns))
     
     # DataFrame with kinematic data
     kinematic_dr3 = pd.DataFrame(
