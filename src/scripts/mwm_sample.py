@@ -27,6 +27,7 @@ def main():
     starflow = fits_to_pandas(
         paths.data / 'MWM' / 'StarFlow_summary_v1_0_1.fits'
     )
+    # ensure SDSS IDs are the same between DR19 and StarFlow in every row
     assert np.all(np.where(mwm_full['sdss_id'] == starflow['sdss_id'], 1, 0))
     mwm_full = mwm_full.join(
         starflow[['age', 'e_p_age', 'e_n_age', 'training_density', 'BITMASK']]
@@ -34,7 +35,7 @@ def main():
     # Quality cuts
     print('Implementing quality cuts...')
     mwm_good = mwm_full[
-        (mwm_full['sdss4_apogee_extra_target_flags'] == 0) &
+        (mwm_full['sdss4_apogee_extra_target_flags'] < 2) &
         (mwm_full['flag_bad'] == 0) & 
         (mwm_full['spectrum_flags'] == 0) &
         (mwm_full['snr'] > 40) &
