@@ -51,7 +51,7 @@ def main():
         (mwm_good['fe_h'] > -999)
     ]
     mwm_good = mwm_good[
-        (mwm_good['ce_h_flags'] == 0) &
+        # (mwm_good['ce_h_flags'] == 0) &
         (mwm_good['mg_h_flags'] == 0) &
         (mwm_good['fe_h_flags'] == 0)
     ]
