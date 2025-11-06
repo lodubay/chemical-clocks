@@ -6,8 +6,48 @@ import numpy as np
 from numpy.random import default_rng
 import pandas as pd
 from astropy.table import Table
+import vice
 
 from _globals import RANDOM_SEED
+
+# =============================================================================
+# SCIENCE FUNCTIONS
+# =============================================================================
+
+def alpha_cut(feh):
+    """
+    Dividing line between low- and high-alpha populations at a given [Fe/H].
+
+    Parameters
+    ----------
+    feh : numpy.ndarray
+        Array of [Fe/H] values.
+    
+    Returns
+    -------
+    numpy.ndarray
+        Values of [Mg/Fe] that divide low- and high-alpha populations.
+    """
+    return np.where(
+        feh >= 0.0,
+        0.1,
+        0.1 - 0.13*feh
+    )
+
+
+class amplified_agb(vice.yields.agb.interpolator): 
+    """
+    Amplify the AGB yields by a multiplicative factor.
+
+    Inherits from vice.yields.agb.interpolator.
+    """
+    def __init__(self, element, study = 'cristallo11', prefactor=3):
+        self.prefactor = prefactor
+        super().__init__(element, study=study)
+    
+    def __call__(self, mass, metallicity): 
+        return self.prefactor * super().__call__(mass, metallicity) 
+
 
 # =============================================================================
 # DATA UTILITY FUNCTIONS
