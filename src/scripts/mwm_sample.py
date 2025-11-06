@@ -39,7 +39,9 @@ def main():
         (mwm_full['flag_bad'] == 0) & 
         (mwm_full['spectrum_flags'] == 0) &
         (mwm_full['snr'] > 40) &
-        (mwm_full['sdss_id'] > 0)
+        (mwm_full['sdss_id'] > 0) &
+        (mwm_full['training_density'] > 3e9) & # Stone-Martinez et al. (2025) recommendation
+        (mwm_full['age'] > 0)
     ].copy()
     # drop duplicate SDSS-V IDs with the lowest SNR
     mwm_good.sort_values(['sdss_id', 'snr'], inplace=True, ascending=True)
@@ -51,7 +53,7 @@ def main():
         (mwm_good['fe_h'] > -999)
     ]
     mwm_good = mwm_good[
-        # (mwm_good['ce_h_flags'] == 0) &
+        (mwm_good['ce_h_flags'] == 0) &
         (mwm_good['mg_h_flags'] == 0) &
         (mwm_good['fe_h_flags'] == 0)
     ]
