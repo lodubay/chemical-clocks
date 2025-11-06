@@ -1,5 +1,5 @@
 % Define document class
-\documentclass[twocolumn,twocolappendix]{aastex631}
+\documentclass[twocolumn,twocolappendix]{aastex701}
 
 \usepackage{graphicx}
 \usepackage{xcolor}
@@ -9,21 +9,31 @@
 \newcommand{\osuaffil}{Department of Astronomy, The Ohio State University, 140 W. 18th Ave, Columbus OH 43210, USA}
 \newcommand{\ccappaffil}{Center for Cosmology and AstroParticle Physics, The Ohio State University, 191 W. Woodruff Ave., Columbus OH 43210, USA}
 
-\shorttitle{}
-\shortauthors{}
+\newcommand{\kpc}{\,{\rm kpc}}
+\newcommand{\Myr}{\,{\rm Myr}}
+\newcommand{\Gyr}{\,{\rm Gyr}}
+\newcommand{\dex}{\,{\rm dex}}
+\newcommand{\Msun}{\,{\rm M}_\odot}
+\newcommand{\kms}{\,{\rm km}\,{\rm s}^{-1}}
+
+\shorttitle{What Makes the $[s/\alpha]$ Chemical Clock Tick?}
+\shortauthors{Dubay et al.}
 
 \begin{document}
 
 % Title
-\title{}
+\title{What Makes the $[s/\alpha]$ Chemical Clock Tick?}
+
+\correspondingauthor{Liam Dubay}
 
 % Author list
 \author[0000-0003-3781-0747]{Liam O.\ Dubay}
 \affiliation{\osuaffil}
 \affiliation{\ccappaffil}
-
-\correspondingauthor{}
+\email{dubay.11@osu.edu}
+\author{co-authors}
 \email{}
+\affiliation{}
 
 \begin{abstract}
     Abstract.
@@ -31,6 +41,79 @@
 
 \section{Introduction}
 \label{sec:introduction}
+
+\begin{itemize}
+    \item $[s/\alpha]$ correlates strongly with stellar age for a number of $s$-process elements \citep{casali_tracing_2025}.
+    \item The [$s/\alpha$]--age relation may vary by region in the Galaxy \citep{ratcliffe_chemical_2024}, complicating its usefulness as an age indicator.
+    \item The [$s/\alpha$]--age correlation is not theoretically justified---GCE models don't predict that the youngest stars have the highest [$s/\alpha$] \citep[e.g.,][]{grisoni_modelling_2020}.
+\end{itemize}
+
+Literature notes
+\begin{itemize}
+    \item \citet{edvardsson_chemical_1993} report a strong correlation between [Ba/H] and isochronal age.
+    \item \citet{bensby_tracing_2007} find that [Ba/Fe] steadily increases over time for $\lesssim5\Gyr$ old thin disk stars (isochronal ages). They hypothesize that the flat trend with age for older stars is due to the $r$-process contribution.
+    \item \citet{nissen_high-precision_2015} finds a tight correlation between [Y/Mg] and isochronal age for Solar twins (similar $\log g$, $T_{\rm eff}$, and [Fe/H]), and proposes its use as a chronometer.
+    \item \citet{slumstrup_ymg_2017} find the [Y/Mg] relation holds for Solar-metallicity RC stars in four open clusters.
+    \item \citet{feltzing_metallicity_2017} investigate the metallicity dependence of the [Y/Mg]--age correlation using abundances and isochronal ages from \citet{bensby_exploring_2014}. They find a strong dependence on metallicity, with stars at [Fe/H]$\approx-0.5$ showing a flat trend with age. They argue that this is due to the metallicity dependence of the Y yield: stars near Solar metallicity produce lots of first-peak elements (e.g., Sr, Y), while lower-metallicity stars instead produce more second-peak elements (e.g., Ba, La, Ce?).
+\end{itemize}
+
+Paper goals
+\begin{itemize}
+    \item Quantify the age--[$s/\alpha$] relation as a function of metallicity and Galactic position using SDSS-V. Is the relation universal or does it depend on other factors?
+    \item Can GCE models match the age--[$s/\alpha$] relation? How much do we need to break yield predictions or enrichment timescales to do so?
+\end{itemize}
+
+\section{Observational Data}
+\label{sec:data}
+
+\subsection{Do we trust the Ce abundances?}
+
+Ce lines in APOGEE reported by \citet{cunha_adding_2017}.
+
+\begin{itemize}
+    \item Check the spectra for high-[Mg/H] and low-[Ce/Mg] stars.
+    \item Compare halo abundances to dwarf galaxies in APOGEE.
+\end{itemize}
+
+\section{Results}
+\label{sec:results}
+
+\begin{itemize}
+    \item Compare [Ce/Mg]--age trends in different regions of the Galaxy.
+    \item Control trends for metallicity or [Mg/H].
+    \item Control for high- and low-$\alpha$.
+    \item Plot [Ce/Mg] vs kinematics
+    \item Compare [Ce/Mg]--age relation in SDSS-V to APOKASC-3 and APO-K2.
+    \item Compare SDSS-V trends to \citet{casali_tracing_2025} trends.
+    \item Can low-metallicity Ce abundances constrain [Ce/Mg] ``plateau'' (if it exists at all)?
+\end{itemize}
+
+\section{Chemical Evolution Models}
+\label{sec:gce}
+
+Run the following multi-zone models (all with inside-out SFH and Gaussian migration scheme):
+
+\begin{itemize}
+    \item AGB yields only, at multiple scales. Show that AGB alone cannot match either the abundance distributions or the age relation.
+    \item AGB + prompt $r$-process, using the CCSN channel. This is comparable to the \citet{grisoni_modelling_2020} models, which assume a 1 Myr delay time for all NSM. Show this does not fix the problem with the age relation.
+    \item A model including a delayed NSM contribution. Hack this together using two GCE models, one of which uses the SN Ia channel for pseudo-NSM Ce enrichment, the other uses SN Ia for Fe production. Show the DTD timescale that's required to get the age relation to look like the data.
+    \item Similar to above, but with radial migration cranked to 11. Does radial migration contribute to some or all of the age trend?
+\end{itemize}
+
+Additionally, using the best GCE model:
+
+\begin{itemize}
+    \item Predict age--abundance trends for $s$- and $r$-process elements not in SDSS-V.
+\end{itemize}
+
+\section{Conclusions}
+\label{sec:conclusions}
+
+\begin{itemize}
+    \item Is [Ce/Mg] a true chemical clock?
+    \item What does Ce tell us about the story of the formation of the Milky Way?
+    \item (GCE modeling) What is the story of Ce itself? What does it say about the yields?
+\end{itemize}
 
 \section*{Acknowledgements}
 
@@ -45,5 +128,6 @@ We would like to acknowledge the land that The Ohio State University occupies is
 \label{app:reproducibility}
 
 \bibliography{references}
+\bibliographystyle{aasjournalv7}
 
 \end{document}
