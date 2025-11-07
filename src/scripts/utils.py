@@ -218,3 +218,15 @@ def get_color_list(cmap, bins):
     rmin, rmax = bins[0], bins[-2]
     colors = cmap([(r-rmin)/(rmax-rmin) for r in bins[:-1]])
     return colors
+
+
+def latex_float(f):
+    """
+    Convert exponential float to LaTeX string.
+    """
+    float_str = '{0:.2g}'.format(f)
+    if 'e' in float_str:
+        base, exponent = float_str.split('e')
+        return r'${0} \times 10^{{{1}}}$'.format(base, int(exponent))
+    else:
+        return float_str
