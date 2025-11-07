@@ -208,7 +208,7 @@ def constant(time):
 
 def lateburst(time):
     amplitude = 2
-    mean = 10
+    mean = 8
     std = 1
     gauss = amplitude * np.exp(-(time - mean)**2 / (2 * std**2))
     return expfall(time) * (1 + gauss)
