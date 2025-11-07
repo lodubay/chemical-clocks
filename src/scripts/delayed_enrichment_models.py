@@ -5,9 +5,10 @@ Plot [Ce/Mg] evolution predicted by one-zone models with delayed Ce enrichment.
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import vice
 
-from agb_enrichment_models import normalize, expfall
+from agb_enrichment_models import normalize, expfall, exprise, constant, lateburst
 from utils import alpha_cut, amplified_agb, latex_float
 from colormaps import paultol
 import paths
@@ -18,6 +19,7 @@ AGB_STUDY = 'cristallo11'
 AGB_YIELD_SCALE = 1
 CCSN_CE_YIELD = 0
 DELAYED_CE_YIELD = 1e-8
+DELAYED_CE_TIMESCALE = 5
 
 
 def main(style='paper'):
@@ -43,7 +45,7 @@ def main(style='paper'):
 
     figwidth = _globals.ONE_COLUMN_WIDTH
     fig, axs = plt.subplots(
-        2, figsize=(figwidth, 1.33 * figwidth), 
+        4, figsize=(figwidth, 2.67 * figwidth), 
         sharex=True, sharey=True,
         gridspec_kw={'hspace': 0.}
     )
@@ -112,11 +114,11 @@ def main(style='paper'):
         name = f'3p-delayed-ce{int(yld*1e9)}'
         sz = vice.singlezone(
             name=str(output_dir / name),
-            tau_ia=1,
+            tau_ia=DELAYED_CE_TIMESCALE,
             **model_kwargs
         )
         sz.run(simtime, overwrite=True)
-        hist = vice.history(str(paths.data/output_dir/name))
+        hist = vice.history(str(output_dir/name))
         axs[0].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
         axs[0].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
                     color=colors[i], label=latex_float(yld)
@@ -129,6 +131,7 @@ def main(style='paper'):
 
     # Different delayed enrichment timescales
     tau_ce_list = [1, 2, 5, 10]
+    colors = [paultol.bright.colors[c] for c in [3, 2, 0, 1]]
     vice.yields.sneia.settings['ce'] = DELAYED_CE_YIELD
     for i, tau_ce in enumerate(tau_ce_list):
         name = f'3p-delayed-tau{tau_ce}'
@@ -138,16 +141,68 @@ def main(style='paper'):
             **model_kwargs
         )
         sz.run(simtime, overwrite=True)
-        hist = vice.history(str(paths.data/output_dir/name))
+        hist = vice.history(str(output_dir/name))
         axs[1].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
         axs[1].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
-                    label='%s Gyr' % tau_ce
+                    color=colors[i], label='%s Gyr' % tau_ce
         )
     axs[1].legend(
         title=r'$\tau_{\rm NSM}$', 
         loc='upper left', 
         bbox_to_anchor=(1, 1)
     )
+
+    # Different outflow mass-loading factors
+    eta_list = [5, 2.5, 1, 0]
+    colors = [paultol.bright.colors[c] for c in [1, 0, 2, 3]]
+    for i, eta in enumerate(eta_list):
+        name = f'3p-eta{eta}'
+        model_kwargs['eta'] = eta
+        sz = vice.singlezone(
+            name=str(output_dir / name),
+            tau_ia=DELAYED_CE_TIMESCALE,
+            **model_kwargs
+        )
+        sz.run(simtime, overwrite=True)
+        hist = vice.history(str(output_dir/name))
+        axs[2].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
+        axs[2].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
+                    color=colors[i], label=eta)
+    axs[2].legend(title=r'$\eta$', loc='upper left', bbox_to_anchor=(1, 1))
+
+    # inset SFR plot
+    axins = inset_axes(
+        axs[3], width='100%', height='100%',
+        loc='lower left',
+        bbox_to_anchor=(1.13, 0, 0.33, 0.33),
+        bbox_transform=axs[3].transAxes,
+        borderpad=0,
+    )
+    axins.set_xlabel('Age [Gyr]')
+    axins.set_title('SFR')
+    # Different SFHs
+    funcs = [exprise, constant, expfall, lateburst]
+    names = ['exprise', 'constant', 'expfall', 'lateburst']
+    labels = ['Rising', 'Constant', 'Falling', 'Burst']
+    colors = [paultol.bright.colors[c] for c in [1, 2, 0, 3]]
+    model_kwargs['eta'] = 2.5
+    for i, name in enumerate(names):
+        fullname = f'3p-{name}'
+        model_kwargs['func'] = normalize(funcs[i])
+        sz = vice.singlezone(
+            name=str(output_dir / fullname),
+            tau_ia=DELAYED_CE_TIMESCALE,
+            **model_kwargs
+        )
+        sz.run(simtime, overwrite=True)
+        hist = vice.history(str(output_dir/fullname))
+        axs[3].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
+        axs[3].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
+                    color=colors[i], label=labels[i])
+        axins.plot(hist['lookback'], hist['sfr'], color=colors[i])
+    axs[3].legend(title='SFH', loc='upper left', bbox_to_anchor=(1, 1))
+    axins.set_xlim((0, 12))
+    axins.set_ylim((0, 0.2))
 
     axs[0].set_xlim((0, 12))
     axs[0].set_ylim((-1, 1))
