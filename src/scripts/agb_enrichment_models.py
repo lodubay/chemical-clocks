@@ -15,7 +15,7 @@ import _globals
 
 SFH_TIMESCALE = 15
 AGB_STUDY = 'karakas16'
-CCSN_CE_YIELD = 2e-9
+CCSN_CE_YIELD = 3e-9
 
 
 def main(style='paper'):
