@@ -30,8 +30,8 @@ def alpha_cut(feh):
     """
     return np.where(
         feh >= 0.0,
-        0.1,
-        0.1 - 0.13*feh
+        0.09,
+        0.09 - 0.13*feh
     )
 
 
@@ -134,7 +134,7 @@ def box_smooth(hist, bins, width):
     return hist_smooth
 
 
-def sample_rows(df, n, weights=None, reset=True, seed=RANDOM_SEED):
+def sample_rows(df, n, weights=None, reset=False, seed=RANDOM_SEED):
     """
     Randomly sample n unique rows from a pandas DataFrame.
 
@@ -168,41 +168,57 @@ def sample_rows(df, n, weights=None, reset=True, seed=RANDOM_SEED):
         raise TypeError('Expected pandas DataFrame.')
     
     
-def binned_medians(data, col, bin_col, bins=50):
-    """
-    Calculate median trends in bins of a second parameter.
-    
-    Parameters
-    ----------
-    col : str
-        Data column corresponding to the first parameter, for which the
-        intervals will be calculated in each bin.
-    bin_col : str
-        Data column corresponding to the second (binning) parameter.
-    bins : int, optional
-        The number of equal-size bins to divide the data along bin_col.
-        The default is 50.
-    
-    Returns
-    -------
-    bin_centers : numpy.ndarray
-        Center of each bin in bin_col.
-    medians : numpy.ndarray
-        Median values of col in each bin.
-    """
-    data = data.dropna(subset=col)
-    bin_edges = np.linspace(data[bin_col].min(), data[bin_col].max(), bins+1)
-    bin_centers = get_bin_centers(bin_edges)
-    grouped = data.groupby(pd.cut(data[bin_col], bin_edges), observed=False)[col]
-    return bin_centers, grouped.median().to_numpy()
-    
-    
-def binned_quantiles(data, col, bin_col, bins=50, q=50):
+def binned_quantiles(data, col, bin_col, q=0.5, bins=50, bin_edges=[], min_count=0):
     """
     Calculate percentile trends in bins of a second parameter.
     
     Parameters
     ----------
+    data : pandas.DataFrame
+        DataFrame with at least two columns.
+    col : str
+        Data column corresponding to the first parameter, for which the
+        intervals will be calculated in each bin.
+    bin_col : str
+        Data column corresponding to the second (binning) parameter.
+    q : float, optional
+        The quantile to calculate, 0 <= q <= 1.
+    bins : int, optional
+        The number of equal-size bins to divide the data along bin_col.
+        The default is 50.
+    bin_edges : array-like, optional
+        Edges of bins for calculating the quantile. Will override the value
+        of bins if provided.
+    min_count : int, optional [default: 0]
+        Minimum data count required to calculate a quantile. If there are fewer
+        points in that bin, the quantile will be NaN.
+    
+    Returns
+    -------
+    bin_centers : numpy.ndarray
+        Center of each bin in bin_col.
+    quantiles : numpy.ndarray
+        Quantile values of col in each bin.
+    """
+    data = data.dropna(subset=col)
+    if len(bin_edges) == 0:
+        bin_edges = np.linspace(data[bin_col].min(), data[bin_col].max(), bins+1)
+    bin_centers = get_bin_centers(bin_edges)
+    grouped = data.groupby(pd.cut(data[bin_col], bin_edges), observed=False)[col]
+    counts = grouped.count().values
+    quantile = grouped.quantile(q).values
+    nans = np.nan * np.ones(counts.shape)
+    return bin_centers, np.where(counts > min_count, quantile, nans)
+    
+    
+def binned_medians(data, col, bin_col, bins=50, bin_edges=[], min_count=0):
+    """
+    Calculate median trends in bins of a second parameter.
+    
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        DataFrame with at least two columns.
     col : str
         Data column corresponding to the first parameter, for which the
         intervals will be calculated in each bin.
@@ -211,8 +227,12 @@ def binned_quantiles(data, col, bin_col, bins=50, q=50):
     bins : int, optional
         The number of equal-size bins to divide the data along bin_col.
         The default is 50.
-    q : float, optional
-        The quantile to calculate, 0 <= q <= 1.
+    bin_edges : array-like, optional
+        Edges of bins for calculating the quantile. Will override the value
+        of bins if provided.
+    min_count : int, optional [default: 0]
+        Minimum data count required to calculate a quantile. If there are fewer
+        points in that bin, the quantile will be NaN.
     
     Returns
     -------
@@ -221,11 +241,10 @@ def binned_quantiles(data, col, bin_col, bins=50, q=50):
     medians : numpy.ndarray
         Median values of col in each bin.
     """
-    data = data.dropna(subset=col)
-    bin_edges = np.linspace(data[bin_col].min(), data[bin_col].max(), bins+1)
-    bin_centers = get_bin_centers(bin_edges)
-    grouped = data.groupby(pd.cut(data[bin_col], bin_edges), observed=False)[col]
-    return bin_centers, grouped.quantile(q).to_numpy()
+    return binned_quantiles(
+        data, col, bin_col, 
+        q=0.5, bins=bins, bin_edges=bin_edges, min_count=min_count
+    )
 
 # =============================================================================
 # PLOTTING FUNCTIONS
