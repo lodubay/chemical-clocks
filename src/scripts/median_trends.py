@@ -79,6 +79,13 @@ def main(style='paper'):
                     ), 
                     '.-', color=high_alpha_color, label=r'High-$\alpha$'
                 )
+    # Indicate median abundance errors
+    axs[0,0].errorbar(
+        0.5, -0.5, 
+        xerr=mwm_rgb['e_mg_h'].median(), 
+        yerr=mwm_rgb['e_ce_mg'].median(), 
+        c='gray', capsize=0, elinewidth=0.5,
+    )
 
     # Format axes
     axs[0,0].set_xlim((-0.8, 0.8))

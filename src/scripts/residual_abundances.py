@@ -132,6 +132,16 @@ def main(style='paper'):
                 *local_age_medians, linestyle='--', color=low_alpha_color,
                 # label='Solar neighborhood'
             )
+    # Indicate median abundance errors
+    age_err_low = np.median(mwm_rgb['age'] - mwm_rgb['e_n_age'])
+    age_err_high = np.median(mwm_rgb['e_p_age'] - mwm_rgb['age'])
+    med_abund_err = mwm_rgb['e_ce_h'].median()
+    axs[0,0].errorbar(
+        3, -0.4, 
+        xerr=[[age_err_low], [age_err_high]], 
+        yerr=med_abund_err, 
+        c='gray', capsize=0, elinewidth=0.5,
+    )
 
     # Format axes
     axs[0,0].set_xlim((0, 12))
