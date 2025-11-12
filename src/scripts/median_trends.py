@@ -24,6 +24,21 @@ def main(style='paper'):
     # Divide by low/high alpha
     mwm_rgb['low_alpha'] = mwm_rgb['mg_fe'] < alpha_cut(mwm_rgb['fe_h']) - ALPHA_BUFFER
     mwm_rgb['high_alpha'] = mwm_rgb['mg_fe'] > alpha_cut(mwm_rgb['fe_h']) + ALPHA_BUFFER
+    # Local sample for comparison
+    local_sample = mwm_rgb[
+        (mwm_rgb['Rg'] >= 7) &
+        (mwm_rgb['Rg'] < 9) &
+        (mwm_rgb['z_max'] < 0.5)
+    ]
+    mg_bin_edges = np.arange(-0.75, 0.76, 0.1)
+    local_low_alpha_medians = binned_quantiles(
+        local_sample[local_sample['low_alpha']], 'ce_mg', 'mg_h', 
+        q=0.5, bin_edges=mg_bin_edges, min_count=10
+    )
+    local_high_alpha_medians = binned_quantiles(
+        local_sample[local_sample['high_alpha']], 'ce_mg', 'mg_h', 
+        q=0.5, bin_edges=mg_bin_edges, min_count=10
+    )
 
     fig, axs = plt.subplots(
         len(ZBINS), len(RBINS),
@@ -34,7 +49,6 @@ def main(style='paper'):
     plt.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.95)
     # scatterplot style arguments
     kwargs = dict(s=1, marker='.', rasterized=True, edgecolor='none')
-    mg_bin_edges = np.arange(-0.75, 0.76, 0.1)
     high_alpha_color = paultol.highcontrast.colors[2]
     low_alpha_color = paultol.highcontrast.colors[0]
 
@@ -61,6 +75,15 @@ def main(style='paper'):
             ax.scatter(
                 high_alpha_sample['mg_h'], high_alpha_sample['ce_mg'], 
                 c=high_alpha_color, **kwargs
+            )
+            # Plot local trends for comparison
+            ax.plot(
+                *local_low_alpha_medians, 
+                linestyle='--', color=low_alpha_color,
+            )
+            ax.plot(
+                *local_high_alpha_medians, 
+                linestyle='--', color=high_alpha_color,
             )
             # Plot median trends
             if low_alpha.shape[0] >= 100:
