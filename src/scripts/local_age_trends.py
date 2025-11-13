@@ -11,6 +11,7 @@ from matplotlib.ticker import MultipleLocator
 from scipy import stats
 
 from _globals import ONE_COLUMN_WIDTH
+from utils import good_ages
 import paths
 
 MET_COL = 'm_h_atm' # Column with metallicity values
@@ -26,6 +27,7 @@ def main(style='paper'):
 
     # Data
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
+    mwm_rgb = good_ages(mwm_rgb).copy()
     local_sample = mwm_rgb[
         (mwm_rgb['Rg'] >= RLIM[0]) &
         (mwm_rgb['Rg'] < RLIM[1]) &

@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from scipy import stats
 
-from utils import get_bin_centers
+from utils import get_bin_centers, good_ages
 from _globals import TWO_COLUMN_WIDTH
 import paths
 
@@ -27,6 +27,7 @@ def main(style='paper'):
 
     # Import MWM sample
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
+    mwm_rgb = good_ages(mwm_rgb).copy()
     local_sample = mwm_rgb[
         (mwm_rgb['Rg'] >= 7) &
         (mwm_rgb['Rg'] < 9) &

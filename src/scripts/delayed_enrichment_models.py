@@ -9,7 +9,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import vice
 
 from agb_enrichment_models import normalize, expfall, exprise, constant, lateburst
-from utils import alpha_cut, amplified_agb, latex_float
+from utils import alpha_cut, amplified_agb, latex_float, good_ages
 from colormaps import paultol
 import paths
 import _globals
@@ -28,6 +28,7 @@ def main(style='paper'):
     
     # Select Solar neighborhood & Solar metallicity stars only
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
+    mwm_rgb = good_ages(mwm_rgb).copy()
     local_sample = mwm_rgb[
         (mwm_rgb['Rg'] >= 7.5) &
         (mwm_rgb['Rg'] < 8.5) &

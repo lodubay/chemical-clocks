@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
-from utils import alpha_cut, binned_quantiles, sample_rows
+from utils import alpha_cut, binned_quantiles, sample_rows, good_ages
 from _globals import TWO_COLUMN_WIDTH
 from colormaps import paultol
 import paths
@@ -21,6 +21,8 @@ def main(style='paper'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
+    # Select stars with good ages
+    mwm_rgb = good_ages(mwm_rgb).copy()
     # Divide by low/high alpha
     mwm_rgb['low_alpha'] = mwm_rgb['mg_fe'] < alpha_cut(mwm_rgb['fe_h']) - ALPHA_BUFFER
     mwm_rgb['high_alpha'] = mwm_rgb['mg_fe'] > alpha_cut(mwm_rgb['fe_h']) + ALPHA_BUFFER

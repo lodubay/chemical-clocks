@@ -14,6 +14,16 @@ from _globals import RANDOM_SEED
 # SCIENCE FUNCTIONS
 # =============================================================================
 
+def good_ages(df):
+    """
+    Perform quality cuts for good StarFlow ages.
+    """
+    return df[
+        (df['training_density'] > 3e9) & # Stone-Martinez et al. (2025) recommendation
+        (df['age'] > 0)
+    ]
+
+
 def alpha_cut(feh):
     """
     Dividing line between low- and high-alpha populations at a given [Fe/H].
