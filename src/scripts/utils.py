@@ -21,7 +21,7 @@ def good_ages(df):
     return df[
         (df['training_density'] > 3e9) & # Stone-Martinez et al. (2025) recommendation
         (df['age'] > 0)
-    ]
+    ].copy()
 
 
 def alpha_cut(feh):
