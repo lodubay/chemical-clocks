@@ -15,7 +15,8 @@ import paths
 RBINS = [(3, 5), (5, 7), (7, 9), (9, 11), (11, 13)] # left to right
 ZBINS = [(1, 2), (0.5, 1), (0, 0.5)] # top to bottom
 ALPHA_BUFFER = 0.02 # dex, buffer around the [Mg/Fe] dividing line
-SAMPLE_FRACTION = 0.25 # fraction of stars to plot in each panel
+SAMPLE_FRACTION = 0.2 # fraction of stars to plot in each panel
+SAMPLE_SIZE = 1000 # number of stars to plot in each panel, randomly selected
 
 def main(style='paper'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
@@ -75,7 +76,7 @@ def main(style='paper'):
     )
     plt.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.95)
     # scatterplot style arguments
-    kwargs = dict(s=1, marker='.', rasterized=True, edgecolor='none')
+    kwargs = dict(s=2, marker='.', rasterized=True, edgecolor='none')
     high_alpha_color = paultol.highcontrast.colors[2]
     low_alpha_color = paultol.highcontrast.colors[0]
 
@@ -94,7 +95,8 @@ def main(style='paper'):
             # Select random sample of stars for scatter plot (good ages only)
             sample = sample_rows(
                 good_ages(subset), 
-                int(SAMPLE_FRACTION * subset.shape[0])
+                # int(SAMPLE_FRACTION * subset.shape[0])
+                SAMPLE_SIZE
             )
             low_alpha_sample = sample[sample['low_alpha']]
             high_alpha_sample = sample[sample['high_alpha']]
