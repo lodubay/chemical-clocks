@@ -163,9 +163,10 @@ def main(style='paper'):
             # Horizontal line for reference
             ax.plot([0, 12], [0, 0], linestyle=':', color='gray', zorder=0)
     # Indicate median abundance errors
-    age_err_low = np.median(mwm_rgb['age'] - mwm_rgb['e_n_age'])
-    age_err_high = np.median(mwm_rgb['e_p_age'] - mwm_rgb['age'])
-    med_abund_err = mwm_rgb['e_ce_h'].median()
+    mwm_rgb_ages = good_ages(mwm_rgb)
+    age_err_low = np.median(mwm_rgb_ages['age'] - mwm_rgb_ages['e_n_age'])
+    age_err_high = np.median(mwm_rgb_ages['e_p_age'] - mwm_rgb_ages['age'])
+    med_abund_err = mwm_rgb_ages['e_ce_h'].median()
     axs[0,0].errorbar(
         3, -0.4, 
         xerr=[[age_err_low], [age_err_high]], 
