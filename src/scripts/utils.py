@@ -24,6 +24,28 @@ def good_ages(df):
     ].copy()
 
 
+def apply_alpha_cut(df, buffer=0.02):
+    """
+    Divide sample into high- and low-alpha populations.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        DataFrame with MWM sample.
+    buffer : float [default: 0.02]
+        Buffer in [Mg/Fe] between the dividing line and the start of the 
+        high- or low-alpha populations.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Same dataframe with two new boolean columns, 'high_alpha' and 'low_alpha'.
+    """
+    df['low_alpha'] = df['mg_fe'] < alpha_cut(df['fe_h']) - buffer
+    df['high_alpha'] = df['mg_fe'] > alpha_cut(df['fe_h']) + buffer
+    return df
+
+
 def alpha_cut(feh):
     """
     Dividing line between low- and high-alpha populations at a given [Fe/H].
