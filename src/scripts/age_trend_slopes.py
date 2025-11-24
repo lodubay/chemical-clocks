@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from scipy import stats
 
-from utils import get_bin_centers, good_ages
+from utils import get_bin_centers, good_ages, apply_alpha_cut
 from _globals import TWO_COLUMN_WIDTH
 import paths
 
@@ -28,10 +28,12 @@ def main(style='paper'):
     # Import MWM sample
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
     mwm_rgb = good_ages(mwm_rgb).copy()
+    mwm_rgb = apply_alpha_cut(mwm_rgb)
     local_sample = mwm_rgb[
         (mwm_rgb['Rg'] >= 7) &
         (mwm_rgb['Rg'] < 9) &
-        (mwm_rgb['z_max'] < 0.5)
+        (mwm_rgb['z_max'] < 0.5) &
+        (mwm_rgb['low_alpha']) # restrict age trends to low-alpha only
     ]
     local_fits, local_mets = fit_metallicity_bins(local_sample, met_bin_edges)
     local_slopes = [f.slope for f in local_fits]
@@ -55,7 +57,8 @@ def main(style='paper'):
                 (mwm_rgb['Rg'] >= rlim[0]) &
                 (mwm_rgb['Rg'] < rlim[1]) &
                 (mwm_rgb['z_max'] >= zlim[0]) &
-                (mwm_rgb['z_max'] < zlim[1])
+                (mwm_rgb['z_max'] < zlim[1]) &
+                (mwm_rgb['low_alpha']) # restrict age trends to low-alpha only
             ]
             # Bin by metallicity and fit linear trend to stars
             region_fits, mets = fit_metallicity_bins(region, met_bin_edges)
@@ -69,10 +72,12 @@ def main(style='paper'):
             )
             # Plot Solar neighborhood fits for comparison
             ax.plot(local_mets, local_slopes, 'k-')
+            # Dotted horizontal line
+            ax.axhline(0, ls=':', c='gray')
 
     # Format axes
     axs[0,0].set_xlim((-0.9, 0.6))
-    axs[0,0].set_ylim((-0.12, 0.12))
+    axs[0,0].set_ylim((-0.11, 0.09))
     axs[0,0].xaxis.set_major_locator(MultipleLocator(0.5))
     axs[0,0].xaxis.set_minor_locator(MultipleLocator(0.1))
     axs[0,0].yaxis.set_major_locator(MultipleLocator(0.05))

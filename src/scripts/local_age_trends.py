@@ -11,7 +11,7 @@ from matplotlib.ticker import MultipleLocator
 from scipy import stats
 
 from _globals import ONE_COLUMN_WIDTH
-from utils import good_ages
+from utils import good_ages, apply_alpha_cut
 import paths
 
 MET_COL = 'm_h_atm' # Column with metallicity values
@@ -28,11 +28,13 @@ def main(style='paper'):
     # Data
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
     mwm_rgb = good_ages(mwm_rgb).copy()
+    mwm_rgb = apply_alpha_cut(mwm_rgb)
     local_sample = mwm_rgb[
         (mwm_rgb['Rg'] >= RLIM[0]) &
         (mwm_rgb['Rg'] < RLIM[1]) &
         (mwm_rgb['z_max'] >= ZLIM[0]) &
-        (mwm_rgb['z_max'] < ZLIM[1])
+        (mwm_rgb['z_max'] < ZLIM[1]) &
+        (mwm_rgb['low_alpha']) # restrict age trends to low-alpha stars only
     ]
 
     # Metallicity bins
