@@ -5,10 +5,11 @@ Plot [Ce/Mg] evolution predicted by one-zone GCE models with varying parameters.
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import vice
 
-from utils import alpha_cut, amplified_agb, good_ages
+from utils import alpha_cut, amplified_agb, good_ages, binned_quantiles, get_bin_centers
 from colormaps import paultol
 import paths
 import _globals
@@ -40,6 +41,20 @@ def main(style='paper'):
         local_sample['mg_fe'] < alpha_cut(local_sample['fe_h'])
     ]
 
+    # Median errors in bins of stellar age
+    local_sample['age_err_low'] = local_sample['age'] - local_sample['e_n_age']
+    local_sample['age_err_high'] = local_sample['e_p_age'] - local_sample['age']
+    big_age_bins = np.arange(0, 15, 4)
+    _, med_age_err_low = binned_quantiles(
+        local_sample, 'age_err_low', 'age', bin_edges=big_age_bins, q=0.5
+    )
+    _, med_age_err_high = binned_quantiles(
+        local_sample, 'age_err_high', 'age', bin_edges=big_age_bins, q=0.5
+    )
+    _, med_abund_err = binned_quantiles(
+        local_sample, 'e_ce_mg', 'age', bin_edges=big_age_bins, q=0.5
+    )
+
     figwidth = _globals.ONE_COLUMN_WIDTH
     fig, axs = plt.subplots(
         3, figsize=(figwidth, 2 * figwidth), 
@@ -66,16 +81,13 @@ def main(style='paper'):
             local_high_alpha['age'], local_high_alpha['ce_mg'],
             facecolors='w', **scatter_kwargs
         )
-
         # median errors
-        age_err_low = np.median(local_sample['age'] - local_sample['e_n_age'])
-        age_err_high = np.median(local_sample['e_p_age'] - local_sample['age'])
-        med_abund_err = local_sample['e_ce_mg'].median()
+        xarr_err = get_bin_centers(big_age_bins)
         ax.errorbar(
-            10, 0.8, 
-            xerr=[[age_err_low], [age_err_high]], 
+            xarr_err, -0.8 * np.ones(xarr_err.shape), 
+            xerr=[med_age_err_low, med_age_err_high], 
             yerr=med_abund_err, 
-            c=datacolor, capsize=0,
+            c=datacolor, capsize=0, linestyle='none'
         )
 
     # Plot onezone models
@@ -165,6 +177,10 @@ def main(style='paper'):
 
     axs[0].set_xlim((0, 12))
     axs[0].set_ylim((-1, 1))
+    axs[0].xaxis.set_major_locator(MultipleLocator(5))
+    axs[0].xaxis.set_minor_locator(MultipleLocator(1))
+    axs[0].yaxis.set_major_locator(MultipleLocator(0.5))
+    axs[0].yaxis.set_minor_locator(MultipleLocator(0.1))
 
     titles = ['(a)', '(b)', '(c)']
     for i, ax in enumerate(axs):
