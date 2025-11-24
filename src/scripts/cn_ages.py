@@ -37,7 +37,7 @@ def main(style='paper'):
     axs[0,1].plot(log_lim, log_lim, 'r-')
     axs[1,1].plot(log_lim, [0, 0], 'r-')
     # Median trends
-    linear_bin_edges = np.arange(0, 13, 1)
+    linear_bin_edges = np.arange(0, 12.5, 0.5)
     linear_bin_centers = get_bin_centers(linear_bin_edges)
     _, linear_cn_medians = binned_quantiles(
         mwm_rgb, 'cn_age', 'age', bin_edges=linear_bin_edges, q=0.5
