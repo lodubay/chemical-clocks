@@ -32,6 +32,9 @@ def main():
     mwm_full = mwm_full.join(
         starflow[['age', 'e_p_age', 'e_n_age', 'training_density', 'BITMASK']]
     )
+    # Fix datatype for contamination & confusion flag
+    # mwm_full['cc_flg'] = mwm_full['cc_flg'].astype('str')
+    # print(mwm_full['cc_flg'])
     # Quality cuts
     print('Implementing quality cuts...')
     mwm_good = mwm_full[
@@ -84,7 +87,7 @@ def main():
     # mwm_good['galpy_Lz'] = Lz
     # Red giants only
     mwm_rgb = mwm_good[
-        (mwm_good['logg'] > 1.0) & (mwm_good['logg'] < 3.7) &
+        (mwm_good['logg'] > 1.0) & (mwm_good['logg'] < 3.5) &
         (mwm_good['teff'] < 5500) & (mwm_good['teff'] > 3500)
     ].copy()
 
