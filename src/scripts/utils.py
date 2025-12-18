@@ -5,6 +5,7 @@ Utility functions and classes for many scripts.
 import numpy as np
 from numpy.random import default_rng
 import pandas as pd
+import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from astropy.table import Table
 import vice
@@ -338,3 +339,42 @@ def latex_float(f):
         return r'${0} \times 10^{{{1}}}$'.format(base, int(exponent))
     else:
         return float_str
+    
+
+def insert_colorbar_axes(fig, orientation='vertical', width=0.02, pad=0.01):
+    """
+    Insert a new Axes object for a colorbar in a multi-panel figure.
+
+    Parameters
+    ----------
+    fig : matplotlib.figure.Figure instance
+        Figure to add the colorbar to.
+    orientation : str, optional [default: 'vertical']
+        Orientation for the colorbar. If 'vertical', space will be taken from
+        the right side of the figure. If 'horizontal', space will be taken
+        from the bottom.
+    width : float, optional [default: 0.02]
+        Width of the colorbar as a fraction of the total figure width.
+    pad : float, optional [default: 0.01]
+        Padding between existing axes and colorbar.
+
+    Returns
+    -------
+    cax : matplotlib.axes.Axes instance
+        New Axes object for colorbar.
+    """
+    if orientation == 'horizontal':
+        # Define colorbar axis
+        height = fig.subplotpars.right - fig.subplotpars.left
+        cax = plt.axes([fig.subplotpars.left, fig.subplotpars.bottom, 
+                        height, width])
+        # Adjust subplots
+        plt.subplots_adjust(bottom=fig.subplotpars.bottom + (width + pad + 0.03))
+    else:
+        # Adjust subplots
+        plt.subplots_adjust(right=fig.subplotpars.right - (width + pad + 0.03))
+        # Define colorbar axis
+        height = fig.subplotpars.top - fig.subplotpars.bottom
+        cax = plt.axes([fig.subplotpars.right + pad, fig.subplotpars.bottom, 
+                        width, height])
+    return cax
