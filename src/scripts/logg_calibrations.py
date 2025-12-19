@@ -17,7 +17,7 @@ from _globals import ONE_COLUMN_WIDTH
 
 AXES_LIM = {
     'mg_h': (-0.8, 0.5),
-    'ce_mg': (-0.7, 0.7),
+    'ce_mg': (-0.8, 0.8),
     'fe_mg': (-0.4, 0.2)
 }
 
