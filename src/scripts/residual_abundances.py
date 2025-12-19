@@ -196,8 +196,9 @@ def main(style='paper'):
     # Text-only lengend
     leg = axs[0,0].legend(
         loc='upper left', handlelength=0, handletextpad=0,
-        markerscale=0, edgecolor='none',
     )
+    for line in leg.get_lines():
+        line.set_visible(False)
     # Color-code legend text
     for line, text in zip(leg.get_lines(), leg.get_texts()):
         text.set_color(line.get_color())
