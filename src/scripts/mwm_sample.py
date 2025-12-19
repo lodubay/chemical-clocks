@@ -367,7 +367,7 @@ def logg_calibrations(df):
     df['fe_mg_corr'] = df['fe_h_corr'] - df['mg_h']
     df['mg_fe_corr'] = df['mg_h'] - df['fe_h_corr']
     df['ce_mg_corr'] = df['ce_h_corr'] - df['mg_h']
-    df['ce_fe_corr'] = df['ce_h_corr'] = df['fe_h_corr']
+    df['ce_fe_corr'] = df['ce_h_corr'] - df['fe_h_corr']
     return df
 
 
