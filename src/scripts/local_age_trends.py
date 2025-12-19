@@ -48,7 +48,7 @@ def main(style='paper'):
     norm = BoundaryNorm(met_bins, cmap.N, extend='both')
 
     pc = ax.scatter(
-        local_sample['age'], local_sample['ce_mg'], c=local_sample[MET_COL], 
+        local_sample['age'], local_sample['ce_mg_corr'], c=local_sample[MET_COL], 
         cmap=cmap, norm=norm,
         s=1, marker='.', rasterized=True, edgecolor='none'
     )
@@ -67,7 +67,7 @@ def main(style='paper'):
             (local_sample['age'] < AGE_FIT_RANGE[1])
         ]
         # Fit linear age trend
-        regress = stats.linregress(subset['age'], subset['ce_mg'])
+        regress = stats.linregress(subset['age'], subset['ce_mg_corr'])
         fits.append(regress)
         # Plot linear regression
         yfit = age_arr * regress.slope + regress.intercept
@@ -101,7 +101,7 @@ def main(style='paper'):
     cbar.ax.yaxis.set_major_locator(MultipleLocator(0.1))
     cbar.ax.tick_params(axis='y', which='major', right=False)
     ax.set_xlabel('Age [Gyr]')
-    ax.set_ylabel('[Ce/Mg]')
+    ax.set_ylabel(r'[Ce/Mg]$_{\rm corr}$')
 
     plt.savefig(paths.figures / 'local_age_trends')
 

@@ -33,11 +33,11 @@ def main(style='paper'):
     ]
     mg_bin_edges = np.arange(-0.75, 0.76, 0.1)
     local_low_alpha_medians = binned_quantiles(
-        local_sample[local_sample['low_alpha']], 'ce_mg', 'mg_h', 
+        local_sample[local_sample['low_alpha']], 'ce_mg_corr', 'mg_h', 
         q=0.5, bin_edges=mg_bin_edges, min_count=10
     )
     local_high_alpha_medians = binned_quantiles(
-        local_sample[local_sample['high_alpha']], 'ce_mg', 'mg_h', 
+        local_sample[local_sample['high_alpha']], 'ce_mg_corr', 'mg_h', 
         q=0.5, bin_edges=mg_bin_edges, min_count=10
     )
 
@@ -70,12 +70,12 @@ def main(style='paper'):
             sample = sample_rows(subset, SAMPLE_SIZE)
             low_alpha_sample = sample[sample['low_alpha']]
             ax.scatter(
-                low_alpha_sample['mg_h'], low_alpha_sample['ce_mg'], 
+                low_alpha_sample['mg_h'], low_alpha_sample['ce_mg_corr'], 
                 c=low_alpha_color, **kwargs
             )
             high_alpha_sample = sample[sample['high_alpha']]
             ax.scatter(
-                high_alpha_sample['mg_h'], high_alpha_sample['ce_mg'], 
+                high_alpha_sample['mg_h'], high_alpha_sample['ce_mg_corr'], 
                 c=high_alpha_color, **kwargs
             )
             # Plot local trends for comparison
@@ -91,18 +91,18 @@ def main(style='paper'):
             if low_alpha.shape[0] >= 100:
                 ax.plot(
                     *binned_quantiles(
-                        low_alpha, 'ce_mg', 'mg_h', 
+                        low_alpha, 'ce_mg_corr', 'mg_h', 
                         q=0.5, bin_edges=mg_bin_edges, min_count=10
                     ), 
-                    '.-', color=low_alpha_color, label=r'Low-$\alpha$'
+                    '.-', color=low_alpha_color, label='High-Ia'
                 )
             if high_alpha.shape[0] >= 100:
                 ax.plot(
                     *binned_quantiles(
-                        high_alpha, 'ce_mg', 'mg_h', 
+                        high_alpha, 'ce_mg_corr', 'mg_h', 
                         q=0.5, bin_edges=mg_bin_edges, min_count=10
                     ), 
-                    '.-', color=high_alpha_color, label=r'High-$\alpha$'
+                    '.-', color=high_alpha_color, label='Low-Ia'
                 )
     # Indicate median abundance errors
     axs[0,0].errorbar(
@@ -124,7 +124,7 @@ def main(style='paper'):
     for i, ax in enumerate(axs[0,:]):
         ax.set_title(r'$%s\leq R_{\rm guide}<%s$ kpc' % RBINS[i], fontsize=8)
     for ax in axs[:,0]:
-        ax.set_ylabel('[Ce/Mg]')
+        ax.set_ylabel(r'[Ce/Mg]$_{\rm corr}$')
     for i, ax in enumerate(axs[:,-1]):
         ax.yaxis.set_label_position('right')
         ax.set_ylabel(

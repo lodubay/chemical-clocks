@@ -63,11 +63,11 @@ def main(style='paper'):
     )
     for ax in axs:
         ax.scatter(
-            local_low_alpha['age'], local_low_alpha['ce_mg'],
+            local_low_alpha['age'], local_low_alpha['ce_mg_corr'],
             **scatter_kwargs
         )
         ax.scatter(
-            local_high_alpha['age'], local_high_alpha['ce_mg'],
+            local_high_alpha['age'], local_high_alpha['ce_mg_corr'],
             facecolors='w', **scatter_kwargs
         )
         # median errors
@@ -209,7 +209,7 @@ def main(style='paper'):
     axs[0].set_ylim((-1, 1))
 
     for ax in axs:
-        ax.set_ylabel('[Ce/Mg]')
+        ax.set_ylabel(r'[Ce/Mg]$_{\rm corr}$')
     axs[-1].set_xlabel('Age [Gyr]')
 
     fig.savefig(paths.figures / 'delayed_enrichment_models')

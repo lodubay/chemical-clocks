@@ -33,18 +33,18 @@ def main(style='paper'):
     local_high_alpha = mwm_rgb_local[mwm_rgb_local['high_alpha']].copy()
     # Calculate median trend with [Mg/H]
     local_low_alpha_medians = binned_quantiles(
-        local_low_alpha, 'ce_h', 'mg_h', 
+        local_low_alpha, 'ce_h_corr', 'mg_h', 
         q=0.5, bin_edges=mg_bin_edges, min_count=10
     )
     local_high_alpha_medians = binned_quantiles(
-        local_high_alpha, 'ce_h', 'mg_h', 
+        local_high_alpha, 'ce_h_corr', 'mg_h', 
         q=0.5, bin_edges=mg_bin_edges, min_count=10
     )
     # Calculate residual Ce abundance
-    local_low_alpha['delta_ce_h'] = local_low_alpha['ce_h'] - np.interp(
+    local_low_alpha['delta_ce_h'] = local_low_alpha['ce_h_corr'] - np.interp(
         local_low_alpha['mg_h'], *local_low_alpha_medians
     )
-    local_high_alpha['delta_ce_h'] = local_high_alpha['ce_h'] - np.interp(
+    local_high_alpha['delta_ce_h'] = local_high_alpha['ce_h_corr'] - np.interp(
         local_high_alpha['mg_h'], *local_high_alpha_medians
     )
 
@@ -71,20 +71,20 @@ def main(style='paper'):
     
     # Plot [Mg/H] vs [Ce/H]
     axs[0,0].scatter(
-        high_alpha_sample['mg_h'], high_alpha_sample['ce_h'], 
+        high_alpha_sample['mg_h'], high_alpha_sample['ce_h_corr'], 
         c=high_alpha_color, **kwargs
     )
     axs[0,0].scatter(
-        low_alpha_sample['mg_h'], low_alpha_sample['ce_h'], 
+        low_alpha_sample['mg_h'], low_alpha_sample['ce_h_corr'], 
         c=low_alpha_color, **kwargs
     )
     axs[0,0].plot(
         *local_high_alpha_medians, 
-        '.-', color=high_alpha_color, label=r'High-$\alpha$'
+        '.-', color=high_alpha_color, label='Low-Ia'
     )
     axs[0,0].plot(
         *local_low_alpha_medians, 
-        '.-', color=low_alpha_color, label=r'Low-$\alpha$'
+        '.-', color=low_alpha_color, label='High-Ia'
     )
 
     # Plot [Ce/H] residuals vs [Mg/H]
@@ -130,29 +130,29 @@ def main(style='paper'):
 
     # Plot [Ce/H] vs age
     axs[0,1].scatter(
-        low_alpha_sample['age'], low_alpha_sample['ce_h'],
+        low_alpha_sample['age'], low_alpha_sample['ce_h_corr'],
         c=low_alpha_color, **kwargs
     )
     axs[0,1].scatter(
-        high_alpha_sample['age'], high_alpha_sample['ce_h'],
+        high_alpha_sample['age'], high_alpha_sample['ce_h_corr'],
         c=high_alpha_color, **kwargs
     )
     # Plot median trends with age
     low_alpha_age_medians = binned_quantiles(
-        good_ages(local_low_alpha), 'ce_h', 'age',
+        good_ages(local_low_alpha), 'ce_h_corr', 'age',
         q=0.5, bin_edges=age_bin_edges, min_count=10
     )
     axs[0,1].plot(
         *low_alpha_age_medians, '.-', color=low_alpha_color, zorder=6,
-        label=r'Low-$\alpha$'
+        label='High-Ia'
     )
     high_alpha_age_medians = binned_quantiles(
-        good_ages(local_high_alpha), 'ce_h', 'age',
+        good_ages(local_high_alpha), 'ce_h_corr', 'age',
         q=0.5, bin_edges=age_bin_edges, min_count=10
     )
     axs[0,1].plot(
         *high_alpha_age_medians, '.-', color=high_alpha_color, zorder=6,
-        label=r'High-$\alpha$'
+        label='Low-Ia'
     )
 
     # Plot [Ce/H] residuals vs age
@@ -171,7 +171,7 @@ def main(style='paper'):
     )
     axs[1,1].plot(
         *low_alpha_age_medians, '.-', color=low_alpha_color, zorder=6,
-        label=r'Low-$\alpha$'
+        label='High-Ia'
     )
     high_alpha_age_medians = binned_quantiles(
         good_ages(local_high_alpha), 'delta_ce_h', 'age',
@@ -179,18 +179,18 @@ def main(style='paper'):
     )
     axs[1,1].plot(
         *high_alpha_age_medians, '.-', color=high_alpha_color, zorder=6,
-        label=r'High-$\alpha$'
+        label='Low-Ia'
     )
 
     # Axes labels
-    axs[0,0].set_ylabel('[Ce/H]')
-    axs[1,0].set_ylabel(r'$\Delta$[Ce/H]')
+    axs[0,0].set_ylabel(r'[Ce/H]$_{\rm corr}$')
+    axs[1,0].set_ylabel(r'$\Delta$[Ce/H]$_{\rm corr}$')
     axs[1,0].set_xlabel('[Mg/H]')
     axs[1,1].set_xlabel('Age [Gyr]')
 
     # Axes limits
     axs[0,0].set_xlim((-0.8, 0.6))
-    axs[0,0].set_ylim((-1.1, 0.8))
+    axs[0,0].set_ylim((-0.9, 0.8))
     axs[1,0].set_ylim((-0.7, 0.7))
     axs[0,1].set_xlim((-1, 12))
 

@@ -103,7 +103,7 @@ def fit_metallicity_bins(
         bins, 
         min_count=MIN_COUNT, 
         xcol='age', 
-        ycol='ce_mg', 
+        ycol='ce_mg_corr', 
         met_col=MET_COL,
         age_fit_range=AGE_FIT_RANGE,
         **kwargs
@@ -120,7 +120,7 @@ def fit_metallicity_bins(
         Minimum number of stars in a bin required to calculate a fit.
     xcol : str, optional [default: 'age']
         Column for the independent fit variable.
-    ycol : str, optional [default: 'ce_mg']
+    ycol : str, optional [default: 'ce_mg_corr']
         Column for the dependent fit variable.
     met_col : str, optional [default: 'm_h_atm']
         Column for the binning variable.

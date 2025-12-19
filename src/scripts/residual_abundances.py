@@ -44,18 +44,18 @@ def main(style='paper'):
     ].copy()
     # Calculate median trend with [Mg/H]
     local_low_alpha_medians = binned_quantiles(
-        local_low_alpha, 'ce_h', 'mg_h', 
+        local_low_alpha, 'ce_h_corr', 'mg_h', 
         q=0.5, bin_edges=mg_bin_edges, min_count=10
     )
     local_high_alpha_medians = binned_quantiles(
-        local_high_alpha, 'ce_h', 'mg_h', 
+        local_high_alpha, 'ce_h_corr', 'mg_h', 
         q=0.5, bin_edges=mg_bin_edges, min_count=10
     )
     # Calculate residual Ce abundance
-    local_low_alpha['delta_ce_h'] = local_low_alpha['ce_h'] - np.interp(
+    local_low_alpha['delta_ce_h'] = local_low_alpha['ce_h_corr'] - np.interp(
         local_low_alpha['mg_h'], *local_low_alpha_medians
     )
-    local_high_alpha['delta_ce_h'] = local_high_alpha['ce_h'] - np.interp(
+    local_high_alpha['delta_ce_h'] = local_high_alpha['ce_h_corr'] - np.interp(
         local_high_alpha['mg_h'], *local_high_alpha_medians
     )
     # Calculate median trend with age (only stars with good ages)
@@ -103,12 +103,12 @@ def main(style='paper'):
             if low_alpha.shape[0] >= 100:
                 # Calculate median trend with [Mg/H]
                 low_alpha_medians = binned_quantiles(
-                    low_alpha, 'ce_h', 'mg_h', 
+                    low_alpha, 'ce_h_corr', 'mg_h', 
                     q=0.5, bin_edges=mg_bin_edges, min_count=10
                 )
                 # Calculate residual Ce abundance
                 # (for all stars, including those with no/poor ages)
-                low_alpha['delta_ce_h'] = low_alpha['ce_h'] - np.interp(
+                low_alpha['delta_ce_h'] = low_alpha['ce_h_corr'] - np.interp(
                     low_alpha['mg_h'], *low_alpha_medians
                 )
                 # Scatter plot random sample of points
@@ -129,11 +129,11 @@ def main(style='paper'):
             if high_alpha.shape[0] >= 100:
                 # Calculate median trend with [Mg/H]
                 high_alpha_medians = binned_quantiles(
-                    high_alpha, 'ce_h', 'mg_h', 
+                    high_alpha, 'ce_h_corr', 'mg_h', 
                     q=0.5, bin_edges=mg_bin_edges, min_count=10
                 )
                 # Calculate residual Ce abundance
-                high_alpha['delta_ce_h'] = high_alpha['ce_h'] - np.interp(
+                high_alpha['delta_ce_h'] = high_alpha['ce_h_corr'] - np.interp(
                     high_alpha['mg_h'], *high_alpha_medians
                 )
                 # Scatter plot random sample of points
@@ -186,7 +186,7 @@ def main(style='paper'):
     for i, ax in enumerate(axs[0,:]):
         ax.set_title(r'$%s\leq R_{\rm guide}<%s$ kpc' % RBINS[i], fontsize=8)
     for ax in axs[:,0]:
-        ax.set_ylabel(r'$\Delta$[Ce/H]')
+        ax.set_ylabel(r'$\Delta$[Ce/H]$_{\rm corr}$')
     for i, ax in enumerate(axs[:,-1]):
         ax.yaxis.set_label_position('right')
         ax.set_ylabel(

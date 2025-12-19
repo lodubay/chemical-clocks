@@ -74,11 +74,11 @@ def main(style='paper'):
     )
     for ax in axs:
         ax.scatter(
-            local_low_alpha['age'], local_low_alpha['ce_mg'],
+            local_low_alpha['age'], local_low_alpha['ce_mg_corr'],
             **scatter_kwargs
         )
         ax.scatter(
-            local_high_alpha['age'], local_high_alpha['ce_mg'],
+            local_high_alpha['age'], local_high_alpha['ce_mg_corr'],
             facecolors='w', **scatter_kwargs
         )
         # median errors
@@ -184,7 +184,7 @@ def main(style='paper'):
 
     titles = ['(a)', '(b)', '(c)']
     for i, ax in enumerate(axs):
-        ax.set_ylabel('[Ce/Mg]')
+        ax.set_ylabel(r'[Ce/Mg]$_{\rm corr}$')
         ax.set_title(titles[i], loc='left', x=0.05, y=0.9, va='top')
     axs[2].set_xlabel('Age [Gyr]')
 
