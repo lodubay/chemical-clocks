@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MultipleLocator
 from matplotlib.cm import ScalarMappable
-from scipy.interpolate import interpn
 
-from utils import get_bin_centers, binned_quantiles, apply_alpha_cut, truncate_colormap, insert_colorbar_axes
+from utils import get_bin_centers, binned_quantiles, apply_alpha_cut, \
+    truncate_colormap, insert_colorbar_axes
 import paths
 from _globals import ONE_COLUMN_WIDTH
 
@@ -72,7 +72,7 @@ def main(style='paper', cmap_name='autumn'):
                 *high_alpha_uncorr_med, 
                 'o--', ms=ms, 
                 color=cmap(norm(logg_center)),
-                zorder=10-j,
+                zorder=10-j
             )
             # Low-alpha median trends, binned by [Mg/H]
             low_alpha_uncorr_med = binned_quantiles(
@@ -83,8 +83,7 @@ def main(style='paper', cmap_name='autumn'):
                 *low_alpha_uncorr_med, 
                 's-', ms=ms,
                 color=cmap(norm(logg_center)),
-                zorder=10-j,
-                label=logg_center
+                zorder=10-j
             )
     # Add colorbar
     cax = insert_colorbar_axes(fig, pad=0.02, width=0.04)
@@ -108,7 +107,6 @@ def main(style='paper', cmap_name='autumn'):
     axs[0,0].yaxis.set_minor_locator(MultipleLocator(0.1))
     axs[1,0].yaxis.set_major_locator(MultipleLocator(0.2))
     axs[1,0].yaxis.set_minor_locator(MultipleLocator(0.05))
-    # axs[0,1].legend(title=r'$\log(g)$', loc='upper left', bbox_to_anchor=(1, 1))
     plt.savefig(paths.figures / 'logg_calibrations')
     plt.close()
 
