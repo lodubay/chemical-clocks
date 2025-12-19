@@ -4,6 +4,7 @@ Generate the Milky Way Mapper sample with quality cuts.
 
 import numpy as np
 import pandas as pd
+from scipy.interpolate import interpn
 from astropy.io import fits
 import astropy.units as u
 import astropy.coordinates as coord
@@ -13,7 +14,7 @@ from galpy.actionAngle import estimateDeltaStaeckel
 import gala.dynamics as gd
 import gala.potential as gp
 
-from utils import fits_to_pandas
+from utils import fits_to_pandas, get_bin_centers
 import paths
 
 def main():
@@ -41,7 +42,7 @@ def main():
         (mwm_full['sdss4_apogee_extra_target_flags'] < 2) &
         (mwm_full['flag_bad'] == 0) & 
         (mwm_full['spectrum_flags'] == 0) &
-        (mwm_full['snr'] > 40) &
+        (mwm_full['snr'] > 100) &
         (mwm_full['sdss_id'] > 0)
     ].copy()
     # drop duplicate SDSS-V IDs with the lowest SNR
@@ -90,10 +91,11 @@ def main():
         (mwm_good['logg'] > 1.0) & (mwm_good['logg'] < 3.5) &
         (mwm_good['teff'] < 5500) & (mwm_good['teff'] > 3500)
     ].copy()
+    # Apply log(g) calibrations
+    print('Applying log(g) calibrations...')
+    mwm_rgb = logg_calibrations(mwm_rgb)
 
     # Export catalogs
-    print('Exporting full quality sample (MWM_good.csv)...')
-    mwm_good.to_csv(paths.data / 'MWM' / 'MWM_good.csv', index=False)
     print('Exporting RGB sample (MWM_RGB.csv)...')
     mwm_rgb.to_csv(paths.data / 'MWM' / 'MWM_RGB.csv', index=False)
     print('Done!')
@@ -324,6 +326,56 @@ def add_kinematics(df, id_name='source_id', verbose=False):
     )
     
     return df
+
+
+def logg_calibrations(df):
+    """
+    Apply calibrations to correct for abundance correlations with log(g).
+    """
+    # Initialize grid of log(g), [Mg/H] values
+    MgH_bin_edges = np.round(np.linspace(-0.75, 0.45, 13, endpoint=True), 2)
+    MgH_bin_centers = get_bin_centers(MgH_bin_edges)
+    logg_bin_edges = np.linspace(0, 3.5, 8, endpoint=True)
+    logg_bin_centers = get_bin_centers(logg_bin_edges)
+    grid = (MgH_bin_centers, logg_bin_centers)
+    # Load calibration grids
+    fe_offsets = np.load(paths.data / 'MWM' / 'fe_offset_grid.npy')
+    ce_offsets = np.load(paths.data / 'MWM' / 'ce_offset_grid.npy')
+
+    # Interpolate & apply log(g) corrections
+    feh_corr = np.empty(df.shape[0])
+    ceh_corr = np.empty(df.shape[0])
+    for i in range(df.shape[0]):
+        feh_corr[i] = apply_elem_offsets(
+            df['mg_h'].iloc[i], 
+            df['logg'].iloc[i], 
+            df['fe_h'].iloc[i], 
+            fe_offsets,
+            grid
+        )
+        ceh_corr[i] = apply_elem_offsets(
+            df['mg_h'].iloc[i], 
+            df['logg'].iloc[i], 
+            df['ce_h'].iloc[i], 
+            ce_offsets,
+            grid
+        )
+
+    # Apply to sample DataFrame
+    df['fe_h_corr'] = feh_corr
+    df['ce_h_corr'] = ceh_corr
+    df['fe_mg_corr'] = df['fe_h_corr'] - df['mg_h']
+    df['mg_fe_corr'] = df['mg_h'] - df['fe_h_corr']
+    df['ce_mg_corr'] = df['ce_h_corr'] - df['mg_h']
+    df['ce_fe_corr'] = df['ce_h_corr'] = df['fe_h_corr']
+    return df
+
+
+def apply_elem_offsets(mgh, logg, xh, offsets, grid):
+    interp_point = np.array([mgh, logg])
+    star_offset = interpn(grid, offsets, interp_point, bounds_error=False, fill_value=None)[0]
+    corr_xh = xh + star_offset
+    return corr_xh
     
 
 if __name__ == '__main__':

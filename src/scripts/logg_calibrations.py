@@ -28,39 +28,10 @@ def main(style='paper', cmap_name='autumn'):
     MgH_bin_centers = get_bin_centers(MgH_bin_edges)
     logg_bin_edges = np.linspace(0, 3.5, 8, endpoint=True)
     logg_bin_centers = get_bin_centers(logg_bin_edges)
-    grid = (MgH_bin_centers, logg_bin_centers)
-    # Load calibration grids
-    fe_offsets = np.load(paths.data / 'MWM' / 'fe_offset_grid.npy')
-    ce_offsets = np.load(paths.data / 'MWM' / 'ce_offset_grid.npy')
 
     # Load MWM data
     calib_data = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
-    calib_data = calib_data[calib_data['snr'] > 100]
     calib_data = apply_alpha_cut(calib_data)
-
-    # Interpolate & apply log(g) corrections
-    feh_corr = np.empty(calib_data.shape[0])
-    ceh_corr = np.empty(calib_data.shape[0])
-    for i in range(calib_data.shape[0]):
-        feh_corr[i] = apply_elem_offsets(
-            calib_data['mg_h'].iloc[i], 
-            calib_data['logg'].iloc[i], 
-            calib_data['fe_h'].iloc[i], 
-            fe_offsets,
-            grid
-        )
-        ceh_corr[i] = apply_elem_offsets(
-            calib_data['mg_h'].iloc[i], 
-            calib_data['logg'].iloc[i], 
-            calib_data['ce_h'].iloc[i], 
-            ce_offsets,
-            grid
-        )
-    
-    calib_data['fe_h_corr'] = feh_corr
-    calib_data['ce_h_corr'] = ceh_corr
-    calib_data['fe_mg_corr'] = calib_data['fe_h_corr'] - calib_data['mg_h']
-    calib_data['ce_mg_corr'] = calib_data['ce_h_corr'] - calib_data['mg_h']
     calib_data['fe_mg'] = -calib_data['mg_fe']
 
     # Plot
@@ -140,13 +111,6 @@ def main(style='paper', cmap_name='autumn'):
     # axs[0,1].legend(title=r'$\log(g)$', loc='upper left', bbox_to_anchor=(1, 1))
     plt.savefig(paths.figures / 'logg_calibrations')
     plt.close()
-
-
-def apply_elem_offsets(mgh, logg, xh, offsets, grid):
-    interp_point = np.array([mgh, logg])
-    star_offset = interpn(grid, offsets, interp_point, bounds_error=False, fill_value=None)[0]
-    corr_xh = xh + star_offset
-    return corr_xh
 
 
 if __name__ == '__main__':
