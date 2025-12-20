@@ -39,7 +39,7 @@ def main(style='paper', cmap_name='autumn'):
     fig, axs = plt.subplots(
         2, 2, 
         sharex=True, sharey='row',
-        figsize=(ONE_COLUMN_WIDTH, ONE_COLUMN_WIDTH),
+        figsize=(ONE_COLUMN_WIDTH, 1.2 * ONE_COLUMN_WIDTH),
         gridspec_kw={'hspace': 0, 'wspace': 0}
     )
     cmap = truncate_colormap(plt.get_cmap(cmap_name), minval=0.1, maxval=0.9)
@@ -86,8 +86,17 @@ def main(style='paper', cmap_name='autumn'):
                 zorder=10-j
             )
     # Add colorbar
-    cax = insert_colorbar_axes(fig, pad=0.02, width=0.04)
-    fig.colorbar(ScalarMappable(norm, cmap), cax=cax, label=r'$\log(g)$')
+    cax = insert_colorbar_axes(
+        fig, 
+        pad=0.06, width=0.02, 
+        orientation='horizontal'
+    )
+    fig.colorbar(
+        ScalarMappable(norm, cmap), 
+        cax=cax, 
+        label=r'$\log(g)$', 
+        orientation='horizontal'
+    )
     cax.yaxis.set_inverted(True)
     # Plot labels
     axs[0,0].set_title('No offsets')
