@@ -10,8 +10,8 @@ from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MultipleLocator
 from matplotlib.cm import ScalarMappable
 
-from utils import get_bin_centers, binned_quantiles, apply_alpha_cut, \
-    truncate_colormap, insert_colorbar_axes
+from utils import get_bin_centers, binned_quantiles, apply_alpha_cut
+from plotting import truncate_colormap, insert_colorbar_axes
 import paths
 from _globals import ONE_COLUMN_WIDTH
 

@@ -9,7 +9,8 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import vice
 
 from agb_enrichment_models import normalize, expfall, exprise, constant, lateburst
-from utils import alpha_cut, amplified_agb, latex_float, good_ages
+from utils import alpha_cut, amplified_agb, good_ages
+from plotting import latex_float
 from colormaps import paultol
 import paths
 import _globals
