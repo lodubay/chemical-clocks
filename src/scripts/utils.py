@@ -378,3 +378,26 @@ def insert_colorbar_axes(fig, orientation='vertical', width=0.02, pad=0.01):
         cax = plt.axes([fig.subplotpars.right + pad, fig.subplotpars.bottom, 
                         width, height])
     return cax
+
+
+def colored_text_legend(ax, **kwargs):
+    """
+    Make a text-only legend with color-coding.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+    kwargs passed to plt.legend()
+
+    Returns
+    -------
+    leg : matplotlib.legend.Legend
+    """
+    # Remove legend handles
+    leg = ax.legend(handlelength=0, handletextpad=0, **kwargs)
+    for line in leg.get_lines():
+        line.set_visible(False)
+    # Color-code legend text
+    for line, text in zip(leg.get_lines(), leg.get_texts()):
+        text.set_color(line.get_color())
+    return leg

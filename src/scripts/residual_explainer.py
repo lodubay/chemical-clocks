@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
-from utils import binned_quantiles, apply_alpha_cut, sample_rows, good_ages
+from utils import binned_quantiles, apply_alpha_cut, sample_rows, good_ages, colored_text_legend
 from colormaps import paultol
 from _globals import ONE_COLUMN_WIDTH
 import paths
@@ -79,12 +79,12 @@ def main(style='paper'):
         c=low_alpha_color, **kwargs
     )
     axs[0,0].plot(
-        *local_high_alpha_medians, 
-        '.-', color=high_alpha_color, label='Low-Ia'
-    )
-    axs[0,0].plot(
         *local_low_alpha_medians, 
         '.-', color=low_alpha_color, label='High-Ia'
+    )
+    axs[0,0].plot(
+        *local_high_alpha_medians, 
+        '.-', color=high_alpha_color, label='Low-Ia'
     )
 
     # Plot [Ce/H] residuals vs [Mg/H]
@@ -203,6 +203,8 @@ def main(style='paper'):
     axs[1,0].yaxis.set_minor_locator(MultipleLocator(0.1))
     axs[0,1].xaxis.set_major_locator(MultipleLocator(5))
     axs[0,1].xaxis.set_minor_locator(MultipleLocator(1))
+
+    leg = colored_text_legend(axs[0,0], loc='upper left')
 
     plt.savefig(paths.figures / 'residual_explainer')
 
