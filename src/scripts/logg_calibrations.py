@@ -88,7 +88,7 @@ def main(style='paper', cmap_name='autumn'):
     # Add colorbar
     cax = insert_colorbar_axes(
         fig, 
-        pad=0.06, width=0.02, 
+        pad=0.06, width=0.03, 
         orientation='horizontal'
     )
     fig.colorbar(
