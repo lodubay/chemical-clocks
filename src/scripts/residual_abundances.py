@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
-from utils import alpha_cut, binned_quantiles, sample_rows, good_ages
+from utils import alpha_cut, binned_quantiles, sample_rows, good_ages, colored_text_legend
 from _globals import TWO_COLUMN_WIDTH
 from colormaps import paultol
 import paths
@@ -124,7 +124,7 @@ def main(style='paper'):
                 )
                 ax.plot(
                     *age_medians, '.-', color=low_alpha_color, zorder=6,
-                    label=r'Low-$\alpha$'
+                    label='High-Ia'
                 )
             if high_alpha.shape[0] >= 100:
                 # Calculate median trend with [Mg/H]
@@ -149,7 +149,7 @@ def main(style='paper'):
                 )
                 ax.plot(
                     *age_medians, '.-', color=high_alpha_color, zorder=5,
-                    label=r'High-$\alpha$'
+                    label='Low-Ia'
                 )
             # Plot local low and high-alpha trends for comparison
             ax.plot(
@@ -194,14 +194,7 @@ def main(style='paper'):
             fontsize=8, labelpad=6
         )
     # Text-only lengend
-    leg = axs[0,0].legend(
-        loc='upper left', handlelength=0, handletextpad=0,
-    )
-    for line in leg.get_lines():
-        line.set_visible(False)
-    # Color-code legend text
-    for line, text in zip(leg.get_lines(), leg.get_texts()):
-        text.set_color(line.get_color())
+    leg = colored_text_legend(axs[0,0], loc='upper left')
 
     plt.savefig(paths.figures / 'residual_abundances')
 

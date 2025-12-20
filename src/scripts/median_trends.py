@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
-from utils import alpha_cut, binned_quantiles, sample_rows
+from utils import alpha_cut, binned_quantiles, sample_rows, colored_text_legend
 from _globals import TWO_COLUMN_WIDTH
 from colormaps import paultol
 import paths
@@ -106,15 +106,15 @@ def main(style='paper'):
                 )
     # Indicate median abundance errors
     axs[0,0].errorbar(
-        0.5, -0.5, 
+        0.4, -0.5, 
         xerr=mwm_rgb['e_mg_h'].median(), 
         yerr=mwm_rgb['e_ce_mg'].median(), 
-        c='gray', capsize=0, elinewidth=0.5,
+        c='gray', capsize=0, elinewidth=1,
     )
 
     # Format axes
-    axs[0,0].set_xlim((-0.8, 0.8))
-    axs[0,0].set_ylim((-0.8, 0.8))
+    axs[0,0].set_xlim((-0.8, 0.6))
+    axs[0,0].set_ylim((-0.7, 0.9))
     axs[0,0].xaxis.set_major_locator(MultipleLocator(0.5))
     axs[0,0].xaxis.set_minor_locator(MultipleLocator(0.1))
     axs[0,0].yaxis.set_major_locator(MultipleLocator(0.5))
@@ -132,14 +132,7 @@ def main(style='paper'):
             fontsize=8, labelpad=6
         )
     # Text-only lengend
-    leg = axs[0,0].legend(
-        loc='upper right', handlelength=0, handletextpad=0,
-    )
-    for line in leg.get_lines():
-        line.set_visible(False)
-    # Color-code legend text
-    for line, text in zip(leg.get_lines(), leg.get_texts()):
-        text.set_color(line.get_color())
+    leg = colored_text_legend(axs[0,0], loc='upper right')
 
     plt.savefig(paths.figures / 'median_trends')
 
