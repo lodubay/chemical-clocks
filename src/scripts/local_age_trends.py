@@ -11,13 +11,13 @@ from matplotlib.ticker import MultipleLocator
 from scipy import stats
 
 from _globals import ONE_COLUMN_WIDTH
-from utils import good_ages, apply_alpha_cut
+from utils import good_ages, apply_alpha_cut, sample_rows
 import paths
 
 MET_COL = 'm_h_atm' # Column with metallicity values
 MET_LABEL = r'[M/H]$_{\rm atm}$'
 AGE_FIT_RANGE = (1, 8) # Range of ages to fit linear trend
-SAMPLE_FRACTION = 1 # fraction of stars to plot in each panel
+SAMPLE_FRACTION = 0.25 # fraction of stars to plot in each panel
 RLIM = (7, 9)
 ZLIM = (0, 0.5)
 
@@ -33,9 +33,17 @@ def main(style='paper'):
         (mwm_rgb['Rg'] >= RLIM[0]) &
         (mwm_rgb['Rg'] < RLIM[1]) &
         (mwm_rgb['z_max'] >= ZLIM[0]) &
-        (mwm_rgb['z_max'] < ZLIM[1]) &
-        (mwm_rgb['low_alpha']) # restrict age trends to low-alpha stars only
+        (mwm_rgb['z_max'] < ZLIM[1])
     ]
+    # Restrict age trends to low-alpha stars only
+    local_low_alpha = local_sample[local_sample['low_alpha']]
+    local_high_alpha = local_sample[~local_sample['low_alpha']] # include border stars
+    # Randomly sample fraction of stars to plot (still fit to full sample)
+    plot_sample = sample_rows(
+        local_sample, int(SAMPLE_FRACTION * local_sample.shape[0])
+    )
+    plot_low_alpha = plot_sample[plot_sample['low_alpha']]
+    plot_high_alpha = plot_sample[~plot_sample['low_alpha']] # include border stars
 
     # Metallicity bins
     met_bins = np.arange(-0.55, 0.46, 0.1)
@@ -48,9 +56,17 @@ def main(style='paper'):
     norm = BoundaryNorm(met_bins, cmap.N, extend='both')
 
     pc = ax.scatter(
-        local_sample['age'], local_sample['ce_mg_corr'], c=local_sample[MET_COL], 
+        plot_low_alpha['age'], plot_low_alpha['ce_mg_corr'], 
+        c=plot_low_alpha[MET_COL], 
         cmap=cmap, norm=norm,
-        s=1, marker='.', rasterized=True, edgecolor='none'
+        s=1, marker='o', rasterized=True, edgecolor='none'
+    )
+    # Plot high-alpha stars for reference (not fit)
+    c = cmap(norm(plot_high_alpha[MET_COL]))
+    ax.scatter(
+        plot_high_alpha['age'], plot_high_alpha['ce_mg_corr'], 
+        edgecolors=c, 
+        s=1, marker='o', rasterized=True, facecolors='w', linewidths=0.3
     )
     cbar = fig.colorbar(pc, ax=ax, label=MET_LABEL)
 
@@ -60,11 +76,11 @@ def main(style='paper'):
     for i in range(len(met_bins)-1):
         met_lim = met_bins[i:i+2]
         met_center = np.mean(met_lim) # mean metallicity of bin
-        subset = local_sample[
-            (local_sample[MET_COL] >= met_lim[0]) & 
-            (local_sample[MET_COL] < met_lim[1]) &
-            (local_sample['age'] >= AGE_FIT_RANGE[0]) &
-            (local_sample['age'] < AGE_FIT_RANGE[1])
+        subset = local_low_alpha[
+            (local_low_alpha[MET_COL] >= met_lim[0]) & 
+            (local_low_alpha[MET_COL] < met_lim[1]) &
+            (local_low_alpha['age'] >= AGE_FIT_RANGE[0]) &
+            (local_low_alpha['age'] < AGE_FIT_RANGE[1])
         ]
         # Fit linear age trend
         regress = stats.linregress(subset['age'], subset['ce_mg_corr'])
