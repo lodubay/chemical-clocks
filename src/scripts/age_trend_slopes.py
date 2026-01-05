@@ -76,7 +76,7 @@ def main(style='paper'):
             ax.axhline(0, ls=':', c='gray')
 
     # Format axes
-    axs[0,0].set_xlim((-0.9, 0.6))
+    axs[0,0].set_xlim((-0.8, 0.6))
     axs[0,0].set_ylim((-0.11, 0.09))
     axs[0,0].xaxis.set_major_locator(MultipleLocator(0.5))
     axs[0,0].xaxis.set_minor_locator(MultipleLocator(0.1))
