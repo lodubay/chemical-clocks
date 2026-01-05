@@ -9,7 +9,7 @@ from matplotlib.ticker import MultipleLocator
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import vice
 
-from utils import alpha_cut, amplified_agb, good_ages, binned_quantiles, get_bin_centers
+from utils import alpha_cut, adjusted_agb, good_ages, binned_quantiles, get_bin_centers
 from colormaps import paultol
 import paths
 import _globals
@@ -17,6 +17,7 @@ import _globals
 SFH_TIMESCALE = 15
 AGB_STUDY = 'karakas16'
 CCSN_CE_YIELD = 3e-9
+END_TIME = 12 # Gyr
 
 
 def main(style='paper'):
@@ -103,8 +104,8 @@ def main(style='paper'):
     yield_scales = [3, 2, 1]
     vice.yields.ccsne.settings['ce'] = CCSN_CE_YIELD
     for i, scale in enumerate(yield_scales):
-        vice.yields.agb.settings['ce'] = amplified_agb(
-            'ce', study=AGB_STUDY, prefactor=scale
+        vice.yields.agb.settings['ce'] = adjusted_agb(
+            'ce', study=AGB_STUDY, amp=scale
         )
         name = f'2p-agb-x{scale}'
         run_singlezone(name, expfall)
@@ -115,8 +116,8 @@ def main(style='paper'):
                     label=r'$\times%s$' % scale
         )
     # no prompt r-process
-    vice.yields.agb.settings['ce'] = amplified_agb(
-        'ce', study=AGB_STUDY, prefactor=1
+    vice.yields.agb.settings['ce'] = adjusted_agb(
+        'ce', study=AGB_STUDY, amp=1
     )
     vice.yields.ccsne.settings['ce'] = 0
     name = f'2p-agb-x1-norproc'
@@ -130,8 +131,8 @@ def main(style='paper'):
 
     # Different outflow mass-loading factors
     vice.yields.ccsne.settings['ce'] = CCSN_CE_YIELD
-    vice.yields.agb.settings['ce'] = amplified_agb(
-        'ce', study=AGB_STUDY, prefactor=1
+    vice.yields.agb.settings['ce'] = adjusted_agb(
+        'ce', study=AGB_STUDY, amp=1
     )
     eta_list = [5, 2.5, 1, 0]
     colors = [paultol.bright.colors[c] for c in [1, 0, 2, 3]]
@@ -156,8 +157,8 @@ def main(style='paper'):
     axins.set_title('SFR')
     # Different star formation histories
     vice.yields.ccsne.settings['ce'] = CCSN_CE_YIELD
-    vice.yields.agb.settings['ce'] = amplified_agb(
-        'ce', study=AGB_STUDY, prefactor=1
+    vice.yields.agb.settings['ce'] = adjusted_agb(
+        'ce', study=AGB_STUDY, amp=1
     )
     funcs = [exprise, constant, expfall, lateburst]
     names = ['exprise', 'constant', 'expfall', 'lateburst']
@@ -172,10 +173,10 @@ def main(style='paper'):
                     color=colors[i], label=labels[i])
         axins.plot(hist['lookback'], hist['sfr'], color=colors[i])
     axs[2].legend(title='SFH', loc='upper left', bbox_to_anchor=(1, 1))
-    axins.set_xlim((0, 12))
+    axins.set_xlim((0, END_TIME))
     axins.set_ylim((0, 0.2))
 
-    axs[0].set_xlim((0, 12))
+    axs[0].set_xlim((0, END_TIME))
     axs[0].set_ylim((-1, 1))
     axs[0].xaxis.set_major_locator(MultipleLocator(5))
     axs[0].xaxis.set_minor_locator(MultipleLocator(1))
@@ -193,7 +194,7 @@ def main(style='paper'):
 
 def run_singlezone(name, sfh, mode='sfr', eta=2.5, output_dir=paths.data/'onezone'):
     dt = 0.01
-    simtime = np.arange(0, 12+dt, dt)
+    simtime = np.arange(0, END_TIME+dt, dt)
     sz = vice.singlezone(
         name=str(output_dir / name),
         func=normalize(sfh),
@@ -232,7 +233,7 @@ def lateburst(time):
 
 def normalize(func):
     dt = 0.01
-    simtime = np.arange(0, 12+dt, dt)
+    simtime = np.arange(0, END_TIME+dt, dt)
     integral = np.sum(dt * func(simtime))
     f = lambda t: 1/integral * func(t)
     return f

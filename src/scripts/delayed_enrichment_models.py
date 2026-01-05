@@ -9,7 +9,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import vice
 
 from agb_enrichment_models import normalize, expfall, exprise, constant, lateburst
-from utils import alpha_cut, amplified_agb, good_ages
+from utils import alpha_cut, adjusted_agb, good_ages
 from plotting import latex_float
 from colormaps import paultol
 import paths
@@ -89,8 +89,8 @@ def main(style='paper'):
     vice.yields.sneia.settings['mg'] = 0.
     vice.yields.sneia.settings['fe'] = 0.0024
     vice.yields.sneia.settings['ce'] = 0
-    vice.yields.agb.settings['ce'] = amplified_agb(
-        'ce', study=AGB_STUDY, prefactor=AGB_YIELD_SCALE
+    vice.yields.agb.settings['ce'] = adjusted_agb(
+        'ce', study=AGB_STUDY, amp=AGB_YIELD_SCALE
     )
     output_dir = paths.data / 'onezone'
     output_dir.mkdir(parents=True, exist_ok=True)
