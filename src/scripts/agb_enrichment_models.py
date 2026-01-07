@@ -16,8 +16,9 @@ import _globals
 
 SFH_TIMESCALE = 15
 AGB_STUDY = 'karakas16'
-CCSN_CE_YIELD = 3e-9
 END_TIME = 12 # Gyr
+SOLAR_CE_S_FRAC = 0.77 # fraction of Ce in the Sun from the s-process
+SOLAR_AGE = 4.6 # Gyr
 
 
 def main(style='paper'):
@@ -58,11 +59,12 @@ def main(style='paper'):
 
     figwidth = _globals.ONE_COLUMN_WIDTH
     fig, axs = plt.subplots(
-        3, figsize=(figwidth, 2 * figwidth), 
+        4, figsize=(figwidth, 2.67 * figwidth), 
         sharex=True, sharey=True,
         gridspec_kw={'hspace': 0.}
     )
     fig.subplots_adjust(right=0.67)
+    legend_kwargs = dict(bbox_to_anchor=(1, 1), loc='upper left')
 
     # Plot MWM data
     datacolor = '0.3'
@@ -90,6 +92,12 @@ def main(style='paper'):
             yerr=med_abund_err, 
             c=datacolor, capsize=0, linestyle='none'
         )
+        # indicate Solar value (s-process only)
+        ax.plot(SOLAR_AGE, np.log10(SOLAR_CE_S_FRAC), 'wo', zorder=9)
+        ax.text(
+            SOLAR_AGE, np.log10(SOLAR_CE_S_FRAC), r'$\odot$',
+            va='center', ha='center', zorder=10, weight='bold', usetex=True
+        )
 
     # Plot onezone models
     vice.yields.ccsne.settings['mg'] = 0.0019
@@ -100,9 +108,13 @@ def main(style='paper'):
     output_dir = paths.data / 'onezone'
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # Calculate prompt Ce enrichment (assigned to CCSNe for convenience)
+    ccsn_ce_yield = vice.yields.ccsne.settings['mg'] * (1 - SOLAR_CE_S_FRAC) * vice.solar_z['ce'] / vice.solar_z['mg']
+    print(ccsn_ce_yield)
+
     # Different AGB yield scales
     yield_scales = [3, 2, 1]
-    vice.yields.ccsne.settings['ce'] = CCSN_CE_YIELD
+    vice.yields.ccsne.settings['ce'] = ccsn_ce_yield
     for i, scale in enumerate(yield_scales):
         vice.yields.agb.settings['ce'] = adjusted_agb(
             'ce', study=AGB_STUDY, amp=scale
@@ -127,10 +139,28 @@ def main(style='paper'):
     axs[0].plot(hist['lookback'], hist['[ce/mg]'], linestyle='--', 
                 color=paultol.bright.colors[0], label=r'No $r$-proc.'
     )
-    axs[0].legend(title='AGB yields', loc='upper left', bbox_to_anchor=(1, 1))
+    axs[0].legend(title='AGB yields', **legend_kwargs)
+
+    # Mass-shifted AGB enrichment
+    mass_shifts = [0, -0.5, -1, -1.5, -2]
+    vice.yields.ccsne.settings['ce'] = ccsn_ce_yield
+    for i, dm in enumerate(mass_shifts):
+        vice.yields.agb.settings['ce'] = adjusted_agb(
+            'ce', study=AGB_STUDY, dm=dm, amp=1
+        )
+        name = f'2p-agb-dm{dm}'
+        run_singlezone(name, expfall)
+        hist = vice.history(str(paths.data/output_dir/name))
+        axs[1].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
+        axs[1].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
+                    color=paultol.bright.colors[i], 
+                    label=r'$%s$ M$_\odot$' % dm
+        )
+    axs[1].legend(title='AGB masses', **legend_kwargs)
+
 
     # Different outflow mass-loading factors
-    vice.yields.ccsne.settings['ce'] = CCSN_CE_YIELD
+    vice.yields.ccsne.settings['ce'] = ccsn_ce_yield
     vice.yields.agb.settings['ce'] = adjusted_agb(
         'ce', study=AGB_STUDY, amp=1
     )
@@ -140,23 +170,23 @@ def main(style='paper'):
         name = f'2p-eta{eta}'
         run_singlezone(name, expfall, eta=eta)
         hist = vice.history(str(paths.data/output_dir/name))
-        axs[1].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
-        axs[1].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
+        axs[2].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
+        axs[2].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
                     color=colors[i], label=eta)
-    axs[1].legend(title=r'$\eta$', loc='upper left', bbox_to_anchor=(1, 1))
+    axs[2].legend(title=r'$\eta$', **legend_kwargs)
     
     # inset SFR plot
     axins = inset_axes(
-        axs[2], width='100%', height='100%',
+        axs[3], width='100%', height='100%',
         loc='lower left',
         bbox_to_anchor=(1.13, 0, 0.33, 0.33),
-        bbox_transform=axs[2].transAxes,
+        bbox_transform=axs[3].transAxes,
         borderpad=0,
     )
     axins.set_xlabel('Age [Gyr]')
     axins.set_title('SFR')
     # Different star formation histories
-    vice.yields.ccsne.settings['ce'] = CCSN_CE_YIELD
+    vice.yields.ccsne.settings['ce'] = ccsn_ce_yield
     vice.yields.agb.settings['ce'] = adjusted_agb(
         'ce', study=AGB_STUDY, amp=1
     )
@@ -168,11 +198,11 @@ def main(style='paper'):
         fullname = f'2p-{name}'
         run_singlezone(fullname, funcs[i])
         hist = vice.history(str(paths.data/output_dir/fullname))
-        axs[2].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
-        axs[2].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
+        axs[3].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
+        axs[3].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
                     color=colors[i], label=labels[i])
         axins.plot(hist['lookback'], hist['sfr'], color=colors[i])
-    axs[2].legend(title='SFH', loc='upper left', bbox_to_anchor=(1, 1))
+    axs[3].legend(title='SFH', **legend_kwargs)
     axins.set_xlim((0, END_TIME))
     axins.set_ylim((0, 0.2))
 
@@ -183,11 +213,11 @@ def main(style='paper'):
     axs[0].yaxis.set_major_locator(MultipleLocator(0.5))
     axs[0].yaxis.set_minor_locator(MultipleLocator(0.1))
 
-    titles = ['(a)', '(b)', '(c)']
+    titles = ['(a)', '(b)', '(c)', '(d)']
     for i, ax in enumerate(axs):
         ax.set_ylabel(r'[Ce/Mg]$_{\rm corr}$')
         ax.set_title(titles[i], loc='left', x=0.05, y=0.9, va='top')
-    axs[2].set_xlabel('Age [Gyr]')
+    axs[3].set_xlabel('Age [Gyr]')
 
     fig.savefig(paths.figures / 'agb_enrichment_models')
 
