@@ -97,8 +97,11 @@ class adjusted_agb(vice.yields.agb.interpolator):
         super().__init__(element, study=study)
     
     def __call__(self, mass, metallicity): 
-        return self.amp * super().__call__(
-            mass - self.dm, metallicity * 1 / self.Zscale
+        return max(
+            self.amp * super().__call__(
+                mass - self.dm, metallicity * 1 / self.Zscale
+            ),
+            0. # prevent negative yields from interpolation
         )
     
     @property
