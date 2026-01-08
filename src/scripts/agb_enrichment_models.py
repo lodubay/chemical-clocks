@@ -14,11 +14,15 @@ from colormaps import paultol
 import paths
 import _globals
 
+# CCSN and SN Ia yields
+from yields import yZ1
+
 SFH_TIMESCALE = 15
-AGB_STUDY = 'karakas16'
+AGB_STUDY = 'cristallo11'
 END_TIME = 12 # Gyr
 SOLAR_CE_S_FRAC = 0.77 # fraction of Ce in the Sun from the s-process
 SOLAR_AGE = 4.6 # Gyr
+ETA_SUN = 0.4 # default mass-loading factor at Solar radius
 
 
 def main(style='paper'):
@@ -90,10 +94,6 @@ def main(style='paper'):
         )
 
     # Plot onezone models
-    vice.yields.ccsne.settings['mg'] = 0.0019
-    vice.yields.ccsne.settings['fe'] = 0.0012
-    vice.yields.sneia.settings['mg'] = 0.
-    vice.yields.sneia.settings['fe'] = 0.0024
     vice.yields.sneia.settings['ce'] = 0
     output_dir = paths.data / 'onezone'
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -157,7 +157,7 @@ def main(style='paper'):
     vice.yields.agb.settings['ce'] = adjusted_agb(
         'ce', study=AGB_STUDY, amp=1
     )
-    eta_list = [5, 2.5, 1, 0]
+    eta_list = [1, 0.4, 0.2, 0]
     colors = [paultol.bright.colors[c] for c in [1, 0, 2, 3]]
     for i, eta in enumerate(eta_list):
         name = f'2p-eta{eta}'
@@ -215,7 +215,7 @@ def main(style='paper'):
     fig.savefig(paths.figures / 'agb_enrichment_models')
 
 
-def run_singlezone(name, sfh, mode='sfr', eta=2.5, output_dir=paths.data/'onezone'):
+def run_singlezone(name, sfh, mode='sfr', eta=ETA_SUN, output_dir=paths.data/'onezone'):
     dt = 0.01
     simtime = np.arange(0, END_TIME+dt, dt)
     sz = vice.singlezone(
