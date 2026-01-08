@@ -9,7 +9,7 @@ from matplotlib.ticker import MultipleLocator
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import vice
 
-from utils import alpha_cut, adjusted_agb, good_ages, binned_quantiles, get_bin_centers
+from utils import alpha_cut, adjusted_agb, good_ages
 from colormaps import paultol
 import paths
 import _globals
@@ -43,19 +43,10 @@ def main(style='paper'):
         local_sample['mg_fe'] < alpha_cut(local_sample['fe_h'])
     ]
 
-    # Median errors in bins of stellar age
-    local_sample['age_err_low'] = local_sample['age'] - local_sample['e_n_age']
-    local_sample['age_err_high'] = local_sample['e_p_age'] - local_sample['age']
-    big_age_bins = np.arange(0, 15, 4)
-    _, med_age_err_low = binned_quantiles(
-        local_sample, 'age_err_low', 'age', bin_edges=big_age_bins, q=0.5
-    )
-    _, med_age_err_high = binned_quantiles(
-        local_sample, 'age_err_high', 'age', bin_edges=big_age_bins, q=0.5
-    )
-    _, med_abund_err = binned_quantiles(
-        local_sample, 'e_ce_mg', 'age', bin_edges=big_age_bins, q=0.5
-    )
+    # Median errors
+    age_err_low = np.median(local_sample['age'] - local_sample['e_n_age'])
+    age_err_high = np.median(local_sample['e_p_age'] - local_sample['age'])
+    med_abund_err = local_sample['e_ce_mg'].median()
 
     figwidth = _globals.ONE_COLUMN_WIDTH
     fig, axs = plt.subplots(
@@ -85,12 +76,11 @@ def main(style='paper'):
             facecolors='w', **scatter_kwargs
         )
         # median errors
-        xarr_err = get_bin_centers(big_age_bins)
         ax.errorbar(
-            xarr_err, -0.8 * np.ones(xarr_err.shape), 
-            xerr=[med_age_err_low, med_age_err_high], 
+            10, 0.8, 
+            xerr=[[age_err_low], [age_err_high]], 
             yerr=med_abund_err, 
-            c=datacolor, capsize=0, linestyle='none'
+            c=datacolor, capsize=0,
         )
         # indicate Solar value (s-process only)
         ax.plot(SOLAR_AGE, np.log10(SOLAR_CE_S_FRAC), 'wo', zorder=9)
@@ -109,11 +99,13 @@ def main(style='paper'):
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Calculate prompt Ce enrichment (assigned to CCSNe for convenience)
-    ccsn_ce_yield = vice.yields.ccsne.settings['mg'] * (1 - SOLAR_CE_S_FRAC) * vice.solar_z['ce'] / vice.solar_z['mg']
-    print(ccsn_ce_yield)
+    ccsn_ce_yield = vice.yields.ccsne.settings['mg'] * (
+        (1 - SOLAR_CE_S_FRAC) * vice.solar_z['ce'] / vice.solar_z['mg']
+    )
 
     # Different AGB yield scales
     yield_scales = [3, 2, 1]
+    colors = [paultol.bright.colors[c] for c in [1, 2, 0]]
     vice.yields.ccsne.settings['ce'] = ccsn_ce_yield
     for i, scale in enumerate(yield_scales):
         vice.yields.agb.settings['ce'] = adjusted_agb(
@@ -124,7 +116,7 @@ def main(style='paper'):
         hist = vice.history(str(paths.data/output_dir/name))
         axs[0].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
         axs[0].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
-                    color=paultol.bright.colors[scale-1], 
+                    color=colors[i], 
                     label=r'$\times%s$' % scale
         )
     # no prompt r-process
@@ -143,6 +135,7 @@ def main(style='paper'):
 
     # Mass-shifted AGB enrichment
     mass_shifts = [0, -0.5, -1, -1.5, -2]
+    colors = [paultol.bright.colors[c] for c in [0, 4, 2, 3, 1]]
     vice.yields.ccsne.settings['ce'] = ccsn_ce_yield
     for i, dm in enumerate(mass_shifts):
         vice.yields.agb.settings['ce'] = adjusted_agb(
@@ -153,7 +146,7 @@ def main(style='paper'):
         hist = vice.history(str(paths.data/output_dir/name))
         axs[1].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
         axs[1].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
-                    color=paultol.bright.colors[i], 
+                    color=colors[i], 
                     label=r'$%s$ M$_\odot$' % dm
         )
     axs[1].legend(title='AGB masses', **legend_kwargs)
@@ -207,7 +200,7 @@ def main(style='paper'):
     axins.set_ylim((0, 0.2))
 
     axs[0].set_xlim((0, END_TIME))
-    axs[0].set_ylim((-1, 1))
+    axs[0].set_ylim((-0.8, 1))
     axs[0].xaxis.set_major_locator(MultipleLocator(5))
     axs[0].xaxis.set_minor_locator(MultipleLocator(1))
     axs[0].yaxis.set_major_locator(MultipleLocator(0.5))
@@ -215,7 +208,7 @@ def main(style='paper'):
 
     titles = ['(a)', '(b)', '(c)', '(d)']
     for i, ax in enumerate(axs):
-        ax.set_ylabel(r'[Ce/Mg]$_{\rm corr}$')
+        ax.set_ylabel('[Ce/Mg]')
         ax.set_title(titles[i], loc='left', x=0.05, y=0.9, va='top')
     axs[3].set_xlabel('Age [Gyr]')
 

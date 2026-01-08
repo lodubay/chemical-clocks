@@ -5,6 +5,7 @@ Plot [Ce/Mg] evolution predicted by one-zone models with delayed Ce enrichment.
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import vice
 
@@ -45,6 +46,11 @@ def main(style='paper'):
         local_sample['mg_fe'] < alpha_cut(local_sample['fe_h'])
     ]
 
+    # Median errors
+    age_err_low = np.median(local_sample['age'] - local_sample['e_n_age'])
+    age_err_high = np.median(local_sample['e_p_age'] - local_sample['age'])
+    med_abund_err = local_sample['e_ce_mg'].median()
+
     figwidth = _globals.ONE_COLUMN_WIDTH
     fig, axs = plt.subplots(
         4, figsize=(figwidth, 2.67 * figwidth), 
@@ -72,9 +78,6 @@ def main(style='paper'):
             facecolors='w', **scatter_kwargs
         )
         # median errors
-        age_err_low = np.median(local_sample['age'] - local_sample['e_n_age'])
-        age_err_high = np.median(local_sample['e_p_age'] - local_sample['age'])
-        med_abund_err = local_sample['e_ce_mg'].median()
         ax.errorbar(
             10, 0.8, 
             xerr=[[age_err_low], [age_err_high]], 
@@ -207,10 +210,16 @@ def main(style='paper'):
     axins.set_ylim((0, 0.2))
 
     axs[0].set_xlim((0, 12))
-    axs[0].set_ylim((-1, 1))
+    axs[0].set_ylim((-0.8, 1))
+    axs[0].xaxis.set_major_locator(MultipleLocator(5))
+    axs[0].xaxis.set_minor_locator(MultipleLocator(1))
+    axs[0].yaxis.set_major_locator(MultipleLocator(0.5))
+    axs[0].yaxis.set_minor_locator(MultipleLocator(0.1))
 
-    for ax in axs:
-        ax.set_ylabel(r'[Ce/Mg]$_{\rm corr}$')
+    titles = ['(a)', '(b)', '(c)', '(d)']
+    for i, ax in enumerate(axs):
+        ax.set_ylabel('[Ce/Mg]')
+        ax.set_title(titles[i], loc='left', x=0.05, y=0.9, va='top')
     axs[-1].set_xlabel('Age [Gyr]')
 
     fig.savefig(paths.figures / 'delayed_enrichment_models')
