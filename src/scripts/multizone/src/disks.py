@@ -16,9 +16,7 @@ Johnson et al. (2021) figures. Current: %s""" % (vice.__version__))
 else: pass
 from .._globals import END_TIME, MAX_SF_RADIUS, ETA_SCALE_RADIUS
 from .migration import diskmigration, gaussian_migration, no_migration
-from . import models
-from . import dtds
-from . import outflows
+from . import models, dtds, outflows, yields
 from .models.utils import get_bin_number, interpolate, modified_exponential
 from .models.diskmodel import two_component_disk, BHG16
 import math as m
@@ -120,7 +118,6 @@ class diskmodel(vice.milkyway):
             evol_kwargs = {},
             verbose = True, 
             migration_mode = "gaussian", 
-            yields="yZ1",
             delay = 0.04, 
             RIa = "plateau", 
             RIa_kwargs={}, 
@@ -136,29 +133,6 @@ class diskmodel(vice.milkyway):
             local_disk_ratio=0.12, 
             **kwargs
         ):
-        # Set the yields
-        if yields == "JW20":
-            from vice.yields.presets import JW20
-        elif yields == "C22":
-            from .yields import C22
-        elif yields == "F04":
-            from .yields import F04
-        elif yields == "W24":
-            # Magg+ 2022 Solar abundances
-            from .yields import W24
-            # Magg22_ZX = 0.0225 # Z/X ratio
-            # Y = vice.solar_z["he"]
-            # self.Z_solar = Magg22_ZX * (1 - Y) / (1 + Magg22_ZX)
-        elif yields == "W24mod":
-            from .yields import W24mod
-        elif yields == "yZ1":
-            from .yields import yZ1
-        elif yields == "yZ2":
-            from .yields import yZ2
-        elif yields == "yZ3":
-            from .yields import yZ3
-        else:
-            from .yields import J21
         super().__init__(zone_width = zone_width, name = name,
             verbose = verbose, **kwargs)
         # Migration prescription
@@ -186,14 +160,6 @@ class diskmodel(vice.milkyway):
                 self.mass_loading = outflows.exponential(
                     solar_value=eta_solar, scale_radius=ETA_SCALE_RADIUS
                 )
-            elif yields == "J21":
-                self.mass_loading = vice.milkyway.default_mass_loading
-            elif yields == "yZ1":
-                self.mass_loading = outflows.yZ1
-            elif yields == "yZ2":
-                self.mass_loading = outflows.yZ2
-            elif yields == "yZ3":
-                self.mass_loading = outflows.yZ3
             else:
                 self.mass_loading = outflows.equilibrium()
         else:

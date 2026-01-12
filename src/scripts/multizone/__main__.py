@@ -38,9 +38,6 @@ _DELAY_MODELS_ = [
     "greggio05_single", 
     "greggio05_double"
 ]
-_YIELD_SETS_ = [
-    "JW20", "J21", "W24", "W24mod", "yZ1", "yZ2"
-]
 
 def parse():
     r"""
@@ -134,12 +131,6 @@ underscores. (Default: \"fe_o\")""",
         type = float,
         default = _globals.ZONE_WIDTH
     )
-    parser.add_argument("--yields",
-        help = "The nucleosynthetic yield set to use. (Default: 'yZ1')",
-        type = str,
-        choices = _YIELD_SETS_,
-        default = "yZ1"
-    )
     parser.add_argument("--seed", 
         help = "Seed for the random number generator.",
         type = int,
@@ -174,7 +165,7 @@ If -inf, infalling gas is always pristine. (Default: -inf).",
     )
     parser.add_argument("--eta-solar",
         help = "The outflow mass-loading factor (eta) in the Solar zone. If \
-None, the default outflow settings for the given yields are used. \
+None, the equilibrium yield settings are used. \
 (Default: None)",
         default = None,
         type = float
@@ -216,7 +207,6 @@ def model(args):
         RIa = args.RIa,
         RIa_kwargs = RIa_kwargs,
         delay = args.minimum_delay,
-        yields = args.yields,
         seed = args.seed,
         radial_gas_velocity = args.radial_gas_velocity,
         has_outflows = not args.no_outflows,
