@@ -108,9 +108,9 @@ class equilibrium(exponential):
     """
     def __init__(self, equilibrium=0., recycling=0.4, tau_star=0., tau_sfh=15.,
                  gradient=-0.06):
-        # Calculate eta for exponential SFH to reach desired equilibrium [O/H]
-        Z_alpha_eq = vice.solar_z["o"] * 10 ** equilibrium
-        yield_ratio = vice.yields.ccsne.settings["o"] / Z_alpha_eq
+        # Calculate eta for exponential SFH to reach desired equilibrium [Mg/H]
+        Z_alpha_eq = vice.solar_z["mg"] * 10 ** equilibrium
+        yield_ratio = vice.yields.ccsne.settings["mg"] / Z_alpha_eq
         eta_sun = yield_ratio - 1 + recycling + tau_star / tau_sfh
         scale_radius = -1 / (gradient * m.log(10))
         super().__init__(eta_sun, scale_radius)
