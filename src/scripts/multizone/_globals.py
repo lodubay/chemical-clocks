@@ -3,7 +3,7 @@ Global variables for the multizone simulations.
 """
 
 # Seed for random number generation (e.g., Gaussian migration)
-RANDOM_SEED = 20230721
+RANDOM_SEED = 20250903
 
 # Total simulation time in Gyr
 END_TIME = 13.2
