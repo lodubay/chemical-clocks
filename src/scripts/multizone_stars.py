@@ -97,8 +97,6 @@ class MultizoneStars:
         # Calculate log age (in years)
         with np.errstate(divide='ignore'): # some stars will have 0 age
             stars['log_age'] = np.log10(stars['age']) + 9.
-        # Calculate [Fe/O]
-        stars['[fe/o]'] = -stars['[o/fe]']
         # Convert radial zone indices to Galactic radii in kpc
         stars['galr_origin'] = zone_width * stars['zone_origin']
         stars['galr_final'] = zone_width * stars['zone_final']
