@@ -13,6 +13,12 @@ src = root / 'src'
 # Absolute path to the `src/data` folder (contains datasets)
 data = src / 'data'
 
+# Absolute path to the folder containing multizone model outputs
+onezone = data / 'onezone'
+
+# Absolute path to the folder containing multizone model outputs
+multizone = data / 'multizone'
+
 # Absolute path to the `src/extra` folder (contains log files and plots which
 # won't be included in the manuscript)
 extra = src / 'extra'
