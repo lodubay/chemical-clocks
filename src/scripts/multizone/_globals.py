@@ -21,8 +21,8 @@ M_STAR_MW = 5.17e10
 DT = 0.01
 
 # List of elements to simulate
-# Order is important! "Reference elements" (e.g., Fe) should come first
-ELEMENTS = ["fe", "mg", "ce"]
+# Order is important! "Reference elements" (e.g., Mg) should come first
+ELEMENTS = ["mg", "fe", "ce"]
 
 # Number of stellar populations per zone per timestep
 NSTARS = 8
