@@ -101,7 +101,7 @@ def main(style='paper'):
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Different delayed enrichment scales
-    delayed_ce_yields = [2e-8, 1e-8, 3e-9, 0]
+    delayed_ce_yields = [1e-8, 3e-9, 1e-9, 0]
     colors = [paultol.bright.colors[c] for c in [1, 0, 2, 3]]
     for i, yld in enumerate(delayed_ce_yields):
         vice.yields.sneia.settings['ce'] = yld
