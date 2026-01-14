@@ -135,7 +135,7 @@ def main(style='paper'):
     # Text-only lengend
     leg = colored_text_legend(axs[0,0], loc='upper right')
 
-    plt.savefig(paths.figures / 'median_trends')
+    plt.savefig(paths.figures / 'median_trends_grid')
 
 
 if __name__ == '__main__':
