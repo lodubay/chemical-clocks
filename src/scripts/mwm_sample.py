@@ -39,7 +39,7 @@ def main():
     # Quality cuts
     print('Implementing quality cuts...')
     mwm_good = mwm_full[
-        (mwm_full['sdss4_apogee_extra_target_flags'] < 2) &
+        (mwm_full['sdss4_apogee_extra_target_flags'] == 0) &
         (mwm_full['flag_bad'] == 0) & 
         (mwm_full['spectrum_flags'] == 0) &
         (mwm_full['snr'] > 100) &
