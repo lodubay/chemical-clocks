@@ -9,7 +9,7 @@ import _globals
 
 def main():
     plt.style.use(paths.styles / 'paper.mplstyle')
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB_EXTRATARG.csv')
     mwm_rgb.rename(
         columns={'age': 'starflow_age', 'e_p_age': 'e_p_starflow_age', 'e_n_age': 'e_n_starflow_age'},
         inplace=True
