@@ -19,6 +19,8 @@ def main(style='paper', cmap='jet_r'):
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
     radius_bin_edges = np.arange(2.5, 15.6, 1)
     age_bin_edges = np.arange(0, 10.1, 2)
+    fine_Rg_bins = np.arange(0, 16.1, 0.5)
+    fine_ce_bins = np.arange(-0.8, 0.81, 0.05)
 
     # Select only low-alpha, near-midplane stars
     mwm_rgb = apply_alpha_cut(mwm_rgb)
@@ -32,24 +34,37 @@ def main(style='paper', cmap='jet_r'):
         sharex=True,
         gridspec_kw={'hspace': 0.}
     )
+    # fig.subplots_adjust(right=0.8)
     cax = insert_colorbar_axes(fig, 'horizontal', pad=0.05)
     age_cmap = plt.get_cmap(cmap)
     norm = BoundaryNorm(age_bin_edges, age_cmap.N)
     xlim = (0, 16)
-    ylim = [(-0.6, 0.6), (-0.5, 0.7)]
+    ylim = [(-0.6, 0.6), (-0.6, 0.6)]
 
     for i, col in enumerate(['ce_h', 'ce_mg']):
         # Plot all stars
-        pcm = axs[i].hexbin(
+        # pcm = axs[i].hexbin(
+        #     all_lowz['Rg'], all_lowz[col],
+        #     C=np.ones(all_lowz.shape[0]),
+        #     reduce_C_function=np.sum,
+        #     gridsize=(30, 12),
+        #     cmap='binary',
+        #     norm=Normalize(vmin=0, vmax=350),
+        #     linewidths=0.2,
+        #     # mincnt=1,
+        #     extent=[xlim[0], xlim[1], ylim[i][0], ylim[i][1]]
+        # )
+        H, xedges, yedges = np.histogram2d(
             all_lowz['Rg'], all_lowz[col],
-            C=np.ones(all_lowz.shape[0]),
-            reduce_C_function=np.sum,
-            gridsize=(30, 12),
+            bins=[fine_Rg_bins, fine_ce_bins],
+            density=True
+        )
+        # normalize by column
+        H_norm_cols = H / np.sum(H, axis=0, keepdims=True)
+        pcm = axs[i].pcolormesh(
+            xedges, yedges, H_norm_cols,
             cmap='binary',
-            norm=Normalize(vmin=0, vmax=350),
-            linewidths=0.2,
-            # mincnt=1,
-            extent=[xlim[0], xlim[1], ylim[i][0], ylim[i][1]]
+            norm=Normalize(vmin=0, vmax=0.2)
         )
         # fig.colorbar(pcm, ax=axs[i])
 
@@ -70,7 +85,13 @@ def main(style='paper', cmap='jet_r'):
                 color=age_cmap(norm(mean_age)), 
                 label=f'{int(mean_age)} Gyr'
             )
-    fig.colorbar(pcm, cax=cax, orientation='horizontal', label='Number of stars')
+    fig.colorbar(
+        pcm, 
+        cax=cax, 
+        orientation='horizontal', 
+        label='Number of stars', 
+        extend='max'
+    )
 
     axs[0].set_xlim(xlim)
     axs[0].set_ylim(ylim[0])
@@ -87,8 +108,14 @@ def main(style='paper', cmap='jet_r'):
     axs[1].set_ylabel('[Ce/Mg]')
     axs[1].set_xlabel(r'$R_{\rm guide}$ [kpc]')
 
-    leg = colored_text_legend(axs[0], loc='center left', title='Age')
-    leg = colored_text_legend(axs[1], loc='center left', title='Age')
+    for ax in axs:
+        colored_text_legend(
+            ax, 
+            loc='center left', 
+            frameon=True,
+            framealpha=1,
+            edgecolor='k'
+        )
 
     plt.savefig(paths.figures / 'ce_gradient')
     plt.close()
