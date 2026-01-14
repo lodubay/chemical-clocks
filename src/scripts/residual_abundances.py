@@ -187,7 +187,7 @@ def main(style='paper'):
     for i, ax in enumerate(axs[0,:]):
         ax.set_title(r'$%s\leq R_{\rm guide}<%s$ kpc' % RBINS[i], fontsize=8)
     for ax in axs[:,0]:
-        ax.set_ylabel(r'$\Delta$[Ce/H]$_{\rm corr}$')
+        ax.set_ylabel(r'$\Delta$[Ce/H]')
     for i, ax in enumerate(axs[:,-1]):
         ax.yaxis.set_label_position('right')
         ax.set_ylabel(
