@@ -172,7 +172,7 @@ def main(style='paper'):
         3, -0.4, 
         xerr=[[age_err_low], [age_err_high]], 
         yerr=med_abund_err, 
-        c='gray', capsize=0, elinewidth=0.5,
+        c='gray', capsize=0, #elinewidth=0.5,
     )
 
     # Format axes
