@@ -21,7 +21,7 @@ def main(style='paper'):
     # Divide by low/high alpha
     mwm_rgb = apply_alpha_cut(mwm_rgb)
 
-    mg_bin_edges = np.arange(-0.75, 0.76, 0.1)
+    mg_bin_edges = np.arange(-0.55, 0.56, 0.1)
     age_bin_edges = np.arange(0.5, 11.6, 1)
 
     # Solar neighborhood sample
@@ -66,7 +66,6 @@ def main(style='paper'):
         good_ages(mwm_rgb_local), 
         int(SAMPLE_FRACTION * mwm_rgb_local.shape[0])
     )
-    # sample = sample_rows(subset, SAMPLE_SIZE)
     low_alpha_sample = local_low_alpha.loc[sample[sample['low_alpha']].index]
     high_alpha_sample = local_high_alpha.loc[sample[sample['high_alpha']].index]
     
@@ -182,17 +181,19 @@ def main(style='paper'):
         *high_alpha_age_medians, '.-', color=high_alpha_color, zorder=6,
         label='Low-Ia'
     )
+    # Horizontal line for reference
+    axs[1,1].plot([-1, 12], [0, 0], linestyle=':', color='gray', zorder=5)
 
     # Axes labels
     axs[0,0].set_ylabel(r'[Ce/H]$_{\rm corr}$')
-    axs[1,0].set_ylabel(r'$\Delta$[Ce/H]$_{\rm corr}$')
+    axs[1,0].set_ylabel(r'$\Delta$[Ce/H]')
     axs[1,0].set_xlabel('[Mg/H]')
     axs[1,1].set_xlabel('Age [Gyr]')
 
     # Axes limits
-    axs[0,0].set_xlim((-0.8, 0.6))
-    axs[0,0].set_ylim((-0.9, 0.8))
-    axs[1,0].set_ylim((-0.7, 0.7))
+    axs[0,0].set_xlim((-0.7, 0.6))
+    axs[0,0].set_ylim((-0.8, 0.8))
+    axs[1,0].set_ylim((-0.8, 0.8))
     axs[0,1].set_xlim((-1, 12))
 
     # Axes ticks
@@ -205,7 +206,13 @@ def main(style='paper'):
     axs[0,1].xaxis.set_major_locator(MultipleLocator(5))
     axs[0,1].xaxis.set_minor_locator(MultipleLocator(1))
 
-    leg = colored_text_legend(axs[0,0], loc='upper left')
+    leg = colored_text_legend(
+        axs[0,0], 
+        loc='lower right',
+        frameon=True,
+        framealpha=1,
+        edgecolor='none'
+    )
 
     plt.savefig(paths.figures / 'residual_explainer')
 
