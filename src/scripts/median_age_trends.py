@@ -100,7 +100,7 @@ def main(style='paper', cmap='viridis_r'):
 
     leg = colored_text_legend(axs[0], ncols=2, loc='upper right')
 
-    plt.savefig(paths.figures / 'median_trends')
+    plt.savefig(paths.figures / 'median_age_trends')
     plt.close()
 
 
