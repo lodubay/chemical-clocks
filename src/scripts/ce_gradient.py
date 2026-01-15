@@ -89,7 +89,7 @@ def main(style='paper', cmap='jet_r'):
         pcm, 
         cax=cax, 
         orientation='horizontal', 
-        label='Number of stars', 
+        label='Column-normalized fraction', 
         extend='max'
     )
 
