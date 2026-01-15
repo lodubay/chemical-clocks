@@ -13,7 +13,7 @@ from _globals import ONE_COLUMN_WIDTH
 from colormaps import paultol
 import paths
 
-def main(style='paper', cmap='jet_r'):
+def main(style='paper', cmap='jet'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
