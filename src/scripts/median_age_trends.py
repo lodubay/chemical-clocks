@@ -121,6 +121,17 @@ def main(style='paper', cmap='viridis_r'):
                 color=radial_cmap(norm(mean_radius))
             )
     fig.colorbar(pcm, cax=cax, orientation='horizontal', label='Number of stars')
+    # Indicate median abundance errors
+    mwm_rgb_ages = good_ages(mwm_rgb)
+    age_err_low = np.median(mwm_rgb_ages['age'] - mwm_rgb_ages['e_n_age'])
+    age_err_high = np.median(mwm_rgb_ages['e_p_age'] - mwm_rgb_ages['age'])
+    med_abund_err = mwm_rgb_ages['e_ce_h'].median()
+    axs[0].errorbar(
+        9.5, 0.55, 
+        xerr=[[age_err_low], [age_err_high]], 
+        yerr=med_abund_err, 
+        c='gray', capsize=0, #elinewidth=0.5,
+    )
 
     axs[0].set_xlim(xlim)
     axs[0].set_ylim(ylim[0])
