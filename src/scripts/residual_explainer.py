@@ -101,32 +101,32 @@ def main(style='paper'):
         local_low_alpha, 'delta_ce_h', 'mg_h',
         q=0.16, bin_edges=mg_bin_edges, min_count=10
     )
-    axs[1,0].plot(*low_alpha_sigma_low, '--', color=low_alpha_color)
+    axs[1,0].plot(*low_alpha_sigma_low, '--', color=low_alpha_color, zorder=6)
     low_alpha_sigma_med = binned_quantiles(
         local_low_alpha, 'delta_ce_h', 'mg_h',
         q=0.5, bin_edges=mg_bin_edges, min_count=10
     )
-    axs[1,0].plot(*low_alpha_sigma_med, '-', color=low_alpha_color)
+    axs[1,0].plot(*low_alpha_sigma_med, '-', color=low_alpha_color, zorder=6)
     low_alpha_sigma_high = binned_quantiles(
         local_low_alpha, 'delta_ce_h', 'mg_h',
         q=0.84, bin_edges=mg_bin_edges, min_count=10
     )
-    axs[1,0].plot(*low_alpha_sigma_high, '--', color=low_alpha_color)
+    axs[1,0].plot(*low_alpha_sigma_high, '--', color=low_alpha_color, zorder=6)
     high_alpha_sigma_low = binned_quantiles(
         local_high_alpha, 'delta_ce_h', 'mg_h',
         q=0.16, bin_edges=mg_bin_edges, min_count=10
     )
-    axs[1,0].plot(*high_alpha_sigma_low, '--', color=high_alpha_color)
+    axs[1,0].plot(*high_alpha_sigma_low, '--', color=high_alpha_color, zorder=6)
     high_alpha_sigma_med = binned_quantiles(
         local_high_alpha, 'delta_ce_h', 'mg_h',
         q=0.5, bin_edges=mg_bin_edges, min_count=10
     )
-    axs[1,0].plot(*high_alpha_sigma_med, '-', color=high_alpha_color)
+    axs[1,0].plot(*high_alpha_sigma_med, '-', color=high_alpha_color, zorder=6)
     high_alpha_sigma_high = binned_quantiles(
         local_high_alpha, 'delta_ce_h', 'mg_h',
         q=0.84, bin_edges=mg_bin_edges, min_count=10
     )
-    axs[1,0].plot(*high_alpha_sigma_high, '--', color=high_alpha_color)
+    axs[1,0].plot(*high_alpha_sigma_high, '--', color=high_alpha_color, zorder=6)
 
     # Plot [Ce/H] vs age
     axs[0,1].scatter(
@@ -182,6 +182,7 @@ def main(style='paper'):
         label='Low-Ia'
     )
     # Horizontal line for reference
+    axs[1,0].plot([-0.7, 0.6], [0, 0], linestyle=':', color='gray', zorder=5)
     axs[1,1].plot([-1, 12], [0, 0], linestyle=':', color='gray', zorder=5)
 
     # Axes labels
