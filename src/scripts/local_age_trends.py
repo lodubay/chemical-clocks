@@ -17,7 +17,7 @@ import paths
 MET_COL = 'm_h_atm' # Column with metallicity values
 MET_LABEL = r'[M/H]$_{\rm atm}$'
 AGE_FIT_RANGE = (1, 8) # Range of ages to fit linear trend
-SAMPLE_FRACTION = 0.25 # fraction of stars to plot in each panel
+SAMPLE_FRACTION = 1 # fraction of stars to plot in each panel
 RLIM = (7, 9)
 ZLIM = (0, 0.5)
 
