@@ -31,7 +31,7 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
 
     Parameters
     ----------
-    cmap : matplotlib colormap instance
+    cmap : str or matplotlib colormap instance
     minval : float, optional
         Lower truncation bound, between 0 and 1. Default is 0.
     maxval : float, optional
@@ -44,6 +44,8 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     new_cmap : matplotlib.colors.LinearSegmentedColormap
         New, truncated colormap.
     """
+    if isinstance(cmap, str):
+        cmap = plt.get_cmap(cmap)
     new_cmap = LinearSegmentedColormap.from_list(
         'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
         cmap(np.linspace(minval, maxval, n)))
