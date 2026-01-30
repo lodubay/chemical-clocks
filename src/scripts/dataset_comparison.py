@@ -169,23 +169,31 @@ def join_apokasc_mwm():
         ((apokasc3['EvolState'] == 'RGB') |
          (apokasc3['EvolState'] == 'RC'))
     ]
-    apokasc3['AgeBest'] = apokasc3['AgeRGB'].copy()
-    apokasc3['AgeBest'].where(
+    # apokasc3['AgeBest'] = apokasc3['AgeRGB'].copy()
+    apokasc3['AgeBest'] = apokasc3['AgeRGB'].where(
         apokasc3['EvolState'] == 'RGB',
-        apokasc3['AgeRC'],
-        inplace=True
+        apokasc3['AgeRC']
     )
     # Import full DR19 catalog
     mwm_full = fits_to_pandas(
         paths.data / 'MWM' / 'astraAllStarASPCAP-0.6.0.fits.gz', 
         hdu=2
     )
-    # Drop bad abundances
-    mwm_full = mwm_full[mwm_full['ce_h_flags'] == 0]
-    mwm_full['ce_mg'], mwm_full['e_ce_mg'] = abundance_ratio(mwm_full, 'ce', 'mg')
+    # drop duplicate SDSS-V IDs with the lowest SNR
+    mwm_full.sort_values(['sdss_id', 'snr'], inplace=True, ascending=True)
+    mwm_full.drop_duplicates(subset='sdss_id', keep='last', inplace=True)
+    # Drop bad spectrum and abundance flags
+    mwm_good = mwm_full[
+        (mwm_full['flag_bad'] == 0) & 
+        (mwm_full['spectrum_flags'] == 0) &
+        (mwm_full['snr'] > 50) &
+        (mwm_full['ce_h_flags'] == 0) &
+        (mwm_full['sdss_id'] > 0)
+    ].copy()
+    mwm_good['ce_mg'], mwm_good['e_ce_mg'] = abundance_ratio(mwm_good, 'ce', 'mg')
     # Merge MWM Ce with APOKASC
     apokasc3 = apokasc3.set_index('APOGEE_ID').join(
-        mwm_full[['sdss4_apogee_id', 'ce_mg', 'e_ce_mg']].set_index('sdss4_apogee_id')
+        mwm_good[['sdss4_apogee_id', 'ce_mg', 'e_ce_mg']].set_index('sdss4_apogee_id')
     )
     apokasc3.rename(columns={'ce_mg': 'MWM_CE_MG', 'e_ce_mg': 'MWM_CE_MG_ERR'}, inplace=True)
     return apokasc3
