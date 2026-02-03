@@ -17,6 +17,9 @@ import gala.potential as gp
 from utils import fits_to_pandas, get_bin_centers
 import paths
 
+LOGG_CUT = (1.0, 3.5)
+TEFF_CUT = (3500, 5500)
+
 def main():
     # Import full DR19 catalog (takes a while)
     print('Importing DR19 catalog...')
@@ -88,8 +91,8 @@ def main():
     # mwm_good['galpy_Lz'] = Lz
     # Red giants only
     mwm_rgb = mwm_good[
-        (mwm_good['logg'] > 1.0) & (mwm_good['logg'] < 3.5) &
-        (mwm_good['teff'] < 5500) & (mwm_good['teff'] > 3500)
+        (mwm_good['logg'] > LOGG_CUT[0]) & (mwm_good['logg'] < LOGG_CUT[1]) &
+        (mwm_good['teff'] > TEFF_CUT[0]) & (mwm_good['teff'] < TEFF_CUT[1])
     ].copy()
     # Apply log(g) calibrations
     print('Applying log(g) calibrations...')
