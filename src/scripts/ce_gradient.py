@@ -18,7 +18,7 @@ def main(style='paper', cmap='jet'):
     # Import MWM sample
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
     radius_bin_edges = np.arange(2.5, 15.6, 1)
-    age_bin_edges = np.arange(0, 10.1, 2)
+    age_bin_edges = np.arange(0.5, 10.6, 1)
     fine_Rg_bins = np.arange(0, 16.1, 0.5)
     fine_ce_bins = np.arange(-0.8, 0.81, 0.05)
 
@@ -26,6 +26,7 @@ def main(style='paper', cmap='jet'):
     mwm_rgb = apply_alpha_cut(mwm_rgb)
     all_lowz = good_ages(mwm_rgb[(mwm_rgb['z_max'] < 0.5)].copy())
     all_low_alpha = good_ages(mwm_rgb[(mwm_rgb['z_max'] < 0.5) & (mwm_rgb['low_alpha'])].copy())
+    all_high_alpha = good_ages(mwm_rgb[(mwm_rgb['z_max'] < 0.5) & (mwm_rgb['high_alpha'])].copy())
     
     # Set up figure
     fig, axs = plt.subplots(
@@ -34,11 +35,11 @@ def main(style='paper', cmap='jet'):
         sharex=True,
         gridspec_kw={'hspace': 0.}
     )
-    # fig.subplots_adjust(right=0.8)
+    fig.subplots_adjust(right=0.8)
     cax = insert_colorbar_axes(fig, 'horizontal', pad=0.05)
     age_cmap = plt.get_cmap(cmap)
     norm = BoundaryNorm(age_bin_edges, age_cmap.N)
-    xlim = (0, 16)
+    xlim = (2, 16)
     ylim = [(-0.6, 0.6), (-0.6, 0.6)]
 
     for i, col in enumerate(['ce_h', 'ce_mg']):
@@ -71,17 +72,32 @@ def main(style='paper', cmap='jet'):
         for j in range(len(age_bin_edges)-1):
             age_bin = age_bin_edges[j:j+2]
             mean_age = np.mean(age_bin)
-            subset = all_lowz[
-                (all_lowz['age'] >= age_bin[0]) &
-                (all_lowz['age'] < age_bin[1])
+            # Plot high-alpha trends
+            high_alpha_subset = all_high_alpha[
+                (all_high_alpha['age'] >= age_bin[0]) &
+                (all_high_alpha['age'] < age_bin[1])
             ]
-            Rg_medians = binned_quantiles(
-                subset, col, 'Rg',
+            high_alpha_medians = binned_quantiles(
+                high_alpha_subset, col, 'Rg',
                 q=0.5, bin_edges=radius_bin_edges, min_count=10
             )
-            axs[i].plot(*Rg_medians, '-', color='w', linewidth=2)
+            axs[i].plot(*high_alpha_medians, '-', color='w', linewidth=2)
             axs[i].plot(
-                *Rg_medians, '-', 
+                *high_alpha_medians, '--', 
+                color=age_cmap(norm(mean_age)), 
+            )
+            # Plot low-alpha trends
+            low_alpha_subset = all_low_alpha[
+                (all_low_alpha['age'] >= age_bin[0]) &
+                (all_low_alpha['age'] < age_bin[1])
+            ]
+            low_alpha_medians = binned_quantiles(
+                low_alpha_subset, col, 'Rg',
+                q=0.5, bin_edges=radius_bin_edges, min_count=10
+            )
+            axs[i].plot(*low_alpha_medians, '-', color='w', linewidth=2)
+            axs[i].plot(
+                *low_alpha_medians, '-', 
                 color=age_cmap(norm(mean_age)), 
                 label=f'{int(mean_age)} Gyr'
             )
@@ -89,7 +105,7 @@ def main(style='paper', cmap='jet'):
         pcm, 
         cax=cax, 
         orientation='horizontal', 
-        label='Column-normalized fraction', 
+        label='Column-normalized density', 
         extend='max'
     )
 
@@ -108,14 +124,19 @@ def main(style='paper', cmap='jet'):
     axs[1].set_ylabel('[Ce/Mg]')
     axs[1].set_xlabel(r'$R_{\rm guide}$ [kpc]')
 
-    for ax in axs:
-        colored_text_legend(
-            ax, 
-            loc='center left', 
-            frameon=True,
-            framealpha=1,
-            edgecolor='k'
-        )
+    # for ax in axs:
+    #     colored_text_legend(
+    #         ax, 
+    #         loc='center left', 
+    #         frameon=True,
+    #         framealpha=1,
+    #         edgecolor='k'
+    #     )
+    colored_text_legend(
+        axs[0], 
+        loc='center left', 
+        bbox_to_anchor=(1, 0)
+    )
 
     plt.savefig(paths.figures / 'ce_gradient')
     plt.close()
