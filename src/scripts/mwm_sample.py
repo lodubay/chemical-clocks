@@ -18,7 +18,7 @@ from utils import fits_to_pandas, get_bin_centers
 import paths
 
 LOGG_CUT = (1.0, 3.5)
-TEFF_CUT = (3500, 5500)
+TEFF_CUT = (4000, 5500)
 
 def main():
     # Import full DR19 catalog (takes a while)
