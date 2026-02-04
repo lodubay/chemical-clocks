@@ -4,6 +4,8 @@ Functions for plotting.
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.collections import PathCollection
+from matplotlib.lines import Line2D
 
 def get_color_list(cmap, bins):
     """
@@ -116,11 +118,15 @@ def colored_text_legend(ax, **kwargs):
     -------
     leg : matplotlib.legend.Legend
     """
+    handles, labels = ax.get_legend_handles_labels()
     # Remove legend handles
-    leg = ax.legend(handlelength=0, handletextpad=0, **kwargs)
+    leg = ax.legend(handlelength=0, handletextpad=0, markerscale=0, **kwargs)
     for line in leg.get_lines():
         line.set_visible(False)
-    # Color-code legend text
-    for line, text in zip(leg.get_lines(), leg.get_texts()):
-        text.set_color(line.get_color())
+    # Color-code legend text by line and point colors
+    for handle, text in zip(handles, leg.get_texts()):
+        if isinstance(handle, PathCollection):
+            text.set_color(handle.get_facecolor()[0])
+        elif isinstance(handle, Line2D):
+            text.set_color(handle.get_color())
     return leg
