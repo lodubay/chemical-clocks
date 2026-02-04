@@ -24,19 +24,26 @@ def main(style='paper'):
     cmap = plt.get_cmap('Spectral_r')
     norm = BoundaryNorm(np.arange(0, 11, 1), cmap.N, extend='max')
     ax.scatter(
-        mwm_rgb['mg_h'], mwm_rgb['ce_mg'], 
+        mwm_rgb['mg_h'], mwm_rgb['ce_mg_corr'], 
         c=mwm_rgb['age'], cmap=cmap, norm=norm,
         s=1, rasterized=True, edgecolors='none', marker='o', zorder=0
     )
     pc, contours = hexbin_contours(
-        ax, mwm_rgb['mg_h'], mwm_rgb['ce_mg'], mwm_rgb['age'],
+        ax, mwm_rgb['mg_h'], mwm_rgb['ce_mg_corr'], mwm_rgb['age'],
         gridsize=30, extent=[XLIM[0], XLIM[1], YLIM[0], YLIM[1]],
         cmap=cmap, norm=norm, mincnt=10, contours=4,
     )
     print(contours)
     fig.colorbar(pc, ax=ax, label='StarFlow Age [Gyr]')
+    # Indicate median abundance errors
+    ax.errorbar(
+        0.4, 0.6, 
+        xerr=mwm_rgb['e_mg_h'].median(), 
+        yerr=mwm_rgb['e_ce_mg'].median(), 
+        c='gray', capsize=0, elinewidth=1,
+    )
     ax.set_xlabel('[Mg/H]')
-    ax.set_ylabel('[Ce/Mg]')
+    ax.set_ylabel(r'[Ce/Mg]$_{\rm corr}$')
     ax.set_xlim(XLIM)
     ax.set_ylim(YLIM)
     ax.xaxis.set_major_locator(MultipleLocator(0.5))
