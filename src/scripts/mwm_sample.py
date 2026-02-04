@@ -19,6 +19,7 @@ import paths
 
 LOGG_CUT = (1.0, 3.5)
 TEFF_CUT = (4000, 5500)
+ABUND_ERR_CUT = 0.2
 
 def main():
     # Import full DR19 catalog (takes a while)
@@ -51,16 +52,23 @@ def main():
     # drop duplicate SDSS-V IDs with the lowest SNR
     mwm_good.sort_values(['sdss_id', 'snr'], inplace=True, ascending=True)
     mwm_good.drop_duplicates(subset='sdss_id', keep='last', inplace=True)
-    # drop stars with no [Fe/H] or [O/H]
+    # drop stars with no abundance values
     mwm_good = mwm_good[
         (mwm_good['ce_h'] > -999) & 
         (mwm_good['mg_h'] > -999) &
         (mwm_good['fe_h'] > -999)
     ]
+    # Remove stars with abundance flags
     mwm_good = mwm_good[
         (mwm_good['ce_h_flags'] == 0) &
         (mwm_good['mg_h_flags'] == 0) &
         (mwm_good['fe_h_flags'] == 0)
+    ]
+    # Limit to stars with low abundance uncertainties
+    mwm_good = mwm_good[
+        (mwm_good['e_ce_h'] < ABUND_ERR_CUT) &
+        (mwm_good['e_mg_h'] < ABUND_ERR_CUT) &
+        (mwm_good['e_fe_h'] < ABUND_ERR_CUT)
     ]
     # Calculate abundance ratios and errors in quadrature
     print('Calculating abundance ratios and coordinates...')
