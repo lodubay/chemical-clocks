@@ -77,7 +77,7 @@ Paper goals
         \multicolumn{1}{c}{Parameter} & \multicolumn{1}{c}{Range or Value} & \multicolumn{1}{c}{Notes} \\
         \hline
         $\log g$            & $[1.0, 3.5]$          & RGB selection \\
-        $T_{\rm eff}$       & $[3500, 5500]$ K      & RGB selection \\
+        $T_{\rm eff}$       & $[4000, 5500]$ K      & RGB selection \\
         $S/N$               & $> 100$               & \todo{Justify} \\
         BAD flag            & 0                     & Bad flag for results\\
         SPECTRUM flag       & 0                     & Data reduction pipeline flags \\
@@ -92,6 +92,8 @@ Paper goals
 We use data from the Milky Way Mapper (MWM; \todo{cite}), a program of the fifth generation of the Sloan Digital Sky Survey \citep[SDSS-V;][]{kollmeier_sdss-v_2017,kollmeier_sloan_2025} data release 19 \citep[DR19;][]{sdss_collaboration_nineteenth_2025}. The catalog includes all data from the previous Apache Point Observatory Galactic Evolution Experiment (APOGEE) DR17 \citep{abdurrouf_seventeenth_2022}. MWM DR19 data were obtained from the infrared APOGEE spectrographs \citep{wilson_apache_2019} mounted on the 2.5-meter Sloan Foundation Telescope \citep{gunn_25_2006} at Apache Point Observatory and the Ir{\'e}n{\'e}e DuPont Telescope \citep{bowen_optical_1973} at Las Campanas Observatory. 
 
 Atmospheric parameters and chemical abundances were determined with the APOGEE Stellar Parameter and Chemical Abundance Pipeline \citep[ASPCAP;][]{garcia_perez_aspcap_2016}, which compares a grid of synthetic spectra \citep{hubeny_tlusty_2021} to the observed spectra using $\chi^2$ minimization. The line lists for most species are presented in \citet{smith_apogee_2021}, with additional Ce lines described by \citet{cunha_adding_2017}. All DR19 abundances assume local thermodynamic equilibrium (LTE). The spectral synthesis is further described by \citet{holtzman_apogee_2018} and \citet{jonsson_apogee_2020}.
+
+We select red giant branch (RGB; $1.0<\log g<3.5$) stars 
 
 \subsection{Stellar Ages}
 
@@ -109,6 +111,21 @@ Ce lines in APOGEE reported by \citet{cunha_adding_2017}.
 \end{itemize}
 
 \subsection{Corrective Abundance Offsets}
+
+% Zero-point offsets
+% DR17 (from allStarLite)
+% Ce: -0.05566
+% Mg: +0.063523
+% Fe: 0
+% DR19 (from allStar)
+% Ce: +0.14872
+% Mg: +0.004268
+% Fe: +0.013549
+% DR19 (from Meszaros++ 2025)
+% Ce: -0.1186
+% Mg: -0.00005
+% Fe: ---
+% Why are these different??
 
 \todo{Contribution from Tawny.}
 
@@ -132,6 +149,15 @@ Figure \ref{fig:logg-calibrations} shows the effect of the corrective offsets on
 
 \section{Results}
 \label{sec:results}
+
+\subsection{Age Trend Validation}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/dataset_comparison.pdf}
+    \caption{Comparison of the age--[Ce/Mg] trend between MWM+StarFlow, OCCAM, and APOKASC-3. Each survey uses different age estimation techniques, but the abundances on the y-axis all come from DR19.}
+    \label{fig:placeholder}
+\end{figure}
 
 \begin{itemize}
     \item Compare [Ce/Mg]--age trends in different regions of the Galaxy.
