@@ -10,24 +10,31 @@ from matplotlib.ticker import MultipleLocator
 
 from _globals import ONE_COLUMN_WIDTH
 from plotting import get_color_list
+from utils import good_ages
 import paths
 
-XLIM = (-0.9, 0.5)
-YLIM = (-0.7, 0.7)
+XLIM = (-0.7, 0.5)
+YLIM = (-0.8, 0.8)
 
 def main(style='paper'):
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
+    mwm_rgb = good_ages(mwm_rgb)
     plt.style.use(paths.styles / f'{style}.mplstyle')
     fig, ax = plt.subplots(figsize=(ONE_COLUMN_WIDTH, 0.7*ONE_COLUMN_WIDTH))
     cmap = plt.get_cmap('Spectral_r')
     norm = BoundaryNorm(np.arange(0, 11, 1), cmap.N, extend='max')
+    ax.scatter(
+        mwm_rgb['mg_h'], mwm_rgb['ce_mg'], 
+        c=mwm_rgb['age'], cmap=cmap, norm=norm,
+        s=1, rasterized=True, edgecolors='none', marker='o', zorder=0
+    )
     pc, contours = hexbin_contours(
         ax, mwm_rgb['mg_h'], mwm_rgb['ce_mg'], mwm_rgb['age'],
         gridsize=30, extent=[XLIM[0], XLIM[1], YLIM[0], YLIM[1]],
-        cmap=cmap, norm=norm, mincnt=0, contours=5,
+        cmap=cmap, norm=norm, mincnt=10, contours=4,
     )
     print(contours)
-    fig.colorbar(pc, ax=ax, label='Age [Gyr]')
+    fig.colorbar(pc, ax=ax, label='StarFlow Age [Gyr]')
     ax.set_xlabel('[Mg/H]')
     ax.set_ylabel('[Ce/Mg]')
     ax.set_xlim(XLIM)
@@ -83,7 +90,7 @@ def hexbin_contours(
     if isinstance(contours, int):
         # Invisible hexbin for density values
         density = ax.hexbin(x, y, gridsize=gridsize, extent=extent, zorder=0, alpha=0)
-        contours = np.linspace(0, density.get_clim()[1], contours+2, endpoint=True)[1:-1]
+        contours = np.linspace(mincnt, density.get_clim()[1], contours+2, endpoint=True)[1:-1]
     # Get colors for contour outlines
     contour_norm = LogNorm(vmin=contours[0], vmax=contours[-1])
     contour_cmap = plt.get_cmap(contour_cmap)
