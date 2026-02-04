@@ -17,7 +17,7 @@ import paths
 def main(style='paper', cmap='viridis_r'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     radius_bin_edges = np.arange(3, 15.1, 2)
     age_bin_edges = np.arange(0.5, 11.6, 1)
     mg_bin_edges = np.arange(-0.75, 0.76, 0.1)

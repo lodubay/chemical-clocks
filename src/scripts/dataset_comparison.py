@@ -28,7 +28,7 @@ def main(style='paper'):
     ylim = (-0.8, 0.8)
 
     # Plot full MWM DR19 sample
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     mwm_ages = good_ages(mwm_rgb)
     pcm0 = axs[0].hexbin(
         mwm_ages['age'], mwm_ages['ce_mg'],

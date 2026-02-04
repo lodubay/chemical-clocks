@@ -26,7 +26,7 @@ def main(style='paper'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
 
     # Data
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     mwm_rgb = good_ages(mwm_rgb).copy()
     mwm_rgb = apply_alpha_cut(mwm_rgb)
     local_sample = mwm_rgb[

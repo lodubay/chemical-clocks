@@ -16,7 +16,7 @@ from colormaps import paultol
 
 
 def main(style='paper'):
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     # mwm_rgb = good_ages(mwm_rgb)
     plt.style.use(paths.styles / f'{style}.mplstyle')
     fig, axs = plt.subplots(

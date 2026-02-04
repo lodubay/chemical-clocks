@@ -17,7 +17,7 @@ XLIM = (-0.7, 0.5)
 YLIM = (-0.8, 0.8)
 
 def main(style='paper'):
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     mwm_rgb = good_ages(mwm_rgb)
     plt.style.use(paths.styles / f'{style}.mplstyle')
     fig, ax = plt.subplots(figsize=(ONE_COLUMN_WIDTH, 0.7*ONE_COLUMN_WIDTH))

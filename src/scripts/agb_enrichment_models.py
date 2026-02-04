@@ -30,7 +30,7 @@ def main(style='paper'):
     plt.rcParams['axes.prop_cycle'] = plt.cycler('color', paultol.bright.colors)
     
     # Select Solar neighborhood & Solar metallicity stars only
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     mwm_rgb = good_ages(mwm_rgb).copy()
     local_sample = mwm_rgb[
         (mwm_rgb['Rg'] >= 7.5) &

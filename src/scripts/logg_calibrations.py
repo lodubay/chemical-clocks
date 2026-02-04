@@ -30,7 +30,7 @@ def main(style='paper', cmap_name='autumn'):
     logg_bin_centers = get_bin_centers(logg_bin_edges)
 
     # Load MWM data
-    calib_data = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
+    calib_data = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     calib_data = apply_alpha_cut(calib_data)
     calib_data['fe_mg'] = -calib_data['mg_fe']
 

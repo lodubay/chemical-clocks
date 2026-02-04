@@ -16,7 +16,7 @@ import paths
 def main(style='paper', cmap='jet'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     radius_bin_edges = np.arange(2.5, 15.6, 1)
     age_bin_edges = np.arange(0.5, 10.6, 1)
     fine_Rg_bins = np.arange(0, 16.1, 0.5)

@@ -17,7 +17,7 @@ SAMPLE_FRACTION = 0.25
 
 def main(style='paper'):
     # Import MWM sample
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'MWM_RGB.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     # Divide by low/high alpha
     mwm_rgb = apply_alpha_cut(mwm_rgb)
 
