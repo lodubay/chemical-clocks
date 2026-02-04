@@ -42,51 +42,52 @@ def main():
     # print(mwm_full['cc_flg'])
     # Quality cuts
     print('Implementing quality cuts...')
-    mwm_good = mwm_full[
+    sample = mwm_full[
+        (mwm_full['sdss_id'] > 0) &
+        # ASPCAP flags
         (mwm_full['sdss4_apogee_extra_target_flags'] == 0) &
         (mwm_full['flag_bad'] == 0) & 
         (mwm_full['spectrum_flags'] == 0) &
         (mwm_full['snr'] > 100) &
-        (mwm_full['sdss_id'] > 0)
+        (mwm_full['m_h_atm'] > -1.5) & # Meszaros et al. (2025) recommendation
+        # RGB
+        (mwm_full['logg'] > LOGG_CUT[0]) & 
+        (mwm_full['logg'] < LOGG_CUT[1]) &
+        (mwm_full['teff'] > TEFF_CUT[0]) & 
+        (mwm_full['teff'] < TEFF_CUT[1]) &
+        # drop stars with no abundance values
+        (mwm_full['ce_h'] > -999) & 
+        (mwm_full['mg_h'] > -999) &
+        (mwm_full['fe_h'] > -999) &
+        # Remove stars with abundance flags
+        (mwm_full['ce_h_flags'] == 0) &
+        (mwm_full['mg_h_flags'] == 0) &
+        (mwm_full['fe_h_flags'] == 0) &
+        # Limit to stars with low abundance uncertainties
+        (mwm_full['e_ce_h'] < ABUND_ERR_CUT) &
+        (mwm_full['e_mg_h'] < ABUND_ERR_CUT) &
+        (mwm_full['e_fe_h'] < ABUND_ERR_CUT)
     ].copy()
     # drop duplicate SDSS-V IDs with the lowest SNR
-    mwm_good.sort_values(['sdss_id', 'snr'], inplace=True, ascending=True)
-    mwm_good.drop_duplicates(subset='sdss_id', keep='last', inplace=True)
-    # drop stars with no abundance values
-    mwm_good = mwm_good[
-        (mwm_good['ce_h'] > -999) & 
-        (mwm_good['mg_h'] > -999) &
-        (mwm_good['fe_h'] > -999)
-    ]
-    # Remove stars with abundance flags
-    mwm_good = mwm_good[
-        (mwm_good['ce_h_flags'] == 0) &
-        (mwm_good['mg_h_flags'] == 0) &
-        (mwm_good['fe_h_flags'] == 0)
-    ]
-    # Limit to stars with low abundance uncertainties
-    mwm_good = mwm_good[
-        (mwm_good['e_ce_h'] < ABUND_ERR_CUT) &
-        (mwm_good['e_mg_h'] < ABUND_ERR_CUT) &
-        (mwm_good['e_fe_h'] < ABUND_ERR_CUT)
-    ]
+    sample.sort_values(['sdss_id', 'snr'], inplace=True, ascending=True)
+    sample.drop_duplicates(subset='sdss_id', keep='last', inplace=True)
     # Calculate abundance ratios and errors in quadrature
     print('Calculating abundance ratios and coordinates...')
-    mwm_good['mg_fe'], mwm_good['e_mg_fe'] = abundance_ratio(mwm_good, 'mg', 'fe')
-    mwm_good['ce_mg'], mwm_good['e_ce_mg'] = abundance_ratio(mwm_good, 'ce', 'mg')
-    mwm_good['ce_fe'], mwm_good['e_ce_fe'] = abundance_ratio(mwm_good, 'ce', 'fe')
-    mwm_good['c_n'], mwm_good['e_c_n'] = abundance_ratio(mwm_good, 'c', 'n')
+    sample['mg_fe'], sample['e_mg_fe'] = abundance_ratio(sample, 'mg', 'fe')
+    sample['ce_mg'], sample['e_ce_mg'] = abundance_ratio(sample, 'ce', 'mg')
+    sample['ce_fe'], sample['e_ce_fe'] = abundance_ratio(sample, 'ce', 'fe')
+    sample['c_n'], sample['e_c_n'] = abundance_ratio(sample, 'c', 'n')
     # Require Gaia distances
-    mwm_good.dropna(axis=0, how='any', subset=['r_med_photogeo'], inplace=True)
+    sample.dropna(axis=0, how='any', subset=['r_med_photogeo'], inplace=True)
     # Calculate galactocentric coordinates based on galactic l, b and Gaia dist
     galr, galphi, galz = galactic_to_galactocentric(
-        mwm_good['l'], mwm_good['b'], mwm_good['r_med_photogeo']/1000
+        sample['l'], sample['b'], sample['r_med_photogeo']/1000
     )
-    mwm_good['gal_r'] = galr # kpc
-    mwm_good['gal_phi'] = galphi # deg
-    mwm_good['gal_z'] = galz # kpc
+    sample['gal_r'] = galr # kpc
+    sample['gal_phi'] = galphi # deg
+    sample['gal_z'] = galz # kpc
     print('Joining with orbit parameters...')
-    mwm_good = add_kinematics(mwm_good, id_name='gaia_dr3_source_id', verbose=True)
+    sample = add_kinematics(sample, id_name='gaia_dr3_source_id', verbose=True)
     # print('Computing orbits...')
     # rguide, zmax, ecc, energy, Lz = orbit_dynamics(
     #     mwm_good['ra'], mwm_good['dec'], mwm_good['r_med_photogeo']/1000,
@@ -97,18 +98,13 @@ def main():
     # mwm_good['galpy_ecc'] = ecc
     # mwm_good['galpy_E'] = energy
     # mwm_good['galpy_Lz'] = Lz
-    # Red giants only
-    mwm_rgb = mwm_good[
-        (mwm_good['logg'] > LOGG_CUT[0]) & (mwm_good['logg'] < LOGG_CUT[1]) &
-        (mwm_good['teff'] > TEFF_CUT[0]) & (mwm_good['teff'] < TEFF_CUT[1])
-    ].copy()
     # Apply log(g) calibrations
     print('Applying log(g) calibrations...')
-    mwm_rgb = logg_calibrations(mwm_rgb)
+    sample = logg_calibrations(sample)
 
     # Export catalogs
-    print('Exporting RGB sample (MWM_RGB.csv)...')
-    mwm_rgb.to_csv(paths.data / 'MWM' / 'MWM_RGB.csv', index=False)
+    print('Exporting high-quality RGB sample (sample.csv)...')
+    sample.to_csv(paths.data / 'MWM' / 'sample.csv', index=False)
     print('Done!')
 
 
