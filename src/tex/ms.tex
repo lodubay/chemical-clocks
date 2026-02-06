@@ -3,14 +3,14 @@
 
 \usepackage{graphicx}
 \usepackage{xcolor}
+\usepackage{amsmath}
 
 % user-defined commands
 \newcommand{\todo}[1]{{\color{red}#1}}
 \newcommand{\osuaffil}{Department of Astronomy, The Ohio State University, 140 W. 18th Ave, Columbus OH 43210, USA}
 \newcommand{\ccappaffil}{Center for Cosmology and AstroParticle Physics, The Ohio State University, 191 W. Woodruff Ave., Columbus OH 43210, USA}
 
-\newcommand{\bracketXH}[1]{{\rm [#1/H]}}
-\newcommand{\bracketXY}[2][H]{{\rm [#2/#1]}}
+\newcommand{\bracket}[2][H]{{\rm [#2/#1]}}
 \newcommand{\kpc}{\,{\rm kpc}}
 \newcommand{\Myr}{\,{\rm Myr}}
 \newcommand{\Gyr}{\,{\rm Gyr}}
@@ -77,7 +77,8 @@ Paper goals
         \multicolumn{1}{c}{Parameter} & \multicolumn{1}{c}{Range or Value} & \multicolumn{1}{c}{Notes} \\
         \hline
         $\log g$            & $[1.0, 3.5]$          & RGB selection \\
-        $T_{\rm eff}$       & $[4000, 5500]$ K      & RGB selection \\
+        $T_{\rm eff}$       & $[4000, 5500]$ K      & Recommended by \citet{meszaros_sdss-v_2025} \\
+        $\bracket{M}$     & $>-1.5$               & Recommended by \citet{meszaros_sdss-v_2025} \\
         $S/N$               & $> 100$               & \todo{Justify} \\
         BAD flag            & 0                     & Bad flag for results\\
         SPECTRUM flag       & 0                     & Data reduction pipeline flags \\
@@ -93,11 +94,18 @@ We use data from the Milky Way Mapper (MWM; \todo{cite}), a program of the fifth
 
 Atmospheric parameters and chemical abundances were determined with the APOGEE Stellar Parameter and Chemical Abundance Pipeline \citep[ASPCAP;][]{garcia_perez_aspcap_2016}, which compares a grid of synthetic spectra \citep{hubeny_tlusty_2021} to the observed spectra using $\chi^2$ minimization. The line lists for most species are presented in \citet{smith_apogee_2021}, with additional Ce lines described by \citet{cunha_adding_2017}. All DR19 abundances assume local thermodynamic equilibrium (LTE). The spectral synthesis is further described by \citet{holtzman_apogee_2018} and \citet{jonsson_apogee_2020}.
 
-We select red giant branch (RGB; $1.0<\log g<3.5$) stars 
+We select red giant branch (RGB; $1.0<\log g<3.5$) stars with $S/N>100$. We limit our sample to the ``optimal region'' for Ce abundances, $T_{\rm eff}>4000$ K and $\bracket{M}>-1.5$, defined by \citet{meszaros_sdss-v_2025}. We further remove stars with the BAD flag, any APOGEE spectrum flags, and abundance flags for Mg, Fe, and Ce, as well as those stars observed in SDSS-IV outside the main sample (EXTRATARG flag). This produces a primary sample of \todo{122,533} stars. The right-hand panel of Figure \ref{fig:kiel-diagram} plots a Kiel diagram of this sample, color-coded by [Ce/H]. A summary of our sample selection criteria is presented in Table \ref{tab:sample}.
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=0.8\textwidth]{figures/kiel_diagram.pdf}
+    \caption{Kiel diagrams of our sample. {\it Left:} comparison between our full sample and the sample that exceeds the recommended age training density \citep{stone-martinez_starflow_2025}. {\it Right:} Kiel diagram of our full sample, color-coded by [Ce/H].}
+    \label{fig:kiel-diagram}
+\end{figure*}
 
 \subsection{Stellar Ages}
 
-We use the StarFlow \citep{stone-martinez_starflow_2025} catalog of stellar ages for MWM DR19. \citet{stone-martinez_starflow_2025} use a deep generative model trained on asteroseismic data to estimate ages for evolved stars. Their model retains information about the parameter space distribution of the training data and accounts for asymmetric uncertainties. We adopt their recommended training space density threshold of $>3\times10^9$, resulting in estimated ages for \todo{106,524} stars between \todo{$-1.05\lesssim\bracketXH{Fe}\lesssim+0.5$}.
+We use the StarFlow \citep{stone-martinez_starflow_2025} catalog of stellar ages for MWM DR19. \citet{stone-martinez_starflow_2025} use a deep generative model trained on asteroseismic data to estimate ages for evolved stars. Their model retains information about the parameter space distribution of the training data and accounts for asymmetric uncertainties. We adopt their recommended training space density threshold of $>3\times10^9$, resulting in estimated ages for \todo{106,524} stars between \todo{$-1.05\lesssim\bracket{Fe}\lesssim+0.5$}. The left-hand panel of Figure \ref{fig:kiel-diagram} compares the Kiel diagram of this stellar age sample against our full sample.
 
 \subsection{Cerium Abundance Precision}
 
@@ -107,7 +115,7 @@ Ce lines in APOGEE reported by \citet{cunha_adding_2017}.
 
 \begin{itemize}
     \item Check the spectra for high-[Mg/H] and low-[Ce/Mg] stars.
-    \item Compare halo abundances to dwarf galaxies in APOGEE.
+    \item Discuss abundance artifacts.
 \end{itemize}
 
 \subsection{Corrective Abundance Offsets}
@@ -129,6 +137,17 @@ Ce lines in APOGEE reported by \citet{cunha_adding_2017}.
 
 \todo{Contribution from Tawny.}
 
+We divide our sample into high-Ia and low-Ia populations using the boundary condition
+\begin{equation}
+    \bracket[Mg]{Fe} = 
+    \begin{cases}
+        -0.09, & \bracket{Fe}>0 \\
+        -0.09+0.13\times\bracket{Fe}, & \bracket{Fe}<0.
+    \end{cases}
+    \label{eq:alpha-cut}
+\end{equation}
+High-Ia stars lie above this boundary, while low-Ia stars lie below; we exclude stars within $\pm0.02\dex$ of this boundary from either population.
+
 Figure \ref{fig:logg-calibrations} shows the effect of the corrective offsets on [Ce/Mg] and [Fe/Mg]. Across different $\log(g)$ bins, the uncorrected [Ce/Mg] trends with [Mg/H] vary by up to $\sim0.3\dex$ for high-Ia stars, and $\sim0.1\dex$ for low-Ia stars. The corrective offsets ensure that abundances are consistent across the full range of $\log(g)$ in the sample.
 
 \begin{figure}
@@ -140,50 +159,50 @@ Figure \ref{fig:logg-calibrations} shows the effect of the corrective offsets on
 
 \subsection{Residual Abundances}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{figures/residual_explainer.pdf}
-    \caption{Demonstration of Ce residual abundance calculation. Top row: median trend in [Ce/H] as a function of [Mg/H] (left) and age (right) for the high- and low-Ia populations. Bottom row: median trend in $\Delta$[Ce/H] as a function of [Mg/H] (left) and age (right). Both populations show similar trends with age in [Ce/H] and $\Delta$[Ce/H].}
-    \label{fig:residual-explainer}
-\end{figure}
-
 \section{Results}
 \label{sec:results}
+
+Outline:
+\begin{itemize}
+    \item We confirm the striking trend in the [Ce/Mg]--age relation, with the oldest stars having the lowest [Ce/Mg] and the youngest having the highest (Figures \ref{fig:cemg-mgh-age} and \ref{fig:dataset-comparison}).
+    \item Comparison with other datasets shows our [Ce/Mg]--age relation is trustworthy (Figure \ref{fig:dataset-comparison}).
+    \item Local age trends show a significant dependence on metallicity. Stars with slightly sub-Solar metallicity have the steepest trend, while metal-rich and metal-poor stars have shallow or flat trends (Figure \ref{fig:local-age-trends}). We calculate residual abundances to control for metallicity (Figure \ref{fig:residual-explainer}).
+    \item The high-Ia population [Ce/Mg]--[Mg/H] trend varies by region of the Galaxy, while the low-Ia population is consistent across $R_{\rm guide}$ and $z_{\rm max}$ (Figure \ref{fig:median-trends-grid}).
+    \item Similarly, the $\Delta\bracket{Ce}$--age trend varies by region for the high-Ia population. The slope is steepest in the outer galaxy, and the trend disappears in the inner galaxy (Figures \ref{fig:residual-abundances} and \ref{fig:median-age-trends}; pick one).
+    \item The radial gradient evolves from negative to flat in [Ce/H], and flat to positive in [Ce/Mg], moving from older to younger populations. Low-Ia stars show a flat gradient and are $\sim0.5\dex$ lower in [Ce/H] and $\sim0.3\dex$ lower in [Ce/Mg] than high-Ia stars on average (Figure \ref{fig:ce-gradient}).
+\end{itemize}
+
+\todo{To do:
+\begin{itemize}
+    \item Can low-metallicity Ce abundances constrain [Ce/Mg] ``plateau'' (if it exists at all)?
+    \item Compare SDSS-V trends to \citet{casali_tracing_2025} trends.
+    \item Is the break in the trend at $\sim6\Gyr$ important? (Figure \ref{fig:median-age-trends}).
+    \item Discuss halo stars, accreted vs in-situ. How do trends compare vs local group galaxies? Make sure stars in our sample aren't in local dwarfs.
+    \item Other kinematic info if useful
+\end{itemize}
+}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/cemg_mgh_age.pdf}
+    \caption{The distribution of abundances in the [Ce/Mg]--[Mg/H] plane for our full sample, color-coded by the median stellar age. Each hexagonal bin contains a minimum of 10 stars; in lower-density regions, each star is plotted individually. The grayscale outlines represent linearly-spaced density contours, with the black contour encompassing the highest density of stars.}
+    \label{fig:cemg-mgh-age}
+\end{figure}
+
+Figure \ref{fig:cemg-mgh-age} shows the median stellar age as a function of [Mg/H] and [Ce/Mg]. A broad age trend is immediately obvious: stars with low [Ce/Mg] are on average the oldest in the sample, while stars with high [Ce/Mg] are the youngest. Most of the old, low-[Ce/Mg] stars belong to the low-Ia population. Stars with Solar [Ce/Mg] are typically $\sim4-6\Gyr$ old, across a wide range of metallicity ($-0.5\lesssim\bracket{Mg}\lesssim+0.2$). The spread in [Ce/Mg] and age is broadest at $\bracket{Mg}\approx-0.2$, while the most Mg-rich stars occupy a narrow range of near-Solar [Ce/Mg] with median ages of $\sim6-7\Gyr$.
 
 \subsection{Age Trend Validation}
 
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/dataset_comparison.pdf}
-    \caption{Comparison of the age--[Ce/Mg] trend between MWM+StarFlow, OCCAM, and APOKASC-3. Each survey uses different age estimation techniques, but the abundances on the y-axis all come from DR19.}
-    \label{fig:placeholder}
+    \caption{Comparison of the age--[Ce/Mg] trend between MWM+StarFlow, APOKASC-3, and OCCAM. Each survey uses different age estimation techniques, but the abundances on the y-axis all come from DR19. For the sake of comparison, we do not apply $\log g$ corrections to the abundances in this plot.}
+    \label{fig:dataset-comparison}
 \end{figure}
 
-\begin{itemize}
-    \item Compare [Ce/Mg]--age trends in different regions of the Galaxy.
-    \item Control trends for metallicity or [Mg/H].
-    \item Control for high- and low-$\alpha$.
-    \item Plot [Ce/Mg] vs kinematics
-    \item Compare [Ce/Mg]--age relation in SDSS-V to APOKASC-3 and APO-K2.
-    \item Compare SDSS-V trends to \citet{casali_tracing_2025} trends.
-    \item Can low-metallicity Ce abundances constrain [Ce/Mg] ``plateau'' (if it exists at all)?
-\end{itemize}
+Figure \ref{fig:dataset-comparison} compares the age--[Ce/Mg] relation from our sample against two other age catalogs: the Open Cluster Chemical Abundances and Mapping Survey \citet[OCCAM;][]{otto_open_2026} and the APOGEE-Kepler Asteroseismic Catalog \citep[APOKASC-3;][]{pinsonneault_apokasc-3_2025}. We use DR19 abundances for both catalogs. The OCCAM data include clusters with at least one RGB star with a measurement of [Ce/H]. Most of the clusters are young, $\lesssim2\Gyr$, and these clusters also show the largest spread in [Ce/Mg]. \todo{Still, the OCCAM trend qualitatively agrees with our sample.} We also see agreement with the trend in the APOKASC-3 data, although this is not surprising because StarFlow is trained on APOKASC-3.
 
-Figure \ref{fig:median-trends-grid} shows how the [Ce/Mg] median trend with [Mg/H] changes with position in the Galaxy. In the Solar neighborhood, the median high-Ia trend peaks at $\bracketXY{Mg}=-0.2$ with $\bracketXY[Mg]{Ce}\approx+0.25$, and the most metal-rich stars have lowest $\bracketXY[Mg]{Ce}\approx-0.1$. Moving from the inner to the outer Galaxy, the metallicity with the highest [Ce/Mg] 
-
-\begin{figure*}
-    \centering
-    \includegraphics[width=\linewidth]{figures/median_trends_grid.pdf}
-    \caption{The $\log(g)$-corrected [Ce/Mg] as a function of [Mg/H] for high- and low-Ia populations across the Galaxy. Each panel corresponds to a bin in $R_{\rm guide}$ (increasing left to right) and $z_{\rm max}$ (increasing bottom to top). The small blue (red) points plot individual abundances of high-Ia (low-Ia) stars. For visual clarity, only a random sample of 1,000 stars are plotted in each panel. The solid lines with large points plot the median [Ce/Mg] in bins of [Mg/H] for each region, and for reference the dashed lines indicate the median trends in the Solar neighborhood ($7\leq R_{\rm guide}<9\kpc$, $z_{\rm max}<0.5\kpc$). The gray error bars in the top left panel indicate the median abundance errors for the full DR19 sample.}
-    \label{fig:median-trends-grid}
-\end{figure*}
-
-\begin{figure*}
-    \centering
-    \includegraphics[width=\linewidth]{figures/residual_abundances.pdf}
-    \caption{Residual age--$\Delta$[Ce/H] trends for high- and low-Ia stars across the Galaxy.}
-    \label{fig:residual-abundances}
-\end{figure*}
+\subsection{Metallicity Dependence}
 
 \begin{figure}
     \centering
@@ -194,10 +213,28 @@ Figure \ref{fig:median-trends-grid} shows how the [Ce/Mg] median trend with [Mg/
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figures/ce_gradient.pdf}
-    \caption{Radial gradients of [Ce/H] and [Ce/Mg] as a function of stellar age. Stars are restricted to $z_{\rm max}<0.5$ kpc.}
-    \label{fig:ce-gradient}
+    \includegraphics[width=\linewidth]{figures/residual_explainer.pdf}
+    \caption{Demonstration of Ce residual abundance calculation. Top row: median trend in [Ce/H] as a function of [Mg/H] (left) and age (right) for the high- and low-Ia populations. Bottom row: median trend in $\Delta$[Ce/H] as a function of [Mg/H] (left) and age (right). Both populations show similar trends with age in [Ce/H] and $\Delta$[Ce/H].}
+    \label{fig:residual-explainer}
 \end{figure}
+
+\subsection{Trends across the Galaxy}
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=\linewidth]{figures/median_trends_grid.pdf}
+    \caption{The $\log(g)$-corrected [Ce/Mg] as a function of [Mg/H] for high- and low-Ia populations across the Galaxy. Each panel corresponds to a bin in $R_{\rm guide}$ (increasing left to right) and $z_{\rm max}$ (increasing bottom to top). The small blue (red) points plot individual abundances of high-Ia (low-Ia) stars. For visual clarity, only a random sample of 1,000 stars are plotted in each panel. The solid lines with large points plot the median [Ce/Mg] in bins of [Mg/H] for each region, and for reference the dashed lines indicate the median trends in the Solar neighborhood ($7\leq R_{\rm guide}<9\kpc$, $z_{\rm max}<0.5\kpc$). The gray error bars in the top left panel indicate the median abundance errors for the full DR19 sample.}
+    \label{fig:median-trends-grid}
+\end{figure*}
+
+Figure \ref{fig:median-trends-grid} shows how the [Ce/Mg] median trend with [Mg/H] changes with position in the Galaxy. In the Solar neighborhood, the median high-Ia trend peaks at $\bracket{Mg}=-0.2$ with $\bracket[Mg]{Ce}\approx+0.25$, and the most metal-rich stars have lowest $\bracket[Mg]{Ce}\approx-0.1$. Moving from the inner to the outer Galaxy, the metallicity with the highest [Ce/Mg] 
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=\linewidth]{figures/residual_abundances.pdf}
+    \caption{Residual age--$\Delta$[Ce/H] trends for high- and low-Ia stars across the Galaxy.}
+    \label{fig:residual-abundances}
+\end{figure*}
 
 \begin{figure}
     \centering
@@ -206,7 +243,14 @@ Figure \ref{fig:median-trends-grid} shows how the [Ce/Mg] median trend with [Mg/
     \label{fig:median-age-trends}
 \end{figure}
 
-\section{Chemical Evolution Models}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/ce_gradient.pdf}
+    \caption{Radial gradients of [Ce/H] and [Ce/Mg] as a function of stellar age. Stars are restricted to $z_{\rm max}<0.5$ kpc.}
+    \label{fig:ce-gradient}
+\end{figure}
+
+\section{Galactic Chemical Evolution}
 \label{sec:gce}
 
 Run the following multi-zone models (all with inside-out SFH and Gaussian migration scheme):
