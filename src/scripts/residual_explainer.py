@@ -60,6 +60,10 @@ def main(style='paper'):
     kwargs = dict(s=1, marker='.', rasterized=True, edgecolor='none')
     high_alpha_color = paultol.highcontrast.colors[2]
     low_alpha_color = paultol.highcontrast.colors[0]
+    # Label each panel
+    labels = ['(a)', '(b)', '(c)', '(d)']
+    for i, ax in enumerate(axs.flatten()):
+        ax.set_title(labels[i], y=0.93, x=0.07, ha='left', va='top', pad=0)
 
     # Scatter plot random sample of points
     sample = sample_rows(
