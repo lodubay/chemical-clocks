@@ -5,7 +5,7 @@ OCCAM DR19 open cluster sample and against APOKASC-3.
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.colors import BoundaryNorm
+from matplotlib.colors import BoundaryNorm, LogNorm
 from matplotlib.ticker import MultipleLocator
 from astropy.io import ascii
 
@@ -20,7 +20,7 @@ def main(style='paper'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     fig, axs = plt.subplots(
         3, sharex=True, sharey=True,
-        figsize=(ONE_COLUMN_WIDTH, 2 * ONE_COLUMN_WIDTH),
+        figsize=(ONE_COLUMN_WIDTH, 1.8 * ONE_COLUMN_WIDTH),
         gridspec_kw={'hspace': 0.},
         # constrained_layout=True
     )
@@ -34,7 +34,7 @@ def main(style='paper'):
         mwm_ages['age'], mwm_ages['ce_mg'],
         C=np.ones(mwm_ages.shape[0]),
         reduce_C_function=np.sum,
-        cmap='Spectral_r',
+        cmap='gist_heat_r',
         gridsize=30,
         linewidths=0.2,
         extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
@@ -68,7 +68,41 @@ def main(style='paper'):
     #     color='k', 
     #     label='Median trend'
     # )
-    axs[0].set_title('StarFlow', y=0.82)
+    axs[0].set_title('(a) StarFlow', y=0.82)
+
+    # APOKASC-3 catalog
+    apokasc_csv_path = paths.data / 'MWM' / 'APOKASC3_MWM.csv'
+    if apokasc_csv_path.exists():
+        apokasc3 = pd.read_csv(apokasc_csv_path)
+    else:
+        apokasc3 = join_apokasc_mwm()
+        apokasc3.to_csv(apokasc_csv_path, index=True)
+    scatter_kwargs = dict(s=1, edgecolors='none', marker='o')
+    cmap = truncate_colormap('RdBu', minval=0.1, maxval=0.9)
+    norm = BoundaryNorm([0, 0.5, 1], cmap.N)
+    pc = axs[1].scatter(
+        apokasc3['AgeBest'], 
+        apokasc3['MWM_CE_MG'],
+        c=apokasc3['EvolState']=='RC', 
+        cmap=cmap,
+        norm=norm,
+        # label='RC',
+        **scatter_kwargs
+    )
+    cbar = fig.colorbar(pc, ax=axs[1], shrink=0.9)
+    cbar.ax.set_yticks([0.25, 0.75], labels=['RGB', 'RC'])
+    # DR19 median trend for comparison
+    axs[1].plot(
+        rolling_medians['age'], rolling_medians['ce_mg'], 
+        'w-', 
+        linewidth=2
+    )
+    axs[1].plot(
+        rolling_medians['age'], rolling_medians['ce_mg'], 
+        'k-', 
+        label='Rolling median'
+    )
+    axs[1].set_title('(b) APOKASC-3', y=0.82)
 
     # OCCAM DR19 open clusters
     occam19 = pd.read_csv(paths.data / 'MWM' / 'occam_19cluster-rgb.csv')
@@ -84,65 +118,45 @@ def main(style='paper'):
         (occam19['Mg_H_ERR'] < 0.2) & 
         (occam19['rgb_N_stars'] > 1) 
     ]
-    im = axs[1].scatter(
+    im = axs[2].scatter(
         occam19['CG_Age'], occam19['Ce_Mg'], 
         s = 15, 
-        c = occam19['rgb_N_stars'], 
-        cmap = 'viridis_r', 
-        vmin = 0, vmax = 18
+        c = np.log10(occam19['rgb_N_stars']), 
+        cmap = 'viridis', 
+        # vmin = 0, vmax = 18
+        # norm = LogNorm()
+        vmin=0
     )
-    axs[1].errorbar(
+    axs[2].errorbar(
         occam19['CG_Age'], occam19['Ce_Mg'], 
         yerr = occam19['Ce_Mg_ERR'], 
         c = 'tab:gray', fmt = '.', zorder = 0, capsize = 0
     )
-    fig.colorbar(im, ax=axs[1], shrink=0.9, extend='max', label='Number of stars')
+    fig.colorbar(im, ax=axs[2], shrink=0.9, label='log number of stars')
     # DR19 median trend for comparison
-    axs[1].plot(
+    axs[2].plot(
         rolling_medians['age'], rolling_medians['ce_mg'], 
         'w-', 
         linewidth=2
     )
-    axs[1].plot(
+    axs[2].plot(
         rolling_medians['age'], rolling_medians['ce_mg'], 
         'k-', 
         label='Rolling median'
     )
-    axs[1].set_title('OCCAM', y=0.82)
+    axs[2].set_title('(c) OCCAM', y=0.82)
 
-    # APOKASC-3 catalog
-    apokasc_csv_path = paths.data / 'MWM' / 'APOKASC3_MWM.csv'
-    if apokasc_csv_path.exists():
-        apokasc3 = pd.read_csv(apokasc_csv_path)
-    else:
-        apokasc3 = join_apokasc_mwm()
-        apokasc3.to_csv(apokasc_csv_path, index=True)
-    scatter_kwargs = dict(s=1, edgecolors='none', marker='o')
-    cmap = truncate_colormap('RdBu', minval=0.1, maxval=0.9)
-    norm = BoundaryNorm([0, 0.5, 1], cmap.N)
-    pc = axs[2].scatter(
-        apokasc3['AgeBest'], 
-        apokasc3['MWM_CE_MG'],
-        c=apokasc3['EvolState']=='RC', 
-        cmap=cmap,
-        norm=norm,
-        # label='RC',
-        **scatter_kwargs
-    )
-    cbar = fig.colorbar(pc, ax=axs[2], shrink=0.9)
-    cbar.ax.set_yticks([0.25, 0.75], labels=['RGB', 'RC'])
-    # DR19 median trend for comparison
-    axs[2].plot(
-        rolling_medians['age'], rolling_medians['ce_mg'], 
-        'w-', 
-        linewidth=2
-    )
-    axs[2].plot(
-        rolling_medians['age'], rolling_medians['ce_mg'], 
-        'k-', 
-        label='Rolling median'
-    )
-    axs[2].set_title('APOKASC-3', y=0.82)
+    # Compare with Casali et al. (2025) best-fit relations
+    # xarr = np.arange(0, 11.1, 0.1)
+    # for feh in [-0.6, -0.3, 0, 0.3]:
+    #     axs[3].plot(xarr, casali_relation(xarr, feh), label='[Fe/H]=%s' % feh)
+    # axs[3].plot(
+    #     rolling_medians['age'], rolling_medians['ce_mg'], 
+    #     'k-', 
+    #     label='Rolling median'
+    # )
+    # axs[3].set_title('Casali et al. (2025)')
+    # axs[3].legend()
 
     # Axes adjustments
     axs[0].set_xlim(xlim)
@@ -156,6 +170,13 @@ def main(style='paper'):
         ax.set_ylabel('[Ce/Mg]')
     plt.savefig(paths.figures / 'dataset_comparison')
     plt.close()
+
+
+def casali_relation(age, feh):
+    """
+    Global fit to the age-[Ce/Mg] relation from Casali et al. (2025).
+    """
+    return -0.032 * age + 0.194 * feh + 0.092
 
 
 def join_apokasc_mwm():
@@ -188,7 +209,10 @@ def join_apokasc_mwm():
         (mwm_full['spectrum_flags'] == 0) &
         (mwm_full['snr'] > 50) &
         (mwm_full['ce_h_flags'] == 0) &
-        (mwm_full['sdss_id'] > 0)
+        (mwm_full['mg_h_flags'] == 0) &
+        (mwm_full['sdss_id'] > 0) &
+        (mwm_full['logg'] < 3.5) &
+        (mwm_full['teff'] > 4000)
     ].copy()
     mwm_good['ce_mg'], mwm_good['e_ce_mg'] = abundance_ratio(mwm_good, 'ce', 'mg')
     # Merge MWM Ce with APOKASC
