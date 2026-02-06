@@ -66,22 +66,24 @@ def main(style='paper', cmap_name='autumn'):
             # High-alpha median trends, binned by [Mg/H]
             high_alpha_uncorr_med = binned_quantiles(
                 logg_subset[logg_subset['high_alpha']], ycol, 'mg_h', 
-                q=0.5, bin_edges=MgH_bin_edges, min_count=10
+                q=0.5, bin_edges=MgH_bin_edges, min_count=10, est_errors=True
             )
-            ax.plot(
+            ax.errorbar(
                 *high_alpha_uncorr_med, 
-                'o--', ms=ms, 
+                fmt='o--', markersize=ms, 
+                capsize=0,
                 color=cmap(norm(logg_center)),
                 zorder=10-j
             )
             # Low-alpha median trends, binned by [Mg/H]
             low_alpha_uncorr_med = binned_quantiles(
                 logg_subset[logg_subset['low_alpha']], ycol, 'mg_h', 
-                q=0.5, bin_edges=MgH_bin_edges, min_count=10
+                q=0.5, bin_edges=MgH_bin_edges, min_count=10, est_errors=True
             )
-            ax.plot(
+            ax.errorbar(
                 *low_alpha_uncorr_med, 
-                's-', ms=ms,
+                fmt='s-', markersize=ms,
+                capsize=0,
                 color=cmap(norm(logg_center)),
                 zorder=10-j
             )

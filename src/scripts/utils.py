@@ -11,6 +11,7 @@ from astropy.table import Table
 import vice
 
 from _globals import RANDOM_SEED, MAX_SF_RADIUS, ZONE_WIDTH
+from stats import median_standard_error
 
 # =============================================================================
 # SCIENCE FUNCTIONS
@@ -278,7 +279,10 @@ def sample_rows(df, n, weights=None, reset=False, seed=RANDOM_SEED):
         raise TypeError('Expected pandas DataFrame.')
     
     
-def binned_quantiles(data, col, bin_col, q=0.5, bins=50, bin_edges=[], min_count=0):
+def binned_quantiles(
+        data, col, bin_col, q=0.5, bins=50, bin_edges=[], min_count=0, 
+        est_errors=False, seed=RANDOM_SEED, nsamples=1000,
+    ):
     """
     Calculate percentile trends in bins of a second parameter.
     
@@ -302,6 +306,14 @@ def binned_quantiles(data, col, bin_col, q=0.5, bins=50, bin_edges=[], min_count
     min_count : int, optional [default: 0]
         Minimum data count required to calculate a quantile. If there are fewer
         points in that bin, the quantile will be NaN.
+    est_errors : bool, optional [default: False]
+        If True, return an array of the standard error on the given quantile,
+        estimated via bootstrapping. Note: this makes the calculation take
+        a lot longer!
+    nsamples : int, optional [default: 1000]
+        Number of bootstrap samples to generate if est_errors == True.
+    seed : int, optional [default: RANDOM_SEED]
+        Seed for random number generator used for bootstrapping errors.
     
     Returns
     -------
@@ -309,6 +321,8 @@ def binned_quantiles(data, col, bin_col, q=0.5, bins=50, bin_edges=[], min_count
         Center of each bin in bin_col.
     quantiles : numpy.ndarray
         Quantile values of col in each bin.
+    errors : numpy.ndarray (if est_errors==True)
+        Bootstrap-estimated standard error.
     """
     data = data.dropna(subset=col)
     if len(bin_edges) == 0:
@@ -318,7 +332,15 @@ def binned_quantiles(data, col, bin_col, q=0.5, bins=50, bin_edges=[], min_count
     counts = grouped.count().values
     quantile = grouped.quantile(q).values
     nans = np.nan * np.ones(counts.shape)
-    return bin_centers, np.where(counts > min_count, quantile, nans)
+    ret = (bin_centers, np.where(counts > min_count, quantile, nans))
+    if est_errors:
+        errors = grouped.apply(median_standard_error, B=nsamples, seed=seed).values
+        ret = (
+            bin_centers, 
+            np.where(counts > min_count, quantile, nans), 
+            np.where(counts > min_count, errors, nans)
+        )
+    return ret
     
     
 def binned_medians(data, col, bin_col, bins=50, bin_edges=[], min_count=0):

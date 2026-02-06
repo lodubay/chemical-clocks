@@ -98,13 +98,20 @@ def main(style='paper', cmap='viridis_r'):
             ]
             low_alpha_age_medians = binned_quantiles(
                 low_alpha_subset, col, 'age',
-                q=0.5, bin_edges=age_bin_edges, min_count=10
+                q=0.5, bin_edges=age_bin_edges, min_count=10, est_errors=True
             )
-            axs[i].plot(*low_alpha_age_medians, '-', color='w', linewidth=2)
+            # axs[i].plot(*low_alpha_age_medians, '-', color='w', linewidth=2)
             axs[i].plot(
-                *low_alpha_age_medians, '-', 
-                color=radial_cmap(norm(mean_radius)), 
+                *low_alpha_age_medians[:-1], '-', 
+                color=radial_cmap(norm(mean_radius)), zorder=4,
                 label=f'{int(mean_radius)} kpc'
+            )
+            axs[i].fill_between(
+                low_alpha_age_medians[0],
+                low_alpha_age_medians[1]+low_alpha_age_medians[2],
+                low_alpha_age_medians[1]-low_alpha_age_medians[2],
+                color=radial_cmap(norm(mean_radius)),
+                alpha=0.5, edgecolor='none', zorder=2
             )
             # Plot high alpha trends
             high_alpha_subset = high_alpha_ages[
@@ -113,12 +120,19 @@ def main(style='paper', cmap='viridis_r'):
             ]
             high_alpha_age_medians = binned_quantiles(
                 high_alpha_subset, col, 'age',
-                q=0.5, bin_edges=age_bin_edges, min_count=10
+                q=0.5, bin_edges=age_bin_edges, min_count=10, est_errors=True
             )
-            axs[i].plot(*high_alpha_age_medians, '-', color='w', linewidth=2)
+            # axs[i].plot(*high_alpha_age_medians[:-1], '-', color='w', linewidth=2)
             axs[i].plot(
-                *high_alpha_age_medians, '--', 
-                color=radial_cmap(norm(mean_radius))
+                *high_alpha_age_medians[:-1], '--', 
+                color=radial_cmap(norm(mean_radius)), zorder=3
+            )
+            axs[i].fill_between(
+                high_alpha_age_medians[0],
+                high_alpha_age_medians[1]+high_alpha_age_medians[2],
+                high_alpha_age_medians[1]-high_alpha_age_medians[2],
+                color=radial_cmap(norm(mean_radius)),
+                edgecolor='none', alpha=0.5, zorder=1
             )
     fig.colorbar(pcm, cax=cax, orientation='horizontal', label='Number of stars')
     # Indicate median abundance errors
@@ -149,8 +163,7 @@ def main(style='paper', cmap='viridis_r'):
     axs[1].set_xlabel('Age [Gyr]')
 
     for ax in axs:
-        handles, labels = ax.get_legend_handles_labels()
-        colored_text_legend(ax, handles=handles[::-1], labels=labels[::-1], loc='center right')
+        colored_text_legend(ax, loc='center right')
 
     plt.savefig(paths.figures / 'median_age_trends')
     plt.close()

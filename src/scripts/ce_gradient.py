@@ -79,12 +79,23 @@ def main(style='paper', cmap='jet'):
             ]
             high_alpha_medians = binned_quantiles(
                 high_alpha_subset, col, 'Rg',
-                q=0.5, bin_edges=radius_bin_edges, min_count=10
+                q=0.5, bin_edges=radius_bin_edges, min_count=10, est_errors=True
             )
-            axs[i].plot(*high_alpha_medians, '-', color='w', linewidth=2)
+            # axs[i].plot(*high_alpha_medians, '-', color='w', linewidth=2)
+            # axs[i].plot(
+            #     *high_alpha_medians, '--', 
+            #     color=age_cmap(norm(mean_age)), 
+            # )
             axs[i].plot(
-                *high_alpha_medians, '--', 
-                color=age_cmap(norm(mean_age)), 
+                *high_alpha_medians[:-1], '--', 
+                color=age_cmap(norm(mean_age)), zorder=3
+            )
+            axs[i].fill_between(
+                high_alpha_medians[0],
+                high_alpha_medians[1]+high_alpha_medians[2],
+                high_alpha_medians[1]-high_alpha_medians[2],
+                color=age_cmap(norm(mean_age)),
+                edgecolor='none', alpha=0.5, zorder=1
             )
             # Plot low-alpha trends
             low_alpha_subset = all_low_alpha[
@@ -93,13 +104,25 @@ def main(style='paper', cmap='jet'):
             ]
             low_alpha_medians = binned_quantiles(
                 low_alpha_subset, col, 'Rg',
-                q=0.5, bin_edges=radius_bin_edges, min_count=10
+                q=0.5, bin_edges=radius_bin_edges, min_count=10, est_errors=True
             )
-            axs[i].plot(*low_alpha_medians, '-', color='w', linewidth=2)
+            # axs[i].plot(*low_alpha_medians, '-', color='w', linewidth=2)
+            # axs[i].plot(
+            #     *low_alpha_medians, '-', 
+            #     color=age_cmap(norm(mean_age)), 
+            #     label=f'{int(mean_age)} Gyr'
+            # )
             axs[i].plot(
-                *low_alpha_medians, '-', 
-                color=age_cmap(norm(mean_age)), 
+                *low_alpha_medians[:-1], '-', 
+                color=age_cmap(norm(mean_age)), zorder=4, 
                 label=f'{int(mean_age)} Gyr'
+            )
+            axs[i].fill_between(
+                low_alpha_medians[0],
+                low_alpha_medians[1]+low_alpha_medians[2],
+                low_alpha_medians[1]-low_alpha_medians[2],
+                color=age_cmap(norm(mean_age)),
+                edgecolor='none', alpha=0.5, zorder=2
             )
     fig.colorbar(
         pcm, 

@@ -22,12 +22,15 @@ def median_standard_error(x, B=1000, seed=RANDOM_SEED):
     float
         Standard error of the median.
     """
-    rng = np.random.default_rng(seed)
-    # Randomly sample input array *with* replacement, all at once
-    samples = rng.choice(x, size=len(x) * B, replace=True).reshape((B, len(x)))
-    medians = np.median(samples, axis=1)
-    # The standard error is the standard deviation of the medians
-    return np.std(medians)
+    if len(x)>0:
+        rng = np.random.default_rng(seed)
+        # Randomly sample input array *with* replacement, all at once
+        samples = rng.choice(x, size=len(x) * B, replace=True).reshape((B, len(x)))
+        medians = np.median(samples, axis=1)
+        # The standard error is the standard deviation of the medians
+        return np.std(medians)
+    else:
+        return np.nan
 
 
 def weighted_quantile(df, val, weight, quantile=0.5):

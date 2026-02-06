@@ -82,28 +82,30 @@ def main(style='paper'):
             # Plot local trends for comparison
             ax.plot(
                 *local_low_alpha_medians, 
-                linestyle='--', color=low_alpha_color,
+                linestyle='--', color=low_alpha_color, label='High-Ia',
             )
             ax.plot(
                 *local_high_alpha_medians, 
-                linestyle='--', color=high_alpha_color,
+                linestyle='--', color=high_alpha_color, label='Low-Ia',
             )
             # Plot median trends
             if low_alpha.shape[0] >= 100:
-                ax.plot(
+                ax.errorbar(
                     *binned_quantiles(
                         low_alpha, 'ce_mg_corr', 'mg_h', 
-                        q=0.5, bin_edges=mg_bin_edges, min_count=10
+                        q=0.5, bin_edges=mg_bin_edges, min_count=10, 
+                        est_errors=True
                     ), 
-                    '.-', color=low_alpha_color, label='High-Ia'
+                    fmt='.-', color=low_alpha_color, capsize=0
                 )
             if high_alpha.shape[0] >= 100:
-                ax.plot(
+                ax.errorbar(
                     *binned_quantiles(
                         high_alpha, 'ce_mg_corr', 'mg_h', 
-                        q=0.5, bin_edges=mg_bin_edges, min_count=10
+                        q=0.5, bin_edges=mg_bin_edges, min_count=10,
+                        est_errors=True
                     ), 
-                    '.-', color=high_alpha_color, label='Low-Ia'
+                    fmt='.-', color=high_alpha_color, capsize=0
                 )
     # Indicate median abundance errors
     axs[0,0].errorbar(
