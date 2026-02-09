@@ -4,7 +4,7 @@ AGB yields.
 """
 
 import vice
-from utils import adjusted_agb
+from .utils import adjusted_agb
 
 # Use solar-scaled CCSN yields from Weinberg et al. (2024)
 from . import W24
