@@ -38,6 +38,9 @@ _DELAY_MODELS_ = [
     "greggio05_single", 
     "greggio05_double"
 ]
+_YIELD_SETS_ = [
+    "fiducial", "massshift", "metscale", "karakas16"
+]
 
 def parse():
     r"""
@@ -131,6 +134,12 @@ underscores. (Default: \"fe_o\")""",
         type = float,
         default = _globals.ZONE_WIDTH
     )
+    parser.add_argument("--yields",
+        help = "The nucleosynthetic yield set to use. (Default: 'fiducial')",
+        type = str,
+        choices = _YIELD_SETS_,
+        default = "fiducial"
+    )
     parser.add_argument("--seed", 
         help = "Seed for the random number generator.",
         type = int,
@@ -207,6 +216,7 @@ def model(args):
         RIa = args.RIa,
         RIa_kwargs = RIa_kwargs,
         delay = args.minimum_delay,
+        yields = args.yields,
         seed = args.seed,
         radial_gas_velocity = args.radial_gas_velocity,
         has_outflows = not args.no_outflows,

@@ -14,6 +14,7 @@ if vice.version[:2] < (1, 2):
     raise RuntimeError("""VICE version >= 1.2.0 is required to produce \
 Johnson et al. (2021) figures. Current: %s""" % (vice.__version__))
 else: pass
+import importlib
 from .._globals import END_TIME, MAX_SF_RADIUS, ETA_SCALE_RADIUS
 from .migration import diskmigration, gaussian_migration, no_migration
 from . import models, dtds, outflows, yields
@@ -74,6 +75,8 @@ class diskmodel(vice.milkyway):
     migration_strength : ``float`` [default: 2.68]
         Coefficient for the strength of radial migration $\sigma_{\rm RM8}$ in
         kpc (affects Gaussian migration only).
+    yields : ``str`` [default: "fiducial"]
+        Nucleosynthetic yield set to adopt (must be defined in src.yields).
     delay : ``float`` [default : 0.04]
         Minimum SN Ia delay time in Gyr.
     RIa : ``str`` [default : "powerlaw"]
@@ -118,6 +121,7 @@ class diskmodel(vice.milkyway):
             evol_kwargs = {},
             verbose = True, 
             migration_mode = "gaussian", 
+            yields = "fiducial",
             delay = 0.04, 
             RIa = "plateau", 
             RIa_kwargs={}, 
@@ -133,6 +137,8 @@ class diskmodel(vice.milkyway):
             local_disk_ratio=0.12, 
             **kwargs
         ):
+        # Set the yields
+        importlib.import_module(f'.yields.{yields}', 'multizone.src')
         super().__init__(zone_width = zone_width, name = name,
             verbose = verbose, **kwargs)
         # Migration prescription

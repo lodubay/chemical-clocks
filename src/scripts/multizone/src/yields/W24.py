@@ -12,8 +12,6 @@ mfecc = 0.058
 mfeia = 0.7
 # Rate of SNe Ia per solar mass of stars
 Ria = 1.3e-3 # Maoz & Graur (2017)
-# Residual fraction of Solar Ce produced by r-process
-Fcer = 0.23 # Arlandini et al. (1999)
 
 def ccsn_ratio(Fexp=0.75, Mmin=0.08, Mmax=120, Mthresh=8, dm=0.01, 
                imf=vice.imf.kroupa):
@@ -56,16 +54,7 @@ mmgcc = mfecc * 10 ** afecc * vice.solar_z["mg"] / vice.solar_z["fe"]
 vice.yields.ccsne.settings["mg"] = Rcc * mmgcc
 vice.yields.ccsne.settings["fe"] = Rcc * mfecc
 
-# Assign r-process Ce production to CCSNe
-vice.yields.ccsne.settings["ce"] = Fcer * (
-    vice.yields.ccsne.settings["mg"] * vice.solar_z["ce"] / vice.solar_z["mg"]
-)
-
 # population averaged SNIa Fe yield
 vice.yields.sneia.settings["fe"] = Ria * mfeia
 # Other SN Ia element yields
 vice.yields.sneia.settings["mg"] = 0.
-vice.yields.sneia.settings["ce"] = 0.
-
-# AGB yields from Cristallo et al. (2011, 2015)
-vice.yields.agb.settings["ce"] = "cristallo11"
