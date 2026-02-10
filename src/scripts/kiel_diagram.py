@@ -8,9 +8,8 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
 import paths
-from _globals import TWO_COLUMN_WIDTH
 from mwm_sample import LOGG_CUT, TEFF_CUT
-from plotting import colored_text_legend, insert_colorbar_axes
+from plotting import colored_text_legend, insert_colorbar_axes, TWO_COLUMN_WIDTH
 from utils import good_ages
 from colormaps import paultol
 

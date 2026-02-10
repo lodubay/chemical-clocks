@@ -8,9 +8,8 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
 from utils import binned_quantiles, apply_alpha_cut, sample_rows, good_ages
-from plotting import colored_text_legend
+from plotting import colored_text_legend, ONE_COLUMN_WIDTH
 from colormaps import paultol
-from _globals import ONE_COLUMN_WIDTH
 import paths
 
 SAMPLE_FRACTION = 0.25

@@ -7,6 +7,16 @@ from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.collections import PathCollection
 from matplotlib.lines import Line2D
 
+# AASTeX plot widths in inches
+ONE_COLUMN_WIDTH = 3.25
+TWO_COLUMN_WIDTH = 7.
+
+# Default colormaps
+DENSITY_COLORMAP = 'gist_heat_r'
+AGE_COLORMAP = 'Spectral_r'
+RADIUS_COLORMAP = 'viridis_r'
+
+
 def get_color_list(cmap, bins):
     """
     Split a discrete colormap into a list of colors based on bin edges.

@@ -10,9 +10,8 @@ from matplotlib.ticker import MultipleLocator
 from astropy.io import ascii
 
 from mwm_sample import abundance_ratio
-from utils import binned_quantiles, good_ages, fits_to_pandas
-from plotting import colored_text_legend, truncate_colormap
-from _globals import ONE_COLUMN_WIDTH
+from utils import good_ages, fits_to_pandas
+from plotting import truncate_colormap, ONE_COLUMN_WIDTH
 import paths
 
 def main(style='paper'):

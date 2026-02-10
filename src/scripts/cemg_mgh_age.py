@@ -8,8 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize, LogNorm, BoundaryNorm
 from matplotlib.ticker import MultipleLocator
 
-from _globals import ONE_COLUMN_WIDTH
-from plotting import get_color_list
+from plotting import ONE_COLUMN_WIDTH
 from utils import good_ages
 import paths
 

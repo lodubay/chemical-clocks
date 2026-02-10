@@ -10,9 +10,9 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import vice
 
 from utils import alpha_cut, adjusted_agb, good_ages
+from plotting import ONE_COLUMN_WIDTH
 from colormaps import paultol
 import paths
-import _globals
 
 # CCSN and SN Ia yields
 from yields import yZ1
@@ -52,7 +52,7 @@ def main(style='paper'):
     age_err_high = np.median(local_sample['e_p_age'] - local_sample['age'])
     med_abund_err = local_sample['e_ce_mg'].median()
 
-    figwidth = _globals.ONE_COLUMN_WIDTH
+    figwidth = ONE_COLUMN_WIDTH
     fig, axs = plt.subplots(
         4, figsize=(figwidth, 2.67 * figwidth), 
         sharex=True, sharey=True,

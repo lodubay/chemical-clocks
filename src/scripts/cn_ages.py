@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 from utils import good_ages, binned_quantiles, get_bin_centers
 import paths
-from _globals import TWO_COLUMN_WIDTH
+from plotting import TWO_COLUMN_WIDTH
 
 # Coefficients for [C/N] age fit polynomial
 CN_AGE_COEF = np.array([-1.721,  0.806,  -0.077,  0.276, -0.643, 10.048])

@@ -3,7 +3,7 @@ Generic statistical routines for this project.
 """
 
 import numpy as np
-from _globals import RANDOM_SEED
+from multizone._globals import RANDOM_SEED
 
 
 def median_standard_error(x, B=1000, seed=RANDOM_SEED):

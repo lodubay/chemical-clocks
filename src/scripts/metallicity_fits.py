@@ -10,7 +10,7 @@ from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MultipleLocator
 from scipy import stats
 
-from _globals import ONE_COLUMN_WIDTH
+from plotting import ONE_COLUMN_WIDTH
 from utils import good_ages, apply_alpha_cut, sample_rows
 import paths
 

@@ -10,7 +10,7 @@ import pandas as pd
 from astropy.table import Table
 import vice
 
-from _globals import RANDOM_SEED, MAX_SF_RADIUS, ZONE_WIDTH
+from multizone._globals import RANDOM_SEED, MAX_SF_RADIUS, ZONE_WIDTH
 from stats import median_standard_error
 
 # =============================================================================

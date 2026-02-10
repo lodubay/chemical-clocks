@@ -9,7 +9,7 @@ from matplotlib.ticker import MultipleLocator
 from scipy import stats
 
 from utils import get_bin_centers, good_ages, apply_alpha_cut
-from _globals import TWO_COLUMN_WIDTH
+from plotting import TWO_COLUMN_WIDTH
 import paths
 
 RBINS = [(3, 5), (5, 7), (7, 9), (9, 11), (11, 13)] # left to right

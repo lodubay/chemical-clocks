@@ -5,7 +5,7 @@ from astropy.io import ascii
 
 import paths
 from utils import fits_to_pandas
-import _globals
+from plotting import TWO_COLUMN_WIDTH
 
 def main():
     plt.style.use(paths.styles / 'paper.mplstyle')
@@ -35,7 +35,7 @@ def main():
     apok2_cols = ['APOGEE', 'APO-K2_Age', 'APO-K2_e_n_Age', 'APO-K2_e_p_Age']
     apok2_mwm = apok2[apok2_cols].join(mwm_rgb[mwm_cols].set_index('sdss4_apogee_id'), on='APOGEE')
 
-    figwidth = _globals.TWO_COLUMN_WIDTH
+    figwidth = TWO_COLUMN_WIDTH
     fig, axs = plt.subplots(
         1, 3, sharex=True, sharey=True, figsize=(figwidth, 0.33 * figwidth),
         gridspec_kw={'wspace': 0}

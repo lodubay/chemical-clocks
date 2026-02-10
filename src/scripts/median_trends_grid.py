@@ -8,8 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
 from utils import alpha_cut, binned_quantiles, sample_rows
-from plotting import colored_text_legend
-from _globals import TWO_COLUMN_WIDTH
+from plotting import colored_text_legend, TWO_COLUMN_WIDTH
 from colormaps import paultol
 import paths
 

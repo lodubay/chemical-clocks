@@ -11,9 +11,8 @@ from matplotlib.ticker import MultipleLocator
 from matplotlib.cm import ScalarMappable
 
 from utils import get_bin_centers, binned_quantiles, apply_alpha_cut
-from plotting import truncate_colormap, insert_colorbar_axes
+from plotting import truncate_colormap, insert_colorbar_axes, ONE_COLUMN_WIDTH
 import paths
-from _globals import ONE_COLUMN_WIDTH
 
 AXES_LIM = {
     'mg_h': (-0.8, 0.5),

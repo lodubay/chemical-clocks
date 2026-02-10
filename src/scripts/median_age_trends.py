@@ -8,9 +8,8 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from matplotlib.colors import BoundaryNorm, Normalize
 
-from utils import apply_alpha_cut, binned_quantiles, sample_rows, good_ages
-from plotting import insert_colorbar_axes, colored_text_legend, truncate_colormap
-from _globals import ONE_COLUMN_WIDTH
+from utils import apply_alpha_cut, binned_quantiles, good_ages
+from plotting import insert_colorbar_axes, colored_text_legend, ONE_COLUMN_WIDTH
 from colormaps import paultol
 import paths
 

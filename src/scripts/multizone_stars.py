@@ -12,7 +12,7 @@ import pandas as pd
 import vice
 
 import paths
-from _globals import RANDOM_SEED, ZONE_WIDTH, END_TIME
+from multizone._globals import RANDOM_SEED, ZONE_WIDTH, END_TIME
 from utils import box_smooth, sample_rows, get_bin_centers
 from stats import weighted_quantile
 
