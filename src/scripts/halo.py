@@ -10,7 +10,7 @@ from matplotlib.colors import LogNorm
 from matplotlib.ticker import MultipleLocator
 
 import paths
-from plotting import TWO_COLUMN_WIDTH
+from plotting import TWO_COLUMN_WIDTH, colored_text_legend
 from mwm_sample import abundance_ratio
 from colormaps import paultol
 
@@ -154,7 +154,7 @@ def main(style='paper'):
     ax2.scatter(
         halo['mg_h'], halo['ce_mg_corr'], 
         c=halo_color, marker='o', 
-        label='Kinematic halo',
+        label='Halo',
         **scatter_kwargs
     )
     # Rolling median
@@ -168,7 +168,7 @@ def main(style='paper'):
     ax2.scatter(
         accreted['mg_h'], accreted['ce_mg_corr'],
         c=accreted_color, marker='D', 
-        label='Chemical accreted',
+        label='Accreted',
         **scatter_kwargs
     )
     # Rolling median
@@ -180,10 +180,9 @@ def main(style='paper'):
     ax2.plot(rolling_accreted['mg_h'], rolling_accreted['ce_mg_corr'], '-', color=accreted_color)
     # Indicate grid edges
     mgh_arr = np.arange(-2.5, 1.25, 0.25)
-    ax2.plot(mgh_arr, -2.1 - mgh_arr, 'k:', label='Flag edge') # edge of stars flagged bad
-    ax2.plot(mgh_arr, -1.6 - mgh_arr, color='gray', ls=':', label='Upper limits') # indicates region of upper limits (manual)
+    ax2.plot(mgh_arr, -2.1 - mgh_arr, 'k:') # edge of stars flagged bad
+    ax2.plot(mgh_arr, -1.6 - mgh_arr, color='gray', ls=':') # indicates region of upper limits (manual)
     ax2.plot(mgh_arr, 0.9 - mgh_arr, 'k:') # edge of stars flagged bad
-    ax2.legend(loc='upper left', frameon=True)
     # Indicate median abundance error
     ax2.errorbar(
         -1.7, -0.9, 
@@ -191,6 +190,8 @@ def main(style='paper'):
         yerr=data['e_ce_mg'].median(),
         c='k', capsize=0
     )
+    # ax2.legend(loc='upper left', frameon=True)
+    colored_text_legend(ax2, loc='upper left', fontsize=plt.rcParams['axes.titlesize'])
 
     plt.subplots_adjust(bottom=0.08, top=0.96, left=0.08, right=0.92)
     plt.savefig(paths.figures / 'halo')
