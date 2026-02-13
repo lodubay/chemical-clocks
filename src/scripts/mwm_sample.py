@@ -79,13 +79,6 @@ def main():
     sample['c_n'], sample['e_c_n'] = abundance_ratio(sample, 'c', 'n')
     # Require Gaia distances
     sample.dropna(axis=0, how='any', subset=['r_med_photogeo'], inplace=True)
-    # Calculate galactocentric coordinates based on galactic l, b and Gaia dist
-    galr, galphi, galz = galactic_to_galactocentric(
-        sample['l'], sample['b'], sample['r_med_photogeo']/1000
-    )
-    sample['gal_r'] = galr # kpc
-    sample['gal_phi'] = galphi # deg
-    sample['gal_z'] = galz # kpc
     print('Joining with orbit parameters...')
     sample = add_kinematics(sample, id_name='gaia_dr3_source_id', verbose=True)
     # print('Computing orbits...')
@@ -138,53 +131,6 @@ def abundance_ratio(catalog, elem1, elem2='fe_h'):
     ratio = catalog[elem1] - catalog[elem2]
     error = np.sqrt(catalog[f'e_{elem1}']**2 + catalog[f'e_{elem2}']**2)
     return ratio, error
-
-
-def galactic_to_galactocentric(l, b, distance):
-    r"""
-    Use astropy's SkyCoord to convert Galactic (l, b, distance) coordinates
-    to galactocentric (r, phi, z) coordinates.
-
-    Parameters
-    ----------
-    l : array-like
-        Galactic longitude in degrees
-    b : array-like
-        Galactic latitude in degrees
-    distance : array-like
-        Distance (from Sun) in kpc
-
-    Returns
-    -------
-    galr : numpy array
-        Galactocentric radius in kpc
-    galphi : numpy array
-        Galactocentric phi-coordinates in degrees
-    galz : numpy arraay
-        Galactocentric z-height in kpc
-    """
-    l = np.array(l)
-    b = np.array(b)
-    d = np.array(distance)
-    if l.shape == b.shape == d.shape:
-        if not isinstance(l, u.quantity.Quantity):
-            l *= u.deg
-        if not isinstance(b, u.quantity.Quantity):
-            b *= u.deg
-        if not isinstance(d, u.quantity.Quantity):
-            d *= u.kpc
-        # Define galactocentric coordinate frame
-        with coord.galactocentric_frame_defaults.set('v4.0'):
-            galcen_frame = coord.Galactocentric()
-        galactic = coord.SkyCoord(l=l, b=b, distance=d, frame=coord.Galactic())
-        galactocentric = galactic.transform_to(frame=galcen_frame)
-        galactocentric.representation_type = 'cylindrical'
-        galr = galactocentric.rho.to(u.kpc).value
-        galphi = galactocentric.phi.to(u.deg).value
-        galz = galactocentric.z.to(u.kpc).value
-        return galr, galphi, galz
-    else:
-        raise ValueError('Arrays must be of same length.')
     
 
 def orbit_dynamics(ra, dec, dist, pmra, pmdec, vrad, approx='staeckel'):
@@ -283,6 +229,22 @@ def add_kinematics(df, id_name='source_id', verbose=False):
     checklist = ids['source_id'].isin(df[id_name])
     if verbose: print('Finished matching source id, total %d stars'%(sum(checklist)))
     kinematic_dr3 = kinematic[checklist]
+
+    # Cartesian to cylindrical coordinates
+    galcen = coord.Galactocentric(
+        x=kinematic_dr3.xyz[:,0] * u.kpc, 
+        y=kinematic_dr3.xyz[:,1] * u.kpc,
+        z=kinematic_dr3.xyz[:,2] * u.kpc,
+        v_x=kinematic_dr3.vxyz[:,0] * u.km/u.s, 
+        v_y=kinematic_dr3.vxyz[:,1] * u.km/u.s, 
+        v_z=kinematic_dr3.vxyz[:,2] * u.km/u.s, 
+        representation_type='cartesian', 
+        differential_type='cartesian',
+        galcen_distance=8.275*u.kpc,
+        z_sun=20.8*u.pc,
+        galcen_v_sun=np.array([8.4, 251.8, 8.4]) * u.km/u.s,
+    )
+    galcen.representation_type = 'cylindrical'
     
     # DataFrame with kinematic data
     kinematic_dr3 = pd.DataFrame(
@@ -291,9 +253,13 @@ def add_kinematics(df, id_name='source_id', verbose=False):
             kinematic_dr3.xyz[:,0],
             kinematic_dr3.xyz[:,1],
             kinematic_dr3.xyz[:,2],
+            galcen.rho.value,
+            galcen.phi.value,
             kinematic_dr3.vxyz[:,0],
             kinematic_dr3.vxyz[:,1],
             kinematic_dr3.vxyz[:,2],
+            galcen.d_rho.value,
+            galcen.d_phi.value * galcen.rho.value,
             kinematic_dr3.actions[:,0],
             kinematic_dr3.actions[:,1],
             kinematic_dr3.actions[:,2],
@@ -313,9 +279,9 @@ def add_kinematics(df, id_name='source_id', verbose=False):
             kinematic_dr3.r_apo/2+kinematic_dr3.r_per/2
         ), dtype=str).T,
         columns=[
-            'source_id','x','y','z',
-            'vx','vy','vz','Jx','Jy',
-            'Jz','E','Lx','Ly','Lz','e',
+            'source_id','x','y','z','rho','phi',
+            'vx','vy','vz','vr','vphi',
+            'Jx','Jy','Jz','E','Lx','Ly','Lz','e',
             'parallax','ra','dec','phot_g_mean_mag',
             'phot_bp_mean_mag','phot_rp_mean_mag',
             'ruwe','z_max','Rg']
