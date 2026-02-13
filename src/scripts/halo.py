@@ -23,29 +23,31 @@ def main(style='paper'):
     data['mn_mg'], data['e_mn_mg'] = abundance_ratio(data, 'mn', 'mg')
     data['al_fe'], data['e_al_fe'] = abundance_ratio(data, 'al', 'fe')
     # Upper limits from Shetrone et al. (2015)
+    data['lim_ce_h'] = ce_upper_limit(data['teff'], data['snr'])
     limits = data[
-        (data['ce_h'] - data['e_ce_h'] <= ce_upper_limit(data['teff'], data['snr']))
+        (data['ce_h'] - data['e_ce_h'] <= data['lim_ce_h'])
     ]
     data = data[
-        (data['ce_h'] - data['e_ce_h'] > ce_upper_limit(data['teff'], data['snr']))
+        (data['ce_h'] - data['e_ce_h'] > data['lim_ce_h'])
     ]
     # Kinematically-selected halo
     halo = data[data['E']/1e5 > halo_ELz_cut(data['Lz']/1e3)]
+    # halo = data[(data['z_max'] > 3) | (data['vphi'] > -100)]
+    # Kinematically-selected disk stars
+    disk = data[data['E']/1e5 < halo_ELz_cut(data['Lz']/1e3)]
+    # disk = data[(data['z_max'] < 3) & (data['vphi'] < -120)]
     # Chemically-selected accreted stars
-    accreted = data[data['mn_mg'] < halo_chem_cut(data['al_fe'])]
-    # Kinematically- and chemically-selected disk stars
-    disk = data[
-        (data['E']/1e5 < halo_ELz_cut(data['Lz']/1e3)) &
-        (data['mn_mg'] > halo_chem_cut(data['al_fe']))
-    ]
-
+    accreted = halo[halo['mn_mg'] < halo_chem_cut(halo['al_fe'])]
+    # Chemically-selected in-situ halo stars
+    insitu = halo[halo['mn_mg'] > halo_chem_cut(halo['al_fe'])]
+    
     # Set up figure
     plt.style.use(paths.styles / f'{style}.mplstyle')
     fig = plt.figure(
         figsize=(0.8*TWO_COLUMN_WIDTH, 0.8*TWO_COLUMN_WIDTH), 
         # constrained_layout=True
     )
-    gs = GridSpec(2, 2, figure=fig, height_ratios=[2, 3], wspace=0.3)
+    gs = GridSpec(2, 2, figure=fig, height_ratios=[2, 3], wspace=0.35)
     ax0 = fig.add_subplot(gs[0,0])
     ax1 = fig.add_subplot(gs[0,1])
     ax2 = fig.add_subplot(gs[1,:])
@@ -53,9 +55,15 @@ def main(style='paper'):
         cmap=DENSITY_COLORMAP, 
         linewidths=0.2,
         reduce_C_function=logsum,
+        mincnt=1
     )
-    halo_color = paultol.bright.colors[2]
+    scatter_kwargs = dict(
+        s=2, rasterized=True, edgecolors='none',
+    )
+    halo_color = 'k'
+    disk_color = 'k'
     accreted_color = paultol.bright.colors[5]
+    insitu_color = paultol.bright.colors[2]
 
     # Kinematic cut in E-Lz plane
     ax0.set_xlabel(r'$L_z$ [$\times10^3$ kpc km s$^{-1}$]')
@@ -68,18 +76,29 @@ def main(style='paper'):
     ylim = (-2.5, 0)
     ax0.set_xlim(xlim)
     ax0.set_ylim(ylim)
+    # Plot disk stars
     pc = ax0.hexbin(
-        data['Lz']/1e3, data['E']/1e5,
-        C=np.ones(data.shape[0]),
+        disk['Lz']/1e3, disk['E']/1e5,
+        C=np.ones(disk.shape[0]),
         gridsize=50,
         extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
         **hexbin_kwargs
     )
-    fig.colorbar(pc, ax=ax0, label=r'$\log N$', pad=0., use_gridspec=True)
+    fig.colorbar(pc, ax=ax0, label=r'$\log N$ (disk)', pad=0., use_gridspec=True)
+    # Plot accreted & in-situ
+    ax0.scatter(
+        insitu['Lz']/1e3, insitu['E']/1e5,
+        c=insitu_color,
+        **scatter_kwargs
+    )
+    ax0.scatter(
+        accreted['Lz']/1e3, accreted['E']/1e5,
+        c=accreted_color,
+        **scatter_kwargs
+    )
     # Indicate boundary
     Lz_arr = np.arange(-5, 5.1, 0.1)
-    # ax0.plot(Lz_arr, halo_ELz_cut(Lz_arr), 'w-')
-    ax0.plot(Lz_arr, halo_ELz_cut(Lz_arr), '-', color=halo_color)
+    ax0.plot(Lz_arr, halo_ELz_cut(Lz_arr), '-', color='k')
     ax0.text(
         2, -0.5, 'Halo', 
         fontsize=plt.rcParams['axes.titlesize'], 
@@ -102,20 +121,32 @@ def main(style='paper'):
     ax1.set_xlim(xlim)
     ax1.set_ylim(ylim)
     pc = ax1.hexbin(
-        data['al_fe'], data['mn_mg'],
-        C=np.ones(data.shape[0]),
+        disk['al_fe'], disk['mn_mg'],
+        C=np.ones(disk.shape[0]),
         gridsize=50,
         extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
         **hexbin_kwargs
     )
-    fig.colorbar(pc, ax=ax1, label=r'$\log N$', pad=0., use_gridspec=True)
+    fig.colorbar(pc, ax=ax1, label=r'$\log N$ (disk)', pad=0., use_gridspec=True)
+    # Plot accreted, in situ stars
+    ax1.scatter(
+        insitu['al_fe'], insitu['mn_mg'],
+        c=insitu_color,
+        **scatter_kwargs
+    )
+    ax1.scatter(
+        accreted['al_fe'], accreted['mn_mg'],
+        c=accreted_color,
+        **scatter_kwargs
+    )
     # Indicate boundary
     alfe_arr = np.arange(-0.8, 0.5, 0.1)
-    # ax1.plot(alfe_arr, halo_chem_cut(alfe_arr), 'w-')
-    ax1.plot(alfe_arr, halo_chem_cut(alfe_arr), '-', color=accreted_color)
+    ax1.plot(alfe_arr, halo_chem_cut(alfe_arr), '-', color='k')
     ax1.text(
-        0.3, 0.3, 'In situ', 
-        fontsize=plt.rcParams['axes.titlesize'], style='italic'
+        0.25, 0.3, r'\textit{In situ}', 
+        color=insitu_color,
+        fontsize=plt.rcParams['axes.titlesize'], 
+        # style='italic'
     )
     ax1.text(
         -0.7, -0.9, 'Accreted', 
@@ -135,6 +166,7 @@ def main(style='paper'):
     ylim = (-1.1, 1.1)
     ax2.set_xlim(xlim)
     ax2.set_ylim(ylim)
+    scatter_kwargs['s'] = 8
     pc = ax2.hexbin(
         disk['mg_h'], disk['ce_mg_corr'],
         C=np.ones(disk.shape[0]),
@@ -147,23 +179,13 @@ def main(style='paper'):
         pad=0., fraction=0.07, aspect=30, 
         use_gridspec=True
     )
-    # Plot kinematically-selected halo stars
-    scatter_kwargs = dict(
-        s=5, rasterized=True, #edgecolors='w', linewidths=0.5,
-    )
+    # Plot in-situ halo stars
     ax2.scatter(
-        halo['mg_h'], halo['ce_mg_corr'], 
-        c=halo_color, marker='o', 
-        label='Halo',
+        insitu['mg_h'], insitu['ce_mg_corr'], 
+        c=insitu_color, marker='o', 
+        label=r'\textit{In situ}',
         **scatter_kwargs
     )
-    # Rolling median
-    sorted_halo = halo.sort_values('mg_h')[['mg_h', 'ce_mg_corr']]
-    rolling_halo = sorted_halo.rolling(
-        100, min_periods=100, step=10, on='mg_h', center=True
-    ).median()
-    ax2.plot(rolling_halo['mg_h'], rolling_halo['ce_mg_corr'], 'w-', linewidth=2)
-    ax2.plot(rolling_halo['mg_h'], rolling_halo['ce_mg_corr'], '-', color=halo_color)
     # Plot chemically-selected accreted stars
     ax2.scatter(
         accreted['mg_h'], accreted['ce_mg_corr'],
@@ -171,6 +193,13 @@ def main(style='paper'):
         label='Accreted',
         **scatter_kwargs
     )
+    # Rolling median of halo
+    sorted_insitu = insitu.sort_values('mg_h')[['mg_h', 'ce_mg_corr']]
+    rolling_insitu = sorted_insitu.rolling(
+        100, min_periods=100, step=10, on='mg_h', center=True
+    ).median()
+    ax2.plot(rolling_insitu['mg_h'], rolling_insitu['ce_mg_corr'], 'w-', linewidth=2)
+    ax2.plot(rolling_insitu['mg_h'], rolling_insitu['ce_mg_corr'], '-', color=insitu_color)
     # Rolling median
     sorted_accreted = accreted.sort_values('mg_h')[['mg_h', 'ce_mg_corr']]
     rolling_accreted = sorted_accreted.rolling(
@@ -209,7 +238,9 @@ def halo_ELz_cut(Lz):
     """
     Arbitrary halo cut - find a better one in the literature
     """
-    return -0.55 - np.exp(Lz / 2.5)
+    # return -0.55 - np.exp(Lz / 2.5)
+    return -0.7 - np.exp(Lz / 1.5)
+    # return np.where(Lz<0, -0.7 - np.exp(Lz / 1.5), -3)
 
 
 def halo_chem_cut(alfe):
