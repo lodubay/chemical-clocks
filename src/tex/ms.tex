@@ -44,6 +44,10 @@
 \section{Introduction}
 \label{sec:introduction}
 
+Stellar ages are a vital component of galactic archaeology studies. Recent years have seen an explosion of large stellar age catalogs that encompass a wide swath of the Milky Way. However, the most precise age estimation techniques, such as asteroseismology, are observationally expensive and apply to a limited range of stellar parameters. ``Chemical clocks,'' or empirically-calibrated relations between stellar age and atmospheric abundance ratios, promise reliable spectroscopic age estimates over a wider parameter space. The best-studied chemical clock is [C/N], which has a strong foundation in stellar physics but can only be used for stars on the red giant branch (RGB).
+
+A number of studies have proposed the use of $[s/\alpha]$\textemdash the ratio of elements produced by the slow neutron-capture process to the $\alpha$-elements produced in core-collapse supernovae (CCSNe)\textemdash as a chemical clock. \citet{nissen_high-precision_2015} reported a tight correlation between [Y/Mg] and isochronal age for Solar twins and proposed its use as a sensitive chronometer. 
+
 \begin{itemize}
     \item $[s/\alpha]$ correlates strongly with stellar age for a number of $s$-process elements \citep{casali_tracing_2025}.
     \item The [$s/\alpha$]--age relation may vary by region in the Galaxy \citep{ratcliffe_chemical_2024}, complicating its usefulness as an age indicator.
@@ -54,7 +58,8 @@ Literature notes
 \begin{itemize}
     \item \citet{edvardsson_chemical_1993} report a strong correlation between [Ba/H] and isochronal age.
     \item \citet{bensby_tracing_2007} find that [Ba/Fe] steadily increases over time for $\lesssim5\Gyr$ old thin disk stars (isochronal ages). They hypothesize that the flat trend with age for older stars is due to the $r$-process contribution.
-    \item \citet{nissen_high-precision_2015} finds a tight correlation between [Y/Mg] and isochronal age for Solar twins (similar $\log g$, $T_{\rm eff}$, and [Fe/H]), and proposes its use as a chronometer.
+    \item \citet{nissen_high-precision_2015} finds a tight correlation between [Y/Mg] and isochronal age for Solar twins (similar $\log g$, $T_{\rm eff}$, and [Fe/H]), and proposes its use as a chronometer. An abundance precision of 0.04 dex would correspond to an age precision of 1 Gyr.
+    \item \citet{nissen_high-precision_2016} show correlations between [Y/Fe] and [Ba/Fe] with age for stars younger than 6 Gyr. They propose [Y/Mg] and [Y/Al] as chemical clocks.
     \item \citet{slumstrup_ymg_2017} find the [Y/Mg] relation holds for Solar-metallicity RC stars in four open clusters.
     \item \citet{feltzing_metallicity_2017} investigate the metallicity dependence of the [Y/Mg]--age correlation using abundances and isochronal ages from \citet{bensby_exploring_2014}. They find a strong dependence on metallicity, with stars at [Fe/H]$\approx-0.5$ showing a flat trend with age. They argue that this is due to the metallicity dependence of the Y yield: stars near Solar metallicity produce lots of first-peak elements (e.g., Sr, Y), while lower-metallicity stars instead produce more second-peak elements (e.g., Ba, La, Ce?).
 \end{itemize}
@@ -94,7 +99,11 @@ We use data from the Milky Way Mapper (MWM; \todo{cite}), a program of the fifth
 
 Atmospheric parameters and chemical abundances were determined with the APOGEE Stellar Parameter and Chemical Abundance Pipeline \citep[ASPCAP;][]{garcia_perez_aspcap_2016}, which compares a grid of synthetic spectra \citep{hubeny_tlusty_2021} to the observed spectra using $\chi^2$ minimization. The line lists for most species are presented in \citet{smith_apogee_2021}, with additional Ce lines described by \citet{cunha_adding_2017}. All DR19 abundances assume local thermodynamic equilibrium (LTE). The spectral synthesis is further described by \citet{holtzman_apogee_2018} and \citet{jonsson_apogee_2020}.
 
-We select red giant branch (RGB; $1.0<\log g<3.5$) stars with $S/N>100$. We limit our sample to the ``optimal region'' for Ce abundances, $T_{\rm eff}>4000$ K and $\bracket{M}>-1.5$, defined by \citet{meszaros_sdss-v_2025}. We further remove stars with the BAD flag, any APOGEE spectrum flags, and abundance flags for Mg, Fe, and Ce, as well as those stars observed in SDSS-IV outside the main sample (EXTRATARG flag). This produces a primary sample of \todo{122,533} stars. The right-hand panel of Figure \ref{fig:kiel-diagram} plots a Kiel diagram of this sample, color-coded by [Ce/H]. A summary of our sample selection criteria is presented in Table \ref{tab:sample}.
+We select red giant branch (RGB; $1.0<\log g<3.5$) stars with $S/N>100$. We limit our sample to the ``optimal region'' for Ce abundances, $T_{\rm eff}>4000$ K and $\bracket{M}>-1.5$, defined by \citet{meszaros_sdss-v_2025}. We further remove stars with the BAD flag, any APOGEE spectrum flags, and abundance flags for Mg, Fe, and Ce, as well as stars observed in SDSS-IV outside the main sample (EXTRATARG flag). This produces a primary sample of \todo{122,533} stars. The right-hand panel of Figure \ref{fig:kiel-diagram} plots a Kiel diagram of this sample, color-coded by [Ce/H]. A summary of our sample selection criteria is presented in Table \ref{tab:sample}.
+
+\subsection{Kinematics}
+
+The 6-D kinematic properties for stars in our sample are calculated using position, proper motion, parallax, and radial velocity measurements from {\it Gaia} DR3 \citep{gaia_collaboration_gaia_2023}. These coordinates are transformed into the Galactocentric cylindrical frame with {\tt astropy} \citep{astropy_collaboration_astropy_2013,astropy_collaboration_astropy_2018,astropy_collaboration_astropy_2022} using updated Solar position and motion parameters from \citet{hunt_multiple_2022}. Orbital parameters (such as the angular momentum $L_z$, energy $E$, guiding-center radius $R_g$, and maximum midplane distance $z_{\rm max}$) are calculated using the {\tt gala} package \citep{price-whelan_gala_2017} with the {\tt MilkyWayPotential2022} potential, assuming the circular velocity at the Solar position is $229\kms$ \citep{eilers_circular_2019}.
 
 \begin{figure*}
     \centering
@@ -246,9 +255,11 @@ Figure \ref{fig:median-trends-grid} shows how the [Ce/Mg] median trend with [Mg/
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/ce_gradient.pdf}
-    \caption{Radial gradients of [Ce/H] and [Ce/Mg] as a function of stellar age. Stars are restricted to $z_{\rm max}<0.5$ kpc.}
+    \caption{Radial gradients of [Ce/H] and [Ce/Mg] as a function of stellar age for the high-Ia (solid lines) and low-Ia subsets (dashed lines). Stars are restricted to $z_{\rm max}<0.5$ kpc.}
     \label{fig:ce-gradient}
 \end{figure}
+
+Figure \ref{fig:ce-gradient} shows the radial [Ce/H] and [Ce/Mg] gradients in bins of stellar age. Within the high-Ia subsample, the radial [Ce/H] gradient is negative with a remarkably consistent slope for $\ge5\Gyr$ old stars, whereas it is nearly flat for the youngest stars. The [Ce/Mg] gradient evolves in a similar direction, except the oldest stars show a mostly flat gradient (from $6-8\Gyr$, excluding the $9\Gyr$ bin because it contains few stars), while the youngest stars exhibit a steep {\it positive} gradient.
 
 \subsection{The Halo}
 \label{sec:halo}
@@ -256,7 +267,7 @@ Figure \ref{fig:median-trends-grid} shows how the [Ce/Mg] median trend with [Mg/
 \begin{figure*}
     \centering
     \includegraphics[width=0.8\linewidth]{figures/halo.pdf}
-    \caption{Caption.}
+    \caption{{\it Top left:} Kinematic selection criteria for MW halo stars. {\it Top right:} Chemical selection criteria for accreted stars. {\it Bottom:} Ce abundance patterns for halo (green) and accreted (purple) stars as compared to the MW disk (2-D histogram). Solid lines plot a rolling median (window size 100) for the halo and accreted samples.}
     \label{fig:halo}
 \end{figure*}
 
