@@ -64,6 +64,11 @@ def main(style='paper'):
     disk_color = 'k'
     accreted_color = paultol.bright.colors[5]
     insitu_color = paultol.bright.colors[2]
+    # Italicize "in situ" if LaTeX is installed
+    if plt.rcParams['text.usetex']:
+        insitu_label = r'\textit{In situ}'
+    else:
+        insitu_label = 'In situ'
 
     # Kinematic cut in E-Lz plane
     ax0.set_xlabel(r'$L_z$ [$\times10^3$ kpc km s$^{-1}$]')
@@ -143,7 +148,7 @@ def main(style='paper'):
     alfe_arr = np.arange(-0.8, 0.5, 0.1)
     ax1.plot(alfe_arr, halo_chem_cut(alfe_arr), '-', color='k')
     ax1.text(
-        0.25, 0.3, r'\textit{In situ}', 
+        0.25, 0.3, insitu_label, 
         color=insitu_color,
         fontsize=plt.rcParams['axes.titlesize'], 
         # style='italic'
@@ -183,7 +188,7 @@ def main(style='paper'):
     ax2.scatter(
         insitu['mg_h'], insitu['ce_mg_corr'], 
         c=insitu_color, marker='o', 
-        label=r'\textit{In situ}',
+        label=insitu_label,
         **scatter_kwargs
     )
     # Plot chemically-selected accreted stars
