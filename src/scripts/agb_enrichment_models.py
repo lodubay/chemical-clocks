@@ -9,7 +9,8 @@ from matplotlib.ticker import MultipleLocator
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import vice
 
-from utils import alpha_cut, adjusted_agb, good_ages
+from multizone.src.yields.utils import adjusted_agb
+from utils import alpha_cut, good_ages
 from plotting import ONE_COLUMN_WIDTH
 from colormaps import paultol
 import paths
@@ -19,8 +20,8 @@ from yields import yZ1
 
 SFH_TIMESCALE = 15
 AGB_STUDY = 'cristallo11'
-END_TIME = 12 # Gyr
-SOLAR_CE_S_FRAC = 0.77 # fraction of Ce in the Sun from the s-process
+END_TIME = 13.2 # Gyr
+SOLAR_CE_S_FRAC = 0.77 # Solar s-process fraction (Arlandini et al. 1999)
 SOLAR_AGE = 4.6 # Gyr
 ETA_SUN = 0.4 # default mass-loading factor at Solar radius
 
@@ -33,8 +34,8 @@ def main(style='paper'):
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     mwm_rgb = good_ages(mwm_rgb).copy()
     local_sample = mwm_rgb[
-        (mwm_rgb['Rg'] >= 7.5) &
-        (mwm_rgb['Rg'] < 8.5) &
+        (mwm_rgb['Rg'] >= 7) &
+        (mwm_rgb['Rg'] < 9) &
         (mwm_rgb['z_max'] < 0.5) &
         (mwm_rgb['mg_h'] >= -0.1) &
         (mwm_rgb['mg_h'] < 0.1)
@@ -58,7 +59,7 @@ def main(style='paper'):
         sharex=True, sharey=True,
         gridspec_kw={'hspace': 0.}
     )
-    fig.subplots_adjust(right=0.67)
+    fig.subplots_adjust(right=0.62)
     legend_kwargs = dict(bbox_to_anchor=(1, 1), loc='upper left')
 
     # Plot MWM data
@@ -68,7 +69,7 @@ def main(style='paper'):
         color=datacolor,
         s=1,
         linewidth=0.2,
-        # rasterized=True
+        rasterized=True
     )
     for ax in axs:
         ax.scatter(
@@ -81,7 +82,7 @@ def main(style='paper'):
         )
         # median errors
         ax.errorbar(
-            9, 0.8, 
+            10, 0.8, 
             xerr=[[age_err_low], [age_err_high]], 
             yerr=med_abund_err, 
             c=datacolor, capsize=0,
@@ -94,7 +95,10 @@ def main(style='paper'):
         )
     # indicate Solar s-process fraction
     axs[0].plot(SOLAR_AGE, np.log10(SOLAR_CE_S_FRAC), 'wo', zorder=9)
-    axs[0].plot(SOLAR_AGE, np.log10(SOLAR_CE_S_FRAC), 'kx', zorder=10, ms=4)
+    axs[0].text(
+        SOLAR_AGE, np.log10(SOLAR_CE_S_FRAC), r'$\otimes$',
+        va='center', ha='center', zorder=10, weight='bold', usetex=True
+    )
 
     # Plot onezone models
     vice.yields.sneia.settings['ce'] = 0
@@ -134,29 +138,47 @@ def main(style='paper'):
     axs[0].plot(hist['lookback'], hist['[ce/mg]'], linestyle='--', 
                 color=paultol.bright.colors[0], label=r'No $r$-proc.'
     )
-    axs[0].legend(title='Enhancement', **legend_kwargs)
+    axs[0].legend(title=r'\textbf{Enhancement}', **legend_kwargs)
 
     # Mass-shifted AGB enrichment
-    mass_shifts = [0, -0.5, -1, -1.5, -2]
-    colors = [paultol.bright.colors[c] for c in [0, 4, 2, 3, 1]]
+    # mass_shifts = [0, -0.5, -1, -1.5, -2]
+    # colors = [paultol.bright.colors[c] for c in [0, 4, 2, 3, 1]]
+    # vice.yields.ccsne.settings['ce'] = ccsn_ce_yield
+    # for i, dm in enumerate(mass_shifts):
+    #     vice.yields.agb.settings['ce'] = adjusted_agb(
+    #         'ce', study=AGB_STUDY, dm=dm, amp=1
+    #     )
+    #     name = f'2p-agb-dm{dm}'
+    #     run_singlezone(name, expfall)
+    #     hist = vice.history(str(paths.data/output_dir/name))
+    #     axs[1].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
+    #     axs[1].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
+    #                 color=colors[i], 
+    #                 label=r'$%s$ M$_\odot$' % dm
+    #     )
+    # axs[1].legend(title=r'\textbf{Mass shift}', **legend_kwargs)
+
+    # Mass-shifted AGB enrichment
+    mass_scales = [2, 1, 0.7, 0.5, 0.3]
+    colors = [paultol.bright.colors[c] for c in [4, 0, 2, 3, 1]]
     vice.yields.ccsne.settings['ce'] = ccsn_ce_yield
-    for i, dm in enumerate(mass_shifts):
+    for i, mscale in enumerate(mass_scales):
         vice.yields.agb.settings['ce'] = adjusted_agb(
-            'ce', study=AGB_STUDY, dm=dm, amp=1
+            'ce', study=AGB_STUDY, dm=0, amp=1, mscale=mscale,
         )
-        name = f'2p-agb-dm{dm}'
+        name = f'2p-agb-mscale{mscale}'
         run_singlezone(name, expfall)
         hist = vice.history(str(paths.data/output_dir/name))
         axs[1].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
         axs[1].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
                     color=colors[i], 
-                    label=r'$%s$ M$_\odot$' % dm
+                    label=r'$\times%s$' % mscale
         )
-    axs[1].legend(title='Mass shift', **legend_kwargs)
+    axs[1].legend(title=r'\textbf{Mass scale}', **legend_kwargs)
 
     # Metallicity-scaled AGB enrichment
-    met_scales = [0.5, 1, 2, 5]
-    colors = [paultol.bright.colors[c] for c in [4, 0, 2, 1]]
+    met_scales = [5, 2, 1, 0.5]
+    colors = [paultol.bright.colors[c] for c in [1, 2, 0, 4]]
     vice.yields.ccsne.settings['ce'] = ccsn_ce_yield
     for i, Zscale in enumerate(met_scales):
         vice.yields.agb.settings['ce'] = adjusted_agb(
@@ -170,7 +192,7 @@ def main(style='paper'):
                     color=colors[i], 
                     label=r'$\times%s$' % Zscale
         )
-    axs[2].legend(title=r'$Z$ scale', **legend_kwargs)
+    axs[2].legend(title=r'\textbf{$Z$ scale}', **legend_kwargs)
 
     # Different outflow mass-loading factors
     # vice.yields.ccsne.settings['ce'] = ccsn_ce_yield
