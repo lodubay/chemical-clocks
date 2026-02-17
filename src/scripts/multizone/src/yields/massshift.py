@@ -1,5 +1,5 @@
 """
-The fiducial yields for the multizone models.
+Yields with Ce production shifted to lower-mass AGB stars.
 """
 
 import vice

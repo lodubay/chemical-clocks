@@ -1,20 +1,24 @@
 """
-Yields with Ce production shifted to higher-metallicity AGB stars.
+Yields with some Ce production shifted to lower masses.
+
+Assumes 50% of total yields come from blue stragglers and other merger products
+(i.e., the yield of a 2 Msun AGB, but the lifetime of a 1 Msun star).
 """
 
 import vice
-from .utils import adjusted_agb
+from .utils import decompose_agb_grid
 
 # Use solar-scaled CCSN yields from Weinberg et al. (2024)
 from . import W24
 
 # AGB yields from Cristallo et al. (2011, 2015)
-vice.yields.agb.settings["ce"] = adjusted_agb(
+vice.yields.agb.settings["ce"] = decompose_agb_grid(
     "ce", 
     study="cristallo11",
-    amp=1,
-    dm=0,
-    Zscale=2, # shift production to higher-metallicity progenitors
+    amplitudes=[0.5, 0.5],
+    mscales=[1, 0.5],
+    mshifts=0,
+    Zscales=1,
 )
 
 # Residual fraction of Solar Ce produced by r-process
