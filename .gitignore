@@ -11,6 +11,9 @@ ms.synctex.gz
 # Spyder project directory
 .spyproject/
 
+# VScode
+.vscode/
+
 # Miscellaneous
 __pycache__
 .virtual_documents/
