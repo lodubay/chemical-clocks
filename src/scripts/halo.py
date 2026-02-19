@@ -22,17 +22,11 @@ def main(style='paper'):
     data = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     data['mn_mg'], data['e_mn_mg'] = abundance_ratio(data, 'mn', 'mg')
     data['al_fe'], data['e_al_fe'] = abundance_ratio(data, 'al', 'fe')
-    # Upper limits from Shetrone et al. (2015)
-    data['lim_ce_h'] = ce_upper_limit(data['teff'], data['snr'])
-    limits = data[
-        (data['ce_h'] - data['e_ce_h'] <= data['lim_ce_h'])
-    ]
-    data = data[
-        (data['ce_h'] - data['e_ce_h'] > data['lim_ce_h'])
-    ]
+    # Upper limits from Shetrone et al. (2025)
+    data = data[data['lim_ce_h_flag'] == 0]
     # Kinematically-selected halo
     halo = data[data['E']/1e5 > halo_ELz_cut(data['Lz']/1e3)]
-    # halo = data[(data['z_max'] > 3) | (data['vphi'] > -100)]
+    # halo = data[(data['z_max'] > 3) | (data['vphi'] > -120)]
     # Kinematically-selected disk stars
     disk = data[data['E']/1e5 < halo_ELz_cut(data['Lz']/1e3)]
     # disk = data[(data['z_max'] < 3) & (data['vphi'] < -120)]
@@ -43,10 +37,7 @@ def main(style='paper'):
     
     # Set up figure
     plt.style.use(paths.styles / f'{style}.mplstyle')
-    fig = plt.figure(
-        figsize=(0.8*TWO_COLUMN_WIDTH, 0.8*TWO_COLUMN_WIDTH), 
-        # constrained_layout=True
-    )
+    fig = plt.figure(figsize=(0.8*TWO_COLUMN_WIDTH, 0.8*TWO_COLUMN_WIDTH))
     gs = GridSpec(2, 2, figure=fig, height_ratios=[2, 3], wspace=0.35)
     ax0 = fig.add_subplot(gs[0,0])
     ax1 = fig.add_subplot(gs[0,1])
@@ -253,13 +244,6 @@ def halo_chem_cut(alfe):
     Chemical cut in [Mn/Mg]-[Al/Fe] plane to select accreted stars.
     """
     return np.where(alfe > -0.2, -0.6-2*alfe, -0.2)
-
-
-def ce_upper_limit(teff, snr):
-    """
-    Ce abundance upper limits based on Teff and S/N from Shetrone et al. (2025).
-    """
-    return -0.93 + 0.51*(teff/1000) - 1.84*(np.log10(snr)) + 0.174*(np.log10(snr))**2
 
 
 if __name__ == '__main__':

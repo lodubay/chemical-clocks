@@ -71,6 +71,9 @@ def main():
     # drop duplicate SDSS-V IDs with the lowest SNR
     sample.sort_values(['sdss_id', 'snr'], inplace=True, ascending=True)
     sample.drop_duplicates(subset='sdss_id', keep='last', inplace=True)
+    # Calculate upper limits and flag abundances below these limits
+    print('Computing abundance limits...')
+    sample = compute_upper_limits(sample)
     # Calculate abundance ratios and errors in quadrature
     print('Calculating abundance ratios and coordinates...')
     sample['mg_fe'], sample['e_mg_fe'] = abundance_ratio(sample, 'mg', 'fe')
@@ -299,6 +302,31 @@ def add_kinematics(df, id_name='source_id', verbose=False):
     )
     
     return df
+
+
+def compute_upper_limits(df):
+    """
+    Compute Shetrone et al. (2025) upper limits for abundance measurements,
+    and flag abundances lower than the limit.
+    """
+    coeffs = pd.read_csv(
+        paths.data / 'MWM' / 'shetrone_dr17_limits.csv', index_col='species'
+    )
+    for el, row in coeffs.iterrows():
+        df['lim_%s_h' % el] = abund_limit_func(
+            df['teff'], df['snr'], **row.to_dict()
+        )
+        df['lim_%s_h_flag' % el] = (
+            df['%s_h' % el] - df['e_%s_h' % el] <= df['lim_%s_h' % el]
+        ).astype(np.int64)
+    return df
+
+
+def abund_limit_func(teff, snr, alpha=0, beta=1, gamma=1, delta=1):
+    """
+    Generic upper limit function based on Teff and S/N from Shetrone et al. (2025).
+    """
+    return alpha + beta*(teff/1000) + gamma*(np.log10(snr)) + delta*(np.log10(snr))**2
 
 
 def logg_calibrations(df):
