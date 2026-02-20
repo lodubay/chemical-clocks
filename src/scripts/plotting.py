@@ -115,13 +115,15 @@ def insert_colorbar_axes(fig, orientation='vertical', width=0.02, pad=0.01):
     return cax
 
 
-def colored_text_legend(ax, **kwargs):
+def colored_text_legend(ax, show_handles=False, **kwargs):
     """
     Make a text-only legend with color-coding.
 
     Parameters
     ----------
     ax : matplotlib.axes.Axes
+    show_handles : bool [default: False]
+        If True, show legend handles while still changing text color
     kwargs passed to plt.legend()
 
     Returns
@@ -130,9 +132,12 @@ def colored_text_legend(ax, **kwargs):
     """
     handles, labels = ax.get_legend_handles_labels()
     # Remove legend handles
-    leg = ax.legend(handlelength=0, handletextpad=0, markerscale=0, **kwargs)
-    for line in leg.get_lines():
-        line.set_visible(False)
+    if show_handles:
+        leg = ax.legend(**kwargs)
+    else:
+        leg = ax.legend(handlelength=0, handletextpad=0, markerscale=0, **kwargs)
+        for line in leg.get_lines():
+            line.set_visible(False)
     # Color-code legend text by line and point colors
     for handle, text in zip(handles, leg.get_texts()):
         if isinstance(handle, PathCollection):

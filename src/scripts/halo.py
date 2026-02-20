@@ -13,6 +13,7 @@ import paths
 from plotting import TWO_COLUMN_WIDTH, colored_text_legend
 from mwm_sample import abundance_ratio
 from colormaps import paultol
+from utils import apply_alpha_cut
 
 DENSITY_COLORMAP = 'binary_r'
 
@@ -28,8 +29,10 @@ def main(style='paper'):
     halo = data[data['E']/1e5 > halo_ELz_cut(data['Lz']/1e3)]
     # halo = data[(data['z_max'] > 3) | (data['vphi'] > -120)]
     # Kinematically-selected disk stars
-    disk = data[data['E']/1e5 < halo_ELz_cut(data['Lz']/1e3)]
+    disk = data[data['E']/1e5 < halo_ELz_cut(data['Lz']/1e3)].copy()
     # disk = data[(data['z_max'] < 3) & (data['vphi'] < -120)]
+    disk = apply_alpha_cut(disk)
+    low_ia = disk[disk['high_alpha']]
     # Chemically-selected accreted stars
     accreted = halo[halo['mn_mg'] < halo_chem_cut(halo['al_fe'])]
     # Chemically-selected in-situ halo stars
@@ -55,6 +58,7 @@ def main(style='paper'):
     disk_color = 'k'
     accreted_color = paultol.bright.colors[5]
     insitu_color = paultol.bright.colors[2]
+    low_ia_color = paultol.bright.colors[1]
     # Italicize "in situ" if LaTeX is installed
     if plt.rcParams['text.usetex']:
         insitu_label = r'\textit{In situ}'
@@ -167,6 +171,7 @@ def main(style='paper'):
         disk['mg_h'], disk['ce_mg_corr'],
         C=np.ones(disk.shape[0]),
         gridsize=(50, 18),
+        zorder=1,
         extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
         **hexbin_kwargs
     )
@@ -175,28 +180,38 @@ def main(style='paper'):
         pad=0., fraction=0.07, aspect=30, 
         use_gridspec=True
     )
-    # Plot in-situ halo stars
-    ax2.scatter(
-        insitu['mg_h'], insitu['ce_mg_corr'], 
-        c=insitu_color, marker='o', 
-        label=insitu_label,
-        **scatter_kwargs
-    )
     # Plot chemically-selected accreted stars
     ax2.scatter(
         accreted['mg_h'], accreted['ce_mg_corr'],
-        c=accreted_color, marker='D', 
+        c=accreted_color, marker='D', zorder=2,
         label='Accreted',
         **scatter_kwargs
     )
-    # Rolling median of halo
+    # Plot in-situ halo stars
+    ax2.scatter(
+        insitu['mg_h'], insitu['ce_mg_corr'], 
+        c=insitu_color, marker='o', zorder=1,
+        label=insitu_label,
+        **scatter_kwargs
+    )
+    # Rolling median of low-Ia stars
+    sorted_low_ia = low_ia.sort_values('mg_h')[['mg_h', 'ce_mg_corr']]
+    rolling_low_ia = sorted_low_ia.rolling(
+        1000, min_periods=1000, step=100, on='mg_h', center=True
+    ).median()
+    ax2.plot(rolling_low_ia['mg_h'], rolling_low_ia['ce_mg_corr'], 'w-', linewidth=2)
+    ax2.plot(
+        rolling_low_ia['mg_h'], rolling_low_ia['ce_mg_corr'], 
+        '--', color=low_ia_color, label='Low-Ia'
+    )
+    # Rolling median of in-situ stars
     sorted_insitu = insitu.sort_values('mg_h')[['mg_h', 'ce_mg_corr']]
     rolling_insitu = sorted_insitu.rolling(
         100, min_periods=100, step=10, on='mg_h', center=True
     ).median()
     ax2.plot(rolling_insitu['mg_h'], rolling_insitu['ce_mg_corr'], 'w-', linewidth=2)
     ax2.plot(rolling_insitu['mg_h'], rolling_insitu['ce_mg_corr'], '-', color=insitu_color)
-    # Rolling median
+    # Rolling median of accreted stars
     sorted_accreted = accreted.sort_values('mg_h')[['mg_h', 'ce_mg_corr']]
     rolling_accreted = sorted_accreted.rolling(
         100, min_periods=100, step=10, on='mg_h', center=True
@@ -215,8 +230,8 @@ def main(style='paper'):
         yerr=data['e_ce_mg'].median(),
         c='k', capsize=0
     )
-    # ax2.legend(loc='upper left', frameon=True)
-    colored_text_legend(ax2, loc='upper left', fontsize=plt.rcParams['axes.titlesize'])
+    # ax2.legend(loc='upper left')
+    colored_text_legend(ax2, show_handles=True, loc='upper left', fontsize=plt.rcParams['axes.titlesize'], frameon=True)
 
     plt.subplots_adjust(bottom=0.08, top=0.96, left=0.08, right=0.92)
     plt.savefig(paths.figures / 'halo')
