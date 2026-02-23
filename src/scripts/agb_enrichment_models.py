@@ -16,7 +16,7 @@ from colormaps import paultol
 import paths
 
 # CCSN and SN Ia yields
-from yields import yZ1
+from multizone.src.yields import W24
 
 SFH_TIMESCALE = 15
 AGB_STUDY = 'cristallo11'
@@ -255,6 +255,16 @@ def main(style='paper'):
     axs[-1].set_xlabel('Age [Gyr]')
 
     fig.savefig(paths.figures / 'agb_enrichment_models')
+    plt.close()
+
+    # Sanity plots
+    hist = vice.history(str(paths.data / 'onezone' / '2p-agb-x1'))
+    plt.plot(hist['lookback'], hist['[mg/h]'], 'k-')
+    plt.xlabel('Lookback [Gyr]')
+    plt.ylabel('[Mg/H]')
+    plt.ylim((-1.5, 0.5))
+    plt.savefig(paths.extra / 'agb_mgh.png')
+    plt.close()
 
 
 def run_singlezone(name, sfh, mode='sfr', eta=ETA_SUN, output_dir=paths.data/'onezone'):
