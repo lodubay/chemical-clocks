@@ -5,6 +5,10 @@
 \usepackage{xcolor}
 \usepackage{amsmath}
 
+\usepackage{siunitx}
+\DeclareSIUnit\year{yr}
+\DeclareSIUnit\parsec{pc}
+
 % user-defined commands
 \newcommand{\todo}[1]{{\color{red}#1}}
 \newcommand{\osuaffil}{Department of Astronomy, The Ohio State University, 140 W. 18th Ave, Columbus OH 43210, USA}
@@ -103,7 +107,7 @@ We select red giant branch (RGB; $1.0<\log g<3.5$) stars with $S/N>100$. We limi
 
 \subsection{Kinematics}
 
-The 6-D kinematic properties for stars in our sample are calculated using position, proper motion, parallax, and radial velocity measurements from {\it Gaia} DR3 \citep{gaia_collaboration_gaia_2023}. These coordinates are transformed into the Galactocentric cylindrical frame with {\tt astropy} \citep{astropy_collaboration_astropy_2013,astropy_collaboration_astropy_2018,astropy_collaboration_astropy_2022} using updated Solar position and motion parameters from \citet{hunt_multiple_2022}. Orbital parameters (such as the angular momentum $L_z$, energy $E$, guiding-center radius $R_g$, and maximum midplane distance $z_{\rm max}$) are calculated using the {\tt gala} package \citep{price-whelan_gala_2017} with the {\tt MilkyWayPotential2022} potential, assuming the circular velocity at the Solar position is $229\kms$ \citep{eilers_circular_2019}.
+The 6-D kinematic properties for stars in our sample are calculated using position, proper motion, parallax, and radial velocity measurements from {\it Gaia} DR3 \citep{gaia_collaboration_gaia_2023}. These coordinates are transformed into the Galactocentric cylindrical frame with {\tt astropy} \citep{astropy_collaboration_astropy_2013,astropy_collaboration_astropy_2018,astropy_collaboration_astropy_2022} using updated Solar position and motion parameters from \citet{hunt_multiple_2022}. Orbital parameters (such as the angular momentum $L_z$, energy $E$, guiding-center radius $R_g$, and maximum midplane distance $z_{\rm max}$) are calculated using the {\tt gala} package \citep{price-whelan_gala_2017} with the {\tt MilkyWayPotential2022} potential, assuming the circular velocity at the Solar position is $229\kms$ \citep{eilers_circular_2019}. \todo{Still missing kinematics for $\sim20000$ stars.}
 
 \begin{figure*}
     \centering
@@ -166,8 +170,6 @@ Figure \ref{fig:logg-calibrations} shows the effect of the corrective offsets on
     \label{fig:logg-calibrations}
 \end{figure}
 
-\subsection{Residual Abundances}
-
 \section{Results}
 \label{sec:results}
 
@@ -186,7 +188,7 @@ Outline:
     \item Can low-metallicity Ce abundances constrain [Ce/Mg] ``plateau'' (if it exists at all)?
     \item Compare SDSS-V trends to \citet{casali_tracing_2025} trends.
     \item Is the break in the trend at $\sim6\Gyr$ important? (Figure \ref{fig:median-age-trends}).
-    \item Discuss halo stars, accreted vs in-situ. How do trends compare vs local group galaxies? Make sure stars in our sample aren't in local dwarfs.
+    \item Discuss halo stars, accreted vs in-situ. How do trends compare vs local group galaxies?
     \item Other kinematic info if useful
 \end{itemize}
 }
@@ -209,7 +211,7 @@ Figure \ref{fig:cemg-mgh-age} shows the median stellar age as a function of [Mg/
     \label{fig:dataset-comparison}
 \end{figure}
 
-Figure \ref{fig:dataset-comparison} compares the age--[Ce/Mg] relation from our sample against two other age catalogs: the Open Cluster Chemical Abundances and Mapping Survey \citet[OCCAM;][]{otto_open_2026} and the APOGEE-Kepler Asteroseismic Catalog \citep[APOKASC-3;][]{pinsonneault_apokasc-3_2025}. We use DR19 abundances for both catalogs. The OCCAM data include clusters with at least one RGB star with a measurement of [Ce/H]. Most of the clusters are young, $\lesssim2\Gyr$, and these clusters also show the largest spread in [Ce/Mg]. \todo{Still, the OCCAM trend qualitatively agrees with our sample.} We also see agreement with the trend in the APOKASC-3 data, although this is not surprising because StarFlow is trained on APOKASC-3.
+Figure \ref{fig:dataset-comparison} compares the age--[Ce/Mg] relation from our sample against two other age catalogs: the APOGEE-Kepler Asteroseismic Catalog \citep[APOKASC-3;][]{pinsonneault_apokasc-3_2025} and the Open Cluster Chemical Abundances and Mapping Survey \citet[OCCAM;][]{otto_open_2026}. Although APOKASC-3 uses DR17 stellar parameters and abundances, in Figure \ref{fig:dataset-comparison} we plot the DR19 abundances due to the difference in zero-point offsets between the data releases. The median trend in our sample matches the APOKASC-3 trend well, although this is expected because the StarFlow ages were trained on APOKASC-3. More informative are the OCCAM cluster ages. The OCCAM data include clusters with at least one RGB star with a measurement of [Ce/H]. Most of the clusters are young, $\lesssim2\Gyr$, and these clusters also show the largest spread in [Ce/Mg]; some have [Ce/Mg] ratios $\sim0.3\dex$ higher than the our median trend. Overall, the OCCAM age--[Ce/Mg] trend agrees with our sample up to ages of $\sim7\Gyr$. This agreement suggests the StarFlow ages are suitable for our purposes.
 
 \subsection{Metallicity Dependence}
 
@@ -217,8 +219,16 @@ Figure \ref{fig:dataset-comparison} compares the age--[Ce/Mg] relation from our 
     \centering
     \includegraphics[width=\linewidth]{figures/local_age_trends.pdf}
     \caption{Solar neighborhood age--[Ce/Mg] relation and linear fits binned by metallicity.}
-    \label{fig:local-age-trends}
+    \label{fig:local-metallicity-trends}
 \end{figure}
+
+As noted in previous studies \citep[e.g.,][]{feltzing_metallicity_2017,sales-silva_exploring_2022,casali_tracing_2025}, the [$s/\alpha$]--age trend is a function of metallicity. Figure \ref{fig:local-metallicity-trends} shows how this relation varies as a function of metallicity in the Solar neighborhood. We bin the stars by metallicity and fit a linear trend in each bin. \todo{Describe fitting procedure.} We only fit stars in the optimal StarFlow age range of $1-8\Gyr$, and we limit our fits to the high-Ia population due to low-Ia stars showing different patterns (see Figure \ref{fig:median-trends-grid}).
+
+Both the slope and intercept of the fits in Figure \ref{fig:local-metallicity-trends} vary with metallicity. Stars with either high or low metallicity show shallow or sometimes even positive slopes, with intercepts near Solar [Ce/Mg]. Stars with slightly sub-Solar metallicity ($\bracket{M}\approx-0.3$) have the steepest trends and the highest [Ce/Mg] at the present day.
+
+\todo{Contrast with Casali fits.}
+
+\subsection{Residual Abundances}
 
 \begin{figure}
     \centering
@@ -236,7 +246,9 @@ Figure \ref{fig:dataset-comparison} compares the age--[Ce/Mg] relation from our 
     \label{fig:median-trends-grid}
 \end{figure*}
 
-Figure \ref{fig:median-trends-grid} shows how the [Ce/Mg] median trend with [Mg/H] changes with position in the Galaxy. In the Solar neighborhood, the median high-Ia trend peaks at $\bracket{Mg}=-0.2$ with $\bracket[Mg]{Ce}\approx+0.25$, and the most metal-rich stars have lowest $\bracket[Mg]{Ce}\approx-0.1$. Moving from the inner to the outer Galaxy, the metallicity with the highest [Ce/Mg] 
+Figure \ref{fig:median-trends-grid} shows how the [Ce/Mg] median trend with [Mg/H] changes with position in the Galaxy. In the Solar neighborhood, the median high-Ia trend peaks at $\bracket{Mg}=-0.2$, and the lowest [Ce/Mg] (slightly sub-solar) is found in the most metal-rich stars. The location of the trend maximum is consistent in most regions of the Galaxy, but the maximum [Ce/Mg] is lowest at small $R_g$ and highest at large $R_g$. The high-Ia trend also flattens when moving to higher $z_{\rm max}$, and the high- and low-Ia sequences become less separated. This behavior is consistent with [Ce/Mg] as a chemical clock: in the inside-out formation scenario of the Milky Way, the inner Galaxy formed first and is therefore dominated by older stars, while the outer Galaxy formed more recently \citep{bird_inside_2021}. Stars at larger midplane distances have experienced more vertical heating and are therefore older (and lower [Ce/Mg]).
+
+\todo{Discuss low-Ia stars having the same patterns everywhere.}
 
 % \begin{figure*}
 %     \centering
@@ -267,9 +279,29 @@ Figure \ref{fig:ce-gradient} shows the radial [Ce/H] and [Ce/Mg] gradients in bi
 \begin{figure*}
     \centering
     \includegraphics[width=0.8\linewidth]{figures/halo.pdf}
-    \caption{{\it Top left:} Kinematic selection criteria for MW halo stars. {\it Top right:} Chemical selection criteria for accreted stars. {\it Bottom:} Ce abundance patterns for halo (green) and accreted (purple) stars as compared to the MW disk (2-D histogram). Solid lines plot a rolling median (window size 100) for the halo and accreted samples.}
+    \caption{{\it Top left:} Kinematic selection criteria for MW halo stars. {\it Top right:} Chemical selection criteria for accreted stars. {\it Bottom:} Ce abundance patterns for halo (green) and accreted (purple) stars as compared to the MW disk (2-D histogram). Solid lines plot a rolling median (window size 100) for the halo and accreted samples. The black dotted lines indicate the boundary where abundances are flagged for being too close to a grid edge. The gray dotted line indicates the approximate region where a large fraction of measurements fall below the \citet{shetrone_apache_2025} upper limits.}
     \label{fig:halo}
 \end{figure*}
+
+We define our halo sample by the following cut in the $E-L_z$ plane:
+\begin{equation}
+    \frac{E_{\rm halo}}{\SI{e5}{\kilo\meter\squared\per\second\squared}} > -0.7 - \exp\Big(\frac{L_z}{\SI{1.5e3}{\kilo\parsec\kilo\meter\per\second}}\Big).
+    \label{eq:halo-cut}
+\end{equation}
+\citet{hawkins_using_2015} proposed using [Mn/Mg] and [Al/Fe] to distinguish stars accreted from dwarf galaxies from stars that were born in the disk or proto-Milky Way. We split our halo sample into accreted and {\it in situ} populations using the following chemical cut:
+\begin{equation}
+    \bracket[Mg]{Mn}_{\rm acc.} <
+    \begin{cases}
+        -0.2, & \bracket[Fe]{Al}<-0.2; \\
+        -0.6-2\bracket[Fe]{Al}, & \bracket[Fe]{Al}\ge-0.2.
+    \end{cases}
+    \label{eq:accreted-cut}
+\end{equation}
+\todo{Discuss abundance upper limits.} 
+
+Figure \ref{fig:halo} plots [Ce/Mg] as a function of [Mg/H] for the halo stars as compared to the Milky Way disk. Most of the accreted stars have $\bracket{Mg}<-0.8$, while the {\it in situ} stars have $\bracket{Mg}>-1.0$, so there is some overlap between the two populations. There is a positive correlation between [Ce/Mg] and [Mg/H] for accreted stars, with [Ce/Mg] increasing by $\sim0.2\dex$ over $\sim0.4\dex$ in [Mg/H]. The {\it in situ} stars show a negative correlation, and the highest-[Mg/H] halo stars have similar [Ce/Mg] ratios to the low-Ia disk population. Interestingly, the median trends of both populations overlap at $\bracket[Mg]{Ce}\approx0$ from $-1\lesssim\bracket{Mg}\lesssim-0.8$, despite being clearly separated in [Al/Fe]. \todo{The accreted halo stars sit at roughly Solar [Ce/Mg] ratios, in between the low-Ia and high-Ia disk populations.}
+
+\todo{Literature comparison.} \citet{skuladottir_neutron-capture_2020} studied n-capture trends in the Sculptor dwarf galaxy ($-2\lesssim\bracket{Fe}\lesssim-1$) and found that [Ba/Fe] ($\sim$pure $s$-process) increases with [Fe/H] before a plateau at the Solar value, [La/Fe] and [Nd/Fe] (mix of $s$ and $r$) decrease (but not as steeply as Eu), while [Y/Fe] shows a flat trend that is inconsistent with the Milky Way. \citet{hasselquist_apogee_2021} studied APOGEE abundances in five dwarf galaxies (LMC, SMC, GSE, Sgr, and Fnx) and found a consistent trend of increasing [Ce/Mg] with [Mg/H], with the most metal-rich stars (at $\bracket{Mg}\approx-0.5$) having [Ce/Mg] more consistent with the thin disk than the thick disk. \citet{shetrone_apache_2025} similarly show increasing [Ce/Fe] with [Fe/H] for stars in several dSph galaxies (mostly Fnx), which is consistent with the MW low-Ia disk until $\bracket{Fe}\approx-1$. \citet{razera_abundance_2022} and \citet{ernandes_abundances_2026} studied bulge spheroid stars from APOGEE and found relatively high $\bracket[Fe]{Ce}\approx+0.5$, peaking at $\bracket{Fe}\approx-0.8$ and declining to higher metallicities.
 
 \section{Galactic Chemical Evolution}
 \label{sec:gce}
