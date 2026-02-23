@@ -223,10 +223,9 @@ def add_kinematics(df, id_name='source_id', verbose=False):
     df : pandas.DataFrame
         Input DataFrame merged with Gaia orbit parameters.
     """
-    data = fits.open(
-        paths.data / 'MWM' / 'dr3-rv-good-plx-MilkyWayPotential2022-joined.fits'
-    )
-    kinematic = data[1].data
+    fitspath = paths.data / 'MWM' / 'dr3-rv-good-plx-MilkyWayPotential2022-joined.fits'
+    with fits.open(fitspath) as hdul:
+        kinematic = hdul[1].data
     if verbose: print('Finished reading in data!')
     ids = pd.DataFrame(kinematic.source_id, columns=['source_id'])
     checklist = ids['source_id'].isin(df[id_name])
