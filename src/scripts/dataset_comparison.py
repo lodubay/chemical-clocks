@@ -77,7 +77,7 @@ def main(style='paper'):
         apokasc3 = join_apokasc_mwm()
         apokasc3.to_csv(apokasc_csv_path, index=True)
     scatter_kwargs = dict(s=1, edgecolors='none', marker='o')
-    cmap = truncate_colormap('RdBu', minval=0.1, maxval=0.9)
+    cmap = truncate_colormap('autumn', minval=0.1, maxval=0.7)
     norm = BoundaryNorm([0, 0.5, 1], cmap.N)
     pc = axs[1].scatter(
         apokasc3['AgeBest'], 
