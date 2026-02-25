@@ -1,5 +1,6 @@
 """
-Plot [Ce/Mg] evolution predicted by one-zone GCE models with varying parameters.
+Plot [Ce/Mg] evolution predicted by one-zone GCE models with modifications
+to the AGB yield prescriptions.
 """
 
 import numpy as np
@@ -10,6 +11,7 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import vice
 
 from multizone.src.yields.utils import adjusted_agb
+from onezone_sfh import run_singlezone, expfall
 from utils import alpha_cut, good_ages
 from plotting import ONE_COLUMN_WIDTH
 from colormaps import paultol
@@ -102,7 +104,7 @@ def main(style='paper'):
 
     # Plot onezone models
     vice.yields.sneia.settings['ce'] = 0
-    output_dir = paths.data / 'onezone'
+    output_dir = paths.data / 'onezone' / 'agb'
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Calculate prompt Ce enrichment (assigned to CCSNe for convenience)
@@ -118,9 +120,9 @@ def main(style='paper'):
         vice.yields.agb.settings['ce'] = adjusted_agb(
             'ce', study=AGB_STUDY, amp=scale
         )
-        name = f'2p-agb-x{scale}'
-        run_singlezone(name, expfall)
-        hist = vice.history(str(paths.data/output_dir/name))
+        name = f'amp{scale}'
+        run_singlezone(name, expfall, output_dir=output_dir)
+        hist = vice.history(str(output_dir/name))
         axs[0].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
         axs[0].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
                     color=colors[i], 
@@ -131,9 +133,9 @@ def main(style='paper'):
         'ce', study=AGB_STUDY, amp=1
     )
     vice.yields.ccsne.settings['ce'] = 0
-    name = f'2p-agb-x1-norproc'
-    run_singlezone(name, expfall)
-    hist = vice.history(str(paths.data/output_dir/name))
+    name = f'amp1-norproc'
+    run_singlezone(name, expfall, output_dir=output_dir)
+    hist = vice.history(str(output_dir/name))
     axs[0].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
     axs[0].plot(hist['lookback'], hist['[ce/mg]'], linestyle='--', 
                 color=paultol.bright.colors[0], label=r'No $r$-proc.'
@@ -148,7 +150,7 @@ def main(style='paper'):
     #     vice.yields.agb.settings['ce'] = adjusted_agb(
     #         'ce', study=AGB_STUDY, dm=dm, amp=1
     #     )
-    #     name = f'2p-agb-dm{dm}'
+    #     name = f'mshift{dm}'
     #     run_singlezone(name, expfall)
     #     hist = vice.history(str(paths.data/output_dir/name))
     #     axs[1].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
@@ -166,9 +168,9 @@ def main(style='paper'):
         vice.yields.agb.settings['ce'] = adjusted_agb(
             'ce', study=AGB_STUDY, dm=0, amp=1, mscale=mscale,
         )
-        name = f'2p-agb-mscale{mscale}'
-        run_singlezone(name, expfall)
-        hist = vice.history(str(paths.data/output_dir/name))
+        name = f'mscale{mscale}'
+        run_singlezone(name, expfall, output_dir=output_dir)
+        hist = vice.history(str(output_dir/name))
         axs[1].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
         axs[1].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
                     color=colors[i], 
@@ -184,62 +186,15 @@ def main(style='paper'):
         vice.yields.agb.settings['ce'] = adjusted_agb(
             'ce', study=AGB_STUDY, dm=0, amp=1, Zscale=Zscale
         )
-        name = f'2p-agb-Zx{Zscale}'
-        run_singlezone(name, expfall)
-        hist = vice.history(str(paths.data/output_dir/name))
+        name = f'Zscale{Zscale}'
+        run_singlezone(name, expfall, output_dir=output_dir)
+        hist = vice.history(str(output_dir/name))
         axs[2].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
         axs[2].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
                     color=colors[i], 
                     label=r'$\times%s$' % Zscale
         )
     axs[2].legend(title=r'\textbf{$Z$ scale}', **legend_kwargs)
-
-    # Different outflow mass-loading factors
-    # vice.yields.ccsne.settings['ce'] = ccsn_ce_yield
-    # vice.yields.agb.settings['ce'] = adjusted_agb(
-    #     'ce', study=AGB_STUDY, amp=1
-    # )
-    # eta_list = [1, 0.4, 0.2, 0]
-    # colors = [paultol.bright.colors[c] for c in [1, 0, 2, 3]]
-    # for i, eta in enumerate(eta_list):
-    #     name = f'2p-eta{eta}'
-    #     run_singlezone(name, expfall, eta=eta)
-    #     hist = vice.history(str(paths.data/output_dir/name))
-    #     axs[2].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
-    #     axs[2].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
-    #                 color=colors[i], label=eta)
-    # axs[2].legend(title=r'$\eta$', **legend_kwargs)
-    
-    # inset SFR plot
-    # axins = inset_axes(
-    #     axs[3], width='100%', height='100%',
-    #     loc='lower left',
-    #     bbox_to_anchor=(1.13, 0, 0.33, 0.33),
-    #     bbox_transform=axs[3].transAxes,
-    #     borderpad=0,
-    # )
-    # axins.set_xlabel('Age [Gyr]')
-    # axins.set_title('SFR')
-    # # Different star formation histories
-    # vice.yields.ccsne.settings['ce'] = ccsn_ce_yield
-    # vice.yields.agb.settings['ce'] = adjusted_agb(
-    #     'ce', study=AGB_STUDY, amp=1
-    # )
-    # funcs = [exprise, constant, expfall, lateburst]
-    # names = ['exprise', 'constant', 'expfall', 'lateburst']
-    # labels = ['Rising', 'Constant', 'Falling', 'Burst']
-    # colors = [paultol.bright.colors[c] for c in [1, 2, 0, 3]]
-    # for i, name in enumerate(names):
-    #     fullname = f'2p-{name}'
-    #     run_singlezone(fullname, funcs[i])
-    #     hist = vice.history(str(paths.data/output_dir/fullname))
-    #     axs[3].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
-    #     axs[3].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
-    #                 color=colors[i], label=labels[i])
-    #     axins.plot(hist['lookback'], hist['sfr'], color=colors[i])
-    # axs[3].legend(title='SFH', **legend_kwargs)
-    # axins.set_xlim((0, END_TIME))
-    # axins.set_ylim((0, 0.2))
 
     axs[0].set_xlim((0, END_TIME))
     axs[0].set_ylim((-0.8, 1))
@@ -254,64 +209,17 @@ def main(style='paper'):
         ax.set_title(titles[i], loc='left', x=0.05, y=0.9, va='top')
     axs[-1].set_xlabel('Age [Gyr]')
 
-    fig.savefig(paths.figures / 'agb_enrichment_models')
+    fig.savefig(paths.figures / 'onezone_agb')
     plt.close()
 
     # Sanity plots
-    hist = vice.history(str(paths.data / 'onezone' / '2p-agb-x1'))
+    hist = vice.history(str(output_dir / 'amp1'))
     plt.plot(hist['lookback'], hist['[mg/h]'], 'k-')
     plt.xlabel('Lookback [Gyr]')
     plt.ylabel('[Mg/H]')
     plt.ylim((-1.5, 0.5))
     plt.savefig(paths.extra / 'agb_mgh.png')
     plt.close()
-
-
-def run_singlezone(name, sfh, mode='sfr', eta=ETA_SUN, output_dir=paths.data/'onezone'):
-    dt = 0.01
-    simtime = np.arange(0, END_TIME+dt, dt)
-    sz = vice.singlezone(
-        name=str(output_dir / name),
-        func=normalize(sfh),
-        mode=mode,
-        elements=('fe', 'mg', 'ce'),
-        IMF='kroupa',
-        eta=eta,
-        delay=0.04,
-        RIa='plaw',
-        tau_star=2,
-        dt=dt,
-    )
-    sz.run(simtime, overwrite=True)
-
-
-def expfall(time):
-    return np.exp(-time/SFH_TIMESCALE)
-
-def exprise(time):
-    return np.exp(time/SFH_TIMESCALE)
-
-def constant(time):
-    if isinstance(time, np.ndarray):
-        return np.ones(time.shape)
-    elif isinstance(time, list):
-        return [1 for t in time]
-    else:
-        return 1
-
-def lateburst(time):
-    amplitude = 2
-    mean = 8
-    std = 1
-    gauss = amplitude * np.exp(-(time - mean)**2 / (2 * std**2))
-    return expfall(time) * (1 + gauss)
-
-def normalize(func):
-    dt = 0.01
-    simtime = np.arange(0, END_TIME+dt, dt)
-    integral = np.sum(dt * func(simtime))
-    f = lambda t: 1/integral * func(t)
-    return f
 
 
 if __name__ == '__main__':
