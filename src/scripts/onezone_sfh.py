@@ -109,16 +109,17 @@ def main(style='paper'):
     vice.yields.agb.settings['ce'] = adjusted_agb('ce', study=AGB_STUDY)
 
     # Different star formation efficiencies
-    taustar_list = [20, 10, 5, 2, 1]
-    colors = [paultol.bright.colors[c] for c in [1, 3, 2, 0, 4]]
+    taustar_list = [1, 2, 5, 10, 20]
+    colors = [paultol.bright.colors[c] for c in [4, 0, 2, 3, 1]]
     for i, taustar in enumerate(taustar_list):
         name = f'taustar{taustar}'
         run_singlezone(name, expfall, tau_star=taustar, output_dir=output_dir)
         hist = vice.history(str(output_dir/name))
         axs[0].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
         axs[0].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
-                    color=colors[i], label=f'{taustar} Gyr', zorder=6-i)
-    axs[0].legend(title=r'$\tau_\star$', **legend_kwargs)
+                    color=colors[i], label=f'{taustar} Gyr')
+    handles, labels = axs[0].get_legend_handles_labels()
+    axs[0].legend(handles[::-1], labels[::-1], title=r'$\tau_\star$', **legend_kwargs)
 
     # Different outflow mass-loading factors
     vice.yields.agb.settings['ce'] = adjusted_agb(
@@ -158,7 +159,7 @@ def main(style='paper'):
         axs[2].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
                     color=colors[i], label=labels[i])
         axins.plot(hist['lookback'], hist['sfr'], color=colors[i])
-    axs[2].legend(title='SFH', **legend_kwargs)
+    axs[2].legend(title=r'\textbf{SFH}', **legend_kwargs)
     axins.set_xlim((0, END_TIME))
     axins.set_ylim((0, 0.2))
 
