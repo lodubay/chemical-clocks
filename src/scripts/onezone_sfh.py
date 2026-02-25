@@ -1,5 +1,6 @@
 """
-Plot [Ce/Mg] evolution predicted by one-zone models with delayed Ce enrichment.
+Plot [Ce/Mg] evolution predicted by one-zone GCE models with varying 
+star formation history parameters.
 """
 
 import numpy as np
@@ -9,23 +10,20 @@ from matplotlib.ticker import MultipleLocator
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import vice
 
-from onezone_sfh import normalize, expfall, exprise, constant, lateburst
-from utils import alpha_cut, adjusted_agb, good_ages
-from plotting import latex_float, ONE_COLUMN_WIDTH
+from multizone.src.yields.utils import adjusted_agb
+from utils import alpha_cut, good_ages
+from plotting import ONE_COLUMN_WIDTH
 from colormaps import paultol
 import paths
 
 # CCSN and SN Ia yields
-from yields import yZ1
+from multizone.src.yields import W24
 
 SFH_TIMESCALE = 15
 AGB_STUDY = 'cristallo11'
-END_TIME = 12 # Gyr
-AGB_YIELD_SCALE = 1
-AGB_MASS_SHIFT = 0
-CCSN_CE_YIELD = 0
-DELAYED_CE_YIELD = 3e-9
-DELAYED_CE_TIMESCALE = 5
+END_TIME = 13.2 # Gyr
+SOLAR_CE_S_FRAC = 0.77 # Solar s-process fraction (Arlandini et al. 1999)
+SOLAR_AGE = 4.6 # Gyr
 ETA_SUN = 0.4 # default mass-loading factor at Solar radius
 
 
@@ -37,8 +35,8 @@ def main(style='paper'):
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     mwm_rgb = good_ages(mwm_rgb).copy()
     local_sample = mwm_rgb[
-        (mwm_rgb['Rg'] >= 7.5) &
-        (mwm_rgb['Rg'] < 8.5) &
+        (mwm_rgb['Rg'] >= 7) &
+        (mwm_rgb['Rg'] < 9) &
         (mwm_rgb['z_max'] < 0.5) &
         (mwm_rgb['mg_h'] >= -0.1) &
         (mwm_rgb['mg_h'] < 0.1)
@@ -58,11 +56,12 @@ def main(style='paper'):
 
     figwidth = ONE_COLUMN_WIDTH
     fig, axs = plt.subplots(
-        4, figsize=(figwidth, 2.67 * figwidth), 
+        3, figsize=(figwidth, 1.67 * figwidth), 
         sharex=True, sharey=True,
         gridspec_kw={'hspace': 0.}
     )
-    fig.subplots_adjust(right=0.67)
+    fig.subplots_adjust(right=0.65)
+    legend_kwargs = dict(bbox_to_anchor=(1, 1.07), loc='upper left')
 
     # Plot MWM data
     datacolor = '0.3'
@@ -89,88 +88,77 @@ def main(style='paper'):
             yerr=med_abund_err, 
             c=datacolor, capsize=0,
         )
+        # indicate Solar value
+        ax.plot(SOLAR_AGE, 0, 'wo', zorder=9)
+        ax.text(
+            SOLAR_AGE, 0, r'$\odot$',
+            va='center', ha='center', zorder=10, weight='bold', usetex=True
+        )
 
     # Plot onezone models
-    vice.yields.ccsne.settings['ce'] = CCSN_CE_YIELD
     vice.yields.sneia.settings['ce'] = 0
-    vice.yields.agb.settings['ce'] = adjusted_agb(
-        'ce', study=AGB_STUDY, amp=AGB_YIELD_SCALE, dm=AGB_MASS_SHIFT,
-    )
-    output_dir = paths.data / 'onezone'
+    output_dir = paths.data / 'onezone' / 'sfh'
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Different delayed enrichment scales
-    delayed_ce_yields = [1e-8, 3e-9, 1e-9, 0]
-    colors = [paultol.bright.colors[c] for c in [1, 0, 2, 3]]
-    for i, yld in enumerate(delayed_ce_yields):
-        vice.yields.sneia.settings['ce'] = yld
-        name = f'3p-delayed-ce{int(yld*1e9)}'
-        run_singlezone(name, expfall)
+    # Calculate prompt Ce enrichment (assigned to CCSNe for convenience)
+    ccsn_ce_yield = vice.yields.ccsne.settings['mg'] * (
+        (1 - SOLAR_CE_S_FRAC) * vice.solar_z['ce'] / vice.solar_z['mg']
+    )
+    vice.yields.ccsne.settings['ce'] = ccsn_ce_yield
+    # Standard AGB assumptions
+    vice.yields.agb.settings['ce'] = adjusted_agb('ce', study=AGB_STUDY)
+
+    # Different star formation efficiencies
+    taustar_list = [20, 10, 5, 2, 1]
+    colors = [paultol.bright.colors[c] for c in [1, 3, 2, 0, 4]]
+    for i, taustar in enumerate(taustar_list):
+        name = f'taustar{taustar}'
+        run_singlezone(name, expfall, tau_star=taustar, output_dir=output_dir)
         hist = vice.history(str(output_dir/name))
         axs[0].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
         axs[0].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
-                    color=colors[i], label=latex_float(yld)
-        )
-    axs[0].legend(
-        title=r'$y_{\rm Ce}^{\rm NSM}$', 
-        loc='upper left', 
-        bbox_to_anchor=(1, 1)
-    )
-
-    # Different delayed enrichment timescales
-    tau_ce_list = [1, 2, 5, 10]
-    colors = [paultol.bright.colors[c] for c in [3, 2, 0, 1]]
-    vice.yields.sneia.settings['ce'] = DELAYED_CE_YIELD
-    for i, tau_ce in enumerate(tau_ce_list):
-        name = f'3p-delayed-tau{tau_ce}'
-        run_singlezone(name, expfall, tau_ia=tau_ce)
-        hist = vice.history(str(output_dir/name))
-        axs[1].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
-        axs[1].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
-                    color=colors[i], label='%s Gyr' % tau_ce
-        )
-    axs[1].legend(
-        title=r'$\tau_{\rm NSM}$', 
-        loc='upper left', 
-        bbox_to_anchor=(1, 1)
-    )
+                    color=colors[i], label=f'{taustar} Gyr', zorder=6-i)
+    axs[0].legend(title=r'$\tau_\star$', **legend_kwargs)
 
     # Different outflow mass-loading factors
+    vice.yields.agb.settings['ce'] = adjusted_agb(
+        'ce', study=AGB_STUDY, amp=1
+    )
     eta_list = [1, 0.4, 0.2, 0]
     colors = [paultol.bright.colors[c] for c in [1, 0, 2, 3]]
     for i, eta in enumerate(eta_list):
-        name = f'3p-eta{eta}'
-        run_singlezone(name, expfall, eta=eta)
+        name = f'eta{eta}'
+        run_singlezone(name, expfall, eta=eta, output_dir=output_dir)
         hist = vice.history(str(output_dir/name))
-        axs[2].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
-        axs[2].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
+        axs[1].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
+        axs[1].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
                     color=colors[i], label=eta)
-    axs[2].legend(title=r'$\eta$', loc='upper left', bbox_to_anchor=(1, 1))
-
+    axs[1].legend(title=r'$\eta$', **legend_kwargs)
+    
+    # Different star formation histories
     # inset SFR plot
     axins = inset_axes(
-        axs[3], width='100%', height='100%',
+        axs[2], width='100%', height='100%',
         loc='lower left',
-        bbox_to_anchor=(1.13, 0, 0.33, 0.33),
-        bbox_transform=axs[3].transAxes,
+        bbox_to_anchor=(1.15, 0, 0.33, 0.33),
+        bbox_transform=axs[2].transAxes,
         borderpad=0,
     )
     axins.set_xlabel('Age [Gyr]')
     axins.set_title('SFR')
-    # Different SFHs
     funcs = [exprise, constant, expfall, lateburst]
     names = ['exprise', 'constant', 'expfall', 'lateburst']
     labels = ['Rising', 'Constant', 'Falling', 'Burst']
     colors = [paultol.bright.colors[c] for c in [1, 2, 0, 3]]
     for i, name in enumerate(names):
-        fullname = f'3p-{name}'
-        run_singlezone(fullname, funcs[i])
+        fullname = name
+        run_singlezone(fullname, funcs[i], output_dir=output_dir)
         hist = vice.history(str(output_dir/fullname))
-        axs[3].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
-        axs[3].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
+        axs[2].plot(hist['lookback'], hist['[ce/mg]'], color='w', linewidth=2)
+        axs[2].plot(hist['lookback'], hist['[ce/mg]'], linestyle='-', 
                     color=colors[i], label=labels[i])
         axins.plot(hist['lookback'], hist['sfr'], color=colors[i])
-    axs[3].legend(title='SFH', loc='upper left', bbox_to_anchor=(1, 1))
+    axs[2].legend(title='SFH', **legend_kwargs)
     axins.set_xlim((0, END_TIME))
     axins.set_ylim((0, 0.2))
 
@@ -187,10 +175,11 @@ def main(style='paper'):
         ax.set_title(titles[i], loc='left', x=0.05, y=0.9, va='top')
     axs[-1].set_xlabel('Age [Gyr]')
 
-    fig.savefig(paths.figures / 'delayed_enrichment_models')
+    fig.savefig(paths.figures / 'onezone_sfh')
+    plt.close()
 
 
-def run_singlezone(name, sfh, mode='sfr', eta=ETA_SUN, tau_ia=DELAYED_CE_TIMESCALE, output_dir=paths.data/'onezone'):
+def run_singlezone(name, sfh, mode='sfr', eta=ETA_SUN, tau_star=2, output_dir=paths.data/'onezone'):
     dt = 0.01
     simtime = np.arange(0, END_TIME+dt, dt)
     sz = vice.singlezone(
@@ -200,13 +189,41 @@ def run_singlezone(name, sfh, mode='sfr', eta=ETA_SUN, tau_ia=DELAYED_CE_TIMESCA
         elements=('fe', 'mg', 'ce'),
         IMF='kroupa',
         eta=eta,
-        delay=0.01,
-        RIa='exp',
-        tau_ia=tau_ia,
-        tau_star=2,
+        delay=0.04,
+        RIa='plaw',
+        tau_star=tau_star,
         dt=dt,
     )
     sz.run(simtime, overwrite=True)
+
+
+def expfall(time):
+    return np.exp(-time/SFH_TIMESCALE)
+
+def exprise(time):
+    return np.exp(time/SFH_TIMESCALE)
+
+def constant(time):
+    if isinstance(time, np.ndarray):
+        return np.ones(time.shape)
+    elif isinstance(time, list):
+        return [1 for t in time]
+    else:
+        return 1
+
+def lateburst(time):
+    amplitude = 2
+    mean = 9
+    std = 1
+    gauss = amplitude * np.exp(-(time - mean)**2 / (2 * std**2))
+    return expfall(time) * (1 + gauss)
+
+def normalize(func):
+    dt = 0.01
+    simtime = np.arange(0, END_TIME+dt, dt)
+    integral = np.sum(dt * func(simtime))
+    f = lambda t: 1/integral * func(t)
+    return f
 
 
 if __name__ == '__main__':
