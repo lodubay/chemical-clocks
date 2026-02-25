@@ -39,7 +39,7 @@ _DELAY_MODELS_ = [
     "greggio05_double"
 ]
 _YIELD_SETS_ = [
-    "fiducial", "massshift", "metscale", "straggler10", "straggler50", "karakas16"
+    "fiducial", "mshift", "mscale", "Zscale", "straggler10", "straggler50", "karakas16"
 ]
 
 def parse():
