@@ -271,22 +271,20 @@ def add_kinematics(df, id_name='source_id', verbose=False):
             kinematic_dr3.L[:,2],
             kinematic_dr3.ecc,
             kinematic_dr3.parallax,
-            kinematic_dr3.ra,
-            kinematic_dr3.dec,
-            kinematic_dr3.phot_g_mean_mag,
-            kinematic_dr3.phot_bp_mean_mag,
-            kinematic_dr3.phot_rp_mean_mag,
+            # kinematic_dr3.ra,
+            # kinematic_dr3.dec,
+            # kinematic_dr3.phot_g_mean_mag,
+            # kinematic_dr3.phot_bp_mean_mag,
+            # kinematic_dr3.phot_rp_mean_mag,
             kinematic_dr3.ruwe,
             kinematic_dr3.z_max,
             kinematic_dr3.r_apo/2+kinematic_dr3.r_per/2
         ), dtype=str).T,
         columns=[
-            'source_id','x','y','z','rho','phi',
+            'source_id','galx','galy','galz','galr','galphi',
             'vx','vy','vz','vr','vphi',
-            'Jx','Jy','Jz','E','Lx','Ly','Lz','e',
-            'parallax','ra','dec','phot_g_mean_mag',
-            'phot_bp_mean_mag','phot_rp_mean_mag',
-            'ruwe','z_max','Rg']
+            'Jx','Jy','Jz','E','Lx','Ly','Lz','ecc',
+            'parallax','ruwe','z_max','Rg']
     )
     
     for i in kinematic_dr3.columns:
