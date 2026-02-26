@@ -61,7 +61,7 @@ def main(style='paper'):
         gridspec_kw={'hspace': 0.}
     )
     fig.subplots_adjust(right=0.65)
-    legend_kwargs = dict(bbox_to_anchor=(1, 1.07), loc='upper left')
+    legend_kwargs = dict(bbox_to_anchor=(1, 1), loc='upper left')
 
     # Plot MWM data
     datacolor = '0.3'
@@ -145,8 +145,8 @@ def main(style='paper'):
         bbox_transform=axs[2].transAxes,
         borderpad=0,
     )
-    axins.set_xlabel('Age [Gyr]')
-    axins.set_title('SFR')
+    axins.set_xlabel('Age [Gyr]', fontsize='small')
+    axins.set_title('SFR', fontsize='small', y=0.8, pad=0.00001)
     funcs = [exprise, constant, expfall, lateburst]
     names = ['exprise', 'constant', 'expfall', 'lateburst']
     labels = ['Rising', 'Constant', 'Falling', 'Burst']
