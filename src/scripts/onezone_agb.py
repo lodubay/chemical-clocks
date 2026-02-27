@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import vice
 
 from multizone.src.yields.utils import adjusted_agb

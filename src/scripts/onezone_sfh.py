@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import vice
 
 from multizone.src.yields.utils import adjusted_agb
@@ -70,7 +69,7 @@ def main(style='paper'):
         color=datacolor,
         s=1,
         linewidth=0.2,
-        # rasterized=True
+        rasterized=True
     )
     for ax in axs:
         ax.scatter(
@@ -138,12 +137,9 @@ def main(style='paper'):
     
     # Different star formation histories
     # inset SFR plot
-    axins = inset_axes(
-        axs[2], width='100%', height='100%',
-        loc='lower left',
-        bbox_to_anchor=(1.15, 0, 0.33, 0.33),
-        bbox_transform=axs[2].transAxes,
-        borderpad=0,
+    axins = axs[2].inset_axes(
+        bounds=(1.15, 0, 0.33, 0.33),
+        transform=axs[2].transAxes,
     )
     axins.set_xlabel('Age [Gyr]', fontsize='small')
     axins.set_title('SFR', fontsize='small', y=0.8, pad=0.00001)
