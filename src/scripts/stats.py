@@ -63,3 +63,55 @@ def weighted_quantile(df, val, weight, quantile=0.5):
             return wq
     else:
         raise ValueError("Quantile must be in range [0,1].")
+
+
+def kde2D(x, y, bandwidth, xbins=100j, ybins=100j, **kwargs):
+    """Build 2D kernel density estimate (KDE).
+
+    Parameters
+    ----------
+    x : array-like
+    y : array-like
+    bandwidth : float
+    xbins : complex, optional [default: 100j]
+    ybins : complex, optional [default: 100j]
+
+    Other keyword arguments are passed to sklearn.neighbors.KernelDensity
+
+    Returns
+    -------
+    xx : MxN numpy array
+        Density grid x-coordinates (M=xbins, N=ybins)
+    yy : MxN numpy array
+        Density grid y-coordinates
+    logz : MxN numpy array
+        Grid of log-likelihood density estimates
+    """
+    from sklearn.neighbors import KernelDensity
+    # Error handling for xbins and ybins
+    if type(xbins) == np.ndarray and type(ybins) == np.ndarray:
+        if xbins.shape == ybins.shape:
+            if len(xbins.shape) == 2 and len(ybins.shape) == 2:
+                xx = xbins
+                yy = ybins
+            else:
+                raise ValueError('Input xbins and ybins must have dimension 2.')
+        else:
+            raise ValueError('Got xbins and ybins of different shape.')
+    elif type(xbins) == complex and type(ybins) == complex:
+        # create grid of sample locations (default: 100x100)
+        xx, yy = np.mgrid[x.min():x.max():xbins,
+                          y.min():y.max():ybins]
+    else:
+        raise TypeError('Input xbins and ybins must have type complex ' + \
+                        '(e.g. 100j) or numpy.ndarray.')
+
+    xy_sample = np.vstack([yy.ravel(), xx.ravel()]).T
+    xy_train  = np.vstack([y, x]).T
+
+    kde_skl = KernelDensity(kernel='gaussian', bandwidth=bandwidth, **kwargs)
+    kde_skl.fit(xy_train)
+
+    # score_samples() returns the log-likelihood of the samples
+    logz = kde_skl.score_samples(xy_sample)
+    return xx, yy, np.reshape(logz, xx.shape)

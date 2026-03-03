@@ -1,0 +1,194 @@
+"""
+This script plots a Hayden-style [Ce/Mg]-[Mg/H] plot of a multizone model
+compared to MWM data.
+"""
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import Normalize, BoundaryNorm
+from matplotlib.ticker import MultipleLocator
+import vice
+
+from multizone_stars import MultizoneStars
+from plotting import insert_colorbar_axes, TWO_COLUMN_WIDTH
+from utils import radial_gradient, get_bin_centers
+from stats import weighted_quantile, kde2D
+import paths
+from multizone._globals import MAX_SF_RADIUS, END_TIME
+
+OUTPUT_NAME = 'insideout-mscale/diskmodel'
+
+ZONE_WIDTH = 0.1 # kpc
+GALR_BINS = [3, 5, 7, 9, 11, 13]
+ABSZ_BINS = [0, 0.5, 1, 2]
+
+
+def main(style='paper', cmap='Spectral_r'):
+    # Set up figure
+    plt.style.use(paths.styles / f'{style}.mplstyle')
+    rows = len(ABSZ_BINS) - 1
+    cols = len(GALR_BINS) - 1
+    width = TWO_COLUMN_WIDTH
+    fig, axs = plt.subplots(
+        rows, cols, 
+        figsize=(width, (width/cols)*rows),
+        sharex=True, sharey=True,
+        gridspec_kw={'hspace': 0., 'wspace': 0.}
+    )
+    cax = insert_colorbar_axes(fig)
+    cbar = fig.colorbar(
+        ScalarMappable(
+            Normalize(vmin=0, vmax=END_TIME), 
+            plt.get_cmap(cmap)
+        ), 
+        cax=cax, 
+        label='Age [Gyr]'
+    )
+    # Plot multizone output
+    mzs = MultizoneStars.from_output(OUTPUT_NAME)
+    for i, row in enumerate(axs):
+        absz_lim = (ABSZ_BINS[-(i+2)], ABSZ_BINS[-(i+1)])
+        for j, ax in enumerate(row):
+            galr_lim = (GALR_BINS[j], GALR_BINS[j+1])
+            subset = mzs.region(galr_lim, absz_lim)
+            subset.scatter_plot(ax, '[mg/h]', '[ce/mg]', color='age',
+                                cmap=cbar.cmap, norm=cbar.norm)
+            plot_gas_abundance(ax, subset, '[mg/h]', '[ce/mg]', c='k')
+    # Format axes
+    axs[0,0].set_xlim((-1.1, 0.6))
+    axs[0,0].set_ylim((-0.8, 0.8))
+    # Label bins in z-height
+    row_label_pos = (0.5, 0.95)
+    for i, ax in enumerate(axs[:,2]):
+        absz_lim = (ABSZ_BINS[-(i+2)], ABSZ_BINS[-(i+1)])
+        ax.text(row_label_pos[0], row_label_pos[1], 
+                r'$%s\leq |z| < %s$ kpc' % absz_lim,
+                transform=ax.transAxes, ha='center', va='top')
+    # Label bins in Rgal
+    for i, ax in enumerate(axs[0]):
+        galr_lim = (GALR_BINS[i], GALR_BINS[i+1])
+        ax.set_title(
+            r'$%s\leq R_{\rm{gal}} < %s$ kpc' % galr_lim, 
+            size=plt.rcParams['font.size']
+        )
+    for ax in axs[-1]:
+        ax.set_xlabel('[Mg/H]')
+    for ax in axs[:,0]:
+        ax.set_ylabel('[Ce/Mg]')
+    
+    plt.savefig(paths.figures / 'model_cemg_mgh.pdf')
+    plt.close()
+
+
+def plot_gas_abundance(ax, mzs, xcol, ycol, label='', **kwargs):
+    """
+    Plot the ISM abundance tracks for the mean zone.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        Axes on which to plot the gas abundance.
+    mzs : MultizoneStars object
+        Object containing model stars data. Gas abundance will be plotted from
+        the mean radius of the data.
+    xcol : str
+        Column of data to plot on the x-axis.
+    ycol : str
+        Column of data to plot on the y-axis.
+    label : str, optional
+        Line label. The default is ''.
+    **kwargs passed to matplotlib.pyplot.plot()
+
+    Returns
+    -------
+    lines : list of Line2D
+        Output of Axes.plot().
+    """
+    zone = int(0.5 * (mzs.galr_lim[0] + mzs.galr_lim[1]) / mzs.zone_width)
+    zone_path = str(mzs.fullpath / ('zone%d' % zone))
+    hist = vice.history(zone_path)
+    lines = ax.plot(hist[xcol], hist[ycol], label=label, **kwargs)
+    return lines
+
+
+def get_kde2D(data, xcol, ycol, bandwidth=0.03, overwrite=False, **kwargs):
+    """
+    Generate 2-dimensional kernel density estimate (KDE) of APOGEE data, 
+    or import previously saved KDE if it already exists.
+    
+    Parameters
+    ----------
+    data : pandas.DataFrame
+        DataFrame of MWM data.
+    xcol : str
+        Name of column with x-axis data
+    ycol : str
+        Name of column with y-axis data
+    bandwidth : float
+        Kernel density estimate bandwidth. A larger number will produce
+        smoother contour lines. The default is 0.03.
+    overwrite : bool
+        If True, force re-generate the 2D KDE and save the output.
+    **kwargs passed to stats.kde2D()
+    
+    Returns
+    -------
+    xx, yy, logz: tuple of numpy.array
+        Outputs of stats.kde2D()
+    """    
+    # Path to save 2D KDE for faster plot times
+    path = kde2D_path(xcol, ycol)
+    if path.exists() and not overwrite:
+        xx, yy, logz = read_kde(path)
+    else:
+        xx, yy, logz = kde2D(data[xcol], data[ycol], bandwidth, **kwargs)
+        save_kde(xx, yy, logz, path)
+    return xx, yy, logz
+
+
+def read_kde(path):
+    """
+    Read a text file generated by save_kde()
+    """
+    arr2d = np.genfromtxt(path)
+    nrows = int(arr2d.shape[0]/3)
+    xx = arr2d[:nrows]
+    yy = arr2d[nrows:2*nrows]
+    logz = arr2d[2*nrows:]
+    return xx, yy, logz
+
+
+def save_kde(xx, yy, logz, path):
+    """
+    Generate a text file containing the KDE of the given region along with its
+    corresponding x and y coordinates.
+    """
+    if not path.parents[0].is_dir():
+        path.parents[0].mkdir(parents=True)
+    with open(path, 'w') as f:
+        for arr in [xx, yy, logz]:
+            f.write('#\n')
+            np.savetxt(f, arr)
+
+
+def kde2D_path(xcol, ycol, galr_lim, absz_lim):
+    """
+    Generate file name for the KDE of the given region.
+    
+    Parameters
+    ---------
+    xcol : str
+        Name of column with x-axis data
+    ycol : str
+        Name of column with y-axis data
+    """
+    kde_dir = '_'.join([''.join(xcol.split('_')).lower(),
+                        ''.join(ycol.split('_')).lower()])
+    filename = 'r%s-%s_z%s-%s.dat' % (galr_lim + absz_lim)
+    return paths.data / 'MWM' / 'kde' / kde_dir / filename
+
+
+if __name__ == '__main__':
+    main()
