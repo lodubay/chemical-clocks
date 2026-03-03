@@ -83,7 +83,11 @@ def main():
     # Require Gaia distances
     sample.dropna(axis=0, how='any', subset=['r_med_photogeo'], inplace=True)
     print('Joining with orbit parameters...')
-    sample = add_kinematics(sample, id_name='gaia_dr3_source_id', verbose=True)
+    sample = add_kinematics(sample, id_name='sdss_id', verbose=True)
+    # Drop stars without guiding radii
+    missing_orbits = sample[sample['Rg'].isna()]
+    print('Removing %s stars with missing orbit info...' % missing_orbits.shape[0])
+    sample.dropna(subset=['Rg', 'z_max'], axis=0, how='any', inplace=True)
     # print('Computing orbits...')
     # rguide, zmax, ecc, energy, Lz = orbit_dynamics(
     #     mwm_good['ra'], mwm_good['dec'], mwm_good['r_med_photogeo']/1000,
@@ -205,7 +209,7 @@ def orbit_dynamics(ra, dec, dist, pmra, pmdec, vrad, approx='staeckel'):
         raise ValueError('Input arrays must have the same length.')
 
 
-def add_kinematics(df, id_name='source_id', verbose=False):
+def add_kinematics(df, id_name='sdss_id', verbose=False):
     """
     Join catalog with orbital parameters for Gaia source IDs.
 
@@ -223,12 +227,12 @@ def add_kinematics(df, id_name='source_id', verbose=False):
     df : pandas.DataFrame
         Input DataFrame merged with Gaia orbit parameters.
     """
-    fitspath = paths.data / 'MWM' / 'dr3-rv-good-plx-MilkyWayPotential2022-joined.fits'
+    fitspath = paths.data / 'MWM' / 'sdssv-mwm-dr19-apogee-actions.fits'
     with fits.open(fitspath) as hdul:
         kinematic = hdul[1].data
     if verbose: print('Finished reading in data!')
-    ids = pd.DataFrame(kinematic.source_id, columns=['source_id'])
-    checklist = ids['source_id'].isin(df[id_name])
+    ids = pd.DataFrame(kinematic.sdss_id, columns=['sdss_id'])
+    checklist = ids['sdss_id'].isin(df[id_name])
     if verbose: print('Finished matching source id, total %d stars'%(sum(checklist)))
     kinematic_dr3 = kinematic[checklist]
 
@@ -251,7 +255,7 @@ def add_kinematics(df, id_name='source_id', verbose=False):
     # DataFrame with kinematic data
     kinematic_dr3 = pd.DataFrame(
         np.array((
-            kinematic_dr3.source_id,
+            kinematic_dr3.sdss_id,
             kinematic_dr3.xyz[:,0],
             kinematic_dr3.xyz[:,1],
             kinematic_dr3.xyz[:,2],
@@ -270,32 +274,32 @@ def add_kinematics(df, id_name='source_id', verbose=False):
             kinematic_dr3.L[:,1],
             kinematic_dr3.L[:,2],
             kinematic_dr3.ecc,
-            kinematic_dr3.parallax,
+            # kinematic_dr3.parallax,
             # kinematic_dr3.ra,
             # kinematic_dr3.dec,
             # kinematic_dr3.phot_g_mean_mag,
             # kinematic_dr3.phot_bp_mean_mag,
             # kinematic_dr3.phot_rp_mean_mag,
-            kinematic_dr3.ruwe,
+            # kinematic_dr3.ruwe,
             kinematic_dr3.z_max,
-            kinematic_dr3.r_apo/2+kinematic_dr3.r_per/2
+            kinematic_dr3.R_guide
         ), dtype=str).T,
         columns=[
-            'source_id','galx','galy','galz','galr','galphi',
+            'sdss_id','galx','galy','galz','galr','galphi',
             'vx','vy','vz','vr','vphi',
             'Jx','Jy','Jz','E','Lx','Ly','Lz','ecc',
-            'parallax','ruwe','z_max','Rg']
+            'z_max','Rg']
     )
     
     for i in kinematic_dr3.columns:
-        if i=='source_id':
+        if i=='sdss_id':
             kinematic_dr3[i] = [int(j) for j in kinematic_dr3[i]]
             continue
         kinematic_dr3[i] = [float(j) for j in kinematic_dr3[i]]
         
     df = pd.merge(
         df, kinematic_dr3,
-        left_on=id_name, right_on='source_id', how='left'
+        left_on=id_name, right_on='sdss_id', how='left'
     )
     
     return df

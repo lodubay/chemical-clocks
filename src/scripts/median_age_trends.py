@@ -66,7 +66,7 @@ def main(style='paper', cmap='viridis_r'):
     cax = insert_colorbar_axes(fig, 'horizontal', pad=0.05)
     radial_cmap = plt.get_cmap(cmap)
     norm = BoundaryNorm(radius_bin_edges, radial_cmap.N)
-    xlim = (0, 12)
+    xlim = (0, 13)
     ylim = [(-0.5, 0.7), (-0.6, 0.6)]
 
     lowz_ages = good_ages(all_lowz)
@@ -80,7 +80,7 @@ def main(style='paper', cmap='viridis_r'):
             reduce_C_function=np.sum,
             gridsize=(30, 12),
             cmap='binary',
-            norm=Normalize(vmin=0, vmax=400),
+            norm=Normalize(vmin=0, vmax=500),
             linewidths=0.2,
             mincnt=1,
             extent=[xlim[0], xlim[1], ylim[i][0], ylim[i][1]]
@@ -133,14 +133,14 @@ def main(style='paper', cmap='viridis_r'):
                 color=radial_cmap(norm(mean_radius)),
                 edgecolor='none', alpha=0.5, zorder=1
             )
-    fig.colorbar(pcm, cax=cax, orientation='horizontal', label='Number of stars')
+    fig.colorbar(pcm, cax=cax, orientation='horizontal', extend='max', label='Number of stars')
     # Indicate median abundance errors
     mwm_rgb_ages = good_ages(mwm_rgb)
     age_err_low = np.median(mwm_rgb_ages['age'] - mwm_rgb_ages['e_n_age'])
     age_err_high = np.median(mwm_rgb_ages['e_p_age'] - mwm_rgb_ages['age'])
     med_abund_err = mwm_rgb_ages['e_ce_h'].median()
     axs[0].errorbar(
-        9.5, 0.55, 
+        10, 0.5, 
         xerr=[[age_err_low], [age_err_high]], 
         yerr=med_abund_err, 
         c='gray', capsize=0, #elinewidth=0.5,
