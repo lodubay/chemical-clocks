@@ -405,3 +405,34 @@ def radial_gradient(multioutput, parameter, index=-1,
     """
     return [multioutput.zones['zone%i' % z].history[index][parameter] 
             for z in range(int(Rmax/zone_width))]
+
+
+def plot_gas_abundance(ax, mzs, xcol, ycol, label='', **kwargs):
+    """
+    Plot the ISM abundance tracks for the mean zone.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        Axes on which to plot the gas abundance.
+    mzs : MultizoneStars object
+        Object containing model stars data. Gas abundance will be plotted from
+        the mean radius of the data.
+    xcol : str
+        Column of data to plot on the x-axis.
+    ycol : str
+        Column of data to plot on the y-axis.
+    label : str, optional
+        Line label. The default is ''.
+    **kwargs passed to matplotlib.pyplot.plot()
+
+    Returns
+    -------
+    lines : list of Line2D
+        Output of Axes.plot().
+    """
+    zone = int(0.5 * (mzs.galr_lim[0] + mzs.galr_lim[1]) / mzs.zone_width)
+    zone_path = str(mzs.fullpath / ('zone%d' % zone))
+    hist = vice.history(zone_path)
+    lines = ax.plot(hist[xcol], hist[ycol], label=label, **kwargs)
+    return lines

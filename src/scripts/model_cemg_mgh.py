@@ -7,14 +7,14 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.cm import ScalarMappable
-from matplotlib.colors import Normalize, BoundaryNorm
+from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MultipleLocator
 import vice
 
 from multizone_stars import MultizoneStars
 from plotting import insert_colorbar_axes, TWO_COLUMN_WIDTH
-from utils import radial_gradient, get_bin_centers
-from stats import weighted_quantile, kde2D
+from utils import plot_gas_abundance
+from stats import kde2D
 import paths
 from multizone._globals import MAX_SF_RADIUS, END_TIME
 
@@ -99,37 +99,6 @@ def main(style='paper', cmap='Spectral_r'):
     
     plt.savefig(paths.figures / 'model_cemg_mgh.pdf')
     plt.close()
-
-
-def plot_gas_abundance(ax, mzs, xcol, ycol, label='', **kwargs):
-    """
-    Plot the ISM abundance tracks for the mean zone.
-
-    Parameters
-    ----------
-    ax : matplotlib.axes.Axes
-        Axes on which to plot the gas abundance.
-    mzs : MultizoneStars object
-        Object containing model stars data. Gas abundance will be plotted from
-        the mean radius of the data.
-    xcol : str
-        Column of data to plot on the x-axis.
-    ycol : str
-        Column of data to plot on the y-axis.
-    label : str, optional
-        Line label. The default is ''.
-    **kwargs passed to matplotlib.pyplot.plot()
-
-    Returns
-    -------
-    lines : list of Line2D
-        Output of Axes.plot().
-    """
-    zone = int(0.5 * (mzs.galr_lim[0] + mzs.galr_lim[1]) / mzs.zone_width)
-    zone_path = str(mzs.fullpath / ('zone%d' % zone))
-    hist = vice.history(zone_path)
-    lines = ax.plot(hist[xcol], hist[ycol], label=label, **kwargs)
-    return lines
 
 
 def plot_kde2D_contours(ax, data, xcol, ycol, enclosed=[0.9, 0.7, 0.5, 0.3, 0.1],
