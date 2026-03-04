@@ -95,7 +95,7 @@ def main(style='paper'):
                         q=0.5, bin_edges=mg_bin_edges, min_count=10, 
                         est_errors=True
                     ), 
-                    fmt='.-', color=low_alpha_color, capsize=0
+                    fmt='s-', markersize=3, color=low_alpha_color, capsize=0
                 )
             if high_alpha.shape[0] >= 100:
                 ax.errorbar(
@@ -104,8 +104,19 @@ def main(style='paper'):
                         q=0.5, bin_edges=mg_bin_edges, min_count=10,
                         est_errors=True
                     ), 
-                    fmt='.-', color=high_alpha_color, capsize=0
+                    fmt='o-', markersize=3, color=high_alpha_color, capsize=0
                 )
+            # Indicate number of low- and high-Ia stars in region
+            ax.text(
+                0.91, 0.91, str(low_alpha.shape[0]), 
+                color=low_alpha_color, 
+                ha='right', va='top', transform=ax.transAxes,
+            )
+            ax.text(
+                0.91, 0.79, str(high_alpha.shape[0]), 
+                color=high_alpha_color, 
+                ha='right', va='top', transform=ax.transAxes,
+            )
     # Indicate median abundance errors
     axs[0,0].errorbar(
         0.4, -0.5, 
@@ -126,7 +137,7 @@ def main(style='paper'):
     for i, ax in enumerate(axs[0,:]):
         ax.set_title(r'$%s\leq R_{\rm guide}<%s$ kpc' % RBINS[i], fontsize=8)
     for ax in axs[:,0]:
-        ax.set_ylabel(r'[Ce/Mg]$_{\rm corr}$')
+        ax.set_ylabel('[Ce/Mg]')
     for i, ax in enumerate(axs[:,-1]):
         ax.yaxis.set_label_position('right')
         ax.set_ylabel(
@@ -134,7 +145,7 @@ def main(style='paper'):
             fontsize=8, labelpad=6
         )
     # Text-only lengend
-    leg = colored_text_legend(axs[0,0], loc='upper right')
+    leg = colored_text_legend(axs[0,0], loc='upper left')
 
     plt.savefig(paths.figures / 'median_trends_grid')
 
