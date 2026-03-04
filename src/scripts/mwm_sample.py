@@ -37,6 +37,8 @@ def main():
     mwm_full = mwm_full.join(
         starflow[['age', 'e_p_age', 'e_n_age', 'training_density', 'BITMASK']]
     )
+    # Drop contamination & confusion flag
+    mwm_full.drop(labels='cc_flg', axis=1, inplace=True)
     # Fix datatype for contamination & confusion flag
     # mwm_full['cc_flg'] = mwm_full['cc_flg'].astype('str')
     # print(mwm_full['cc_flg'])
@@ -282,13 +284,14 @@ def add_kinematics(df, id_name='sdss_id', verbose=False):
             # kinematic_dr3.phot_rp_mean_mag,
             # kinematic_dr3.ruwe,
             kinematic_dr3.z_max,
-            kinematic_dr3.R_guide
+            kinematic_dr3.R_guide,
+            kinematic_dr3['flags']
         ), dtype=str).T,
         columns=[
             'sdss_id','galx','galy','galz','galr','galphi',
             'vx','vy','vz','vr','vphi',
             'Jx','Jy','Jz','E','Lx','Ly','Lz','ecc',
-            'z_max','Rg']
+            'z_max','Rg','orbit_flags']
     )
     
     for i in kinematic_dr3.columns:
@@ -297,6 +300,10 @@ def add_kinematics(df, id_name='sdss_id', verbose=False):
             continue
         kinematic_dr3[i] = [float(j) for j in kinematic_dr3[i]]
         
+    # drop duplicate kinematic entries
+    kinematic_dr3.sort_values(['sdss_id', 'orbit_flags'], inplace=True, ascending=True)
+    kinematic_dr3.drop_duplicates(subset='sdss_id', keep='first', inplace=True)
+
     df = pd.merge(
         df, kinematic_dr3,
         left_on=id_name, right_on='sdss_id', how='left'

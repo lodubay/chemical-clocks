@@ -80,7 +80,7 @@ def main(style='paper', cmap='viridis_r'):
             reduce_C_function=np.sum,
             gridsize=(30, 12),
             cmap='binary',
-            norm=Normalize(vmin=0, vmax=500),
+            norm=Normalize(vmin=0, vmax=400),
             linewidths=0.2,
             mincnt=1,
             extent=[xlim[0], xlim[1], ylim[i][0], ylim[i][1]]
