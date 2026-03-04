@@ -113,10 +113,6 @@ def main(style='paper'):
             color=color
         )
     
-        # Second panel: compare against Casali et al. (2025) trends
-        # axs[1].plot(age_arr, casali_local_fit(age_arr, met_center), color=color, linestyle='--')
-        # axs[1].plot(age_arr, casali_global_fit(age_arr, met_center), color=color, linestyle='-')
-    
     axs[0].set_xlim((0, 11))
     axs[0].set_ylim((-0.8, 0.8))
     axs[0].xaxis.set_major_locator(MultipleLocator(5))
@@ -157,12 +153,10 @@ def main(style='paper'):
         color=slope_color, linestyle='--', zorder=1, 
         label='Casali et al. (2025)'
     )
-    # Horizontal line for comparison
-    xlim = (met_bin_centers[0]-0.1, met_bin_centers[-1]+0.1)
-    axs[1].plot(xlim, [0, 0], linestyle=':', color='gray', zorder=0)
 
     axs[1].set_xlabel(MET_LABEL)
     axs[1].set_ylabel(r'Slope [dex Gyr$^{-1}$]', color=slope_color)
+    xlim = (met_bin_centers[0]-0.1, met_bin_centers[-1]+0.1)
     axs[1].set_xlim(xlim)
     axs[1].set_ylim((-0.07, 0.07))
     axs[1].tick_params(axis='y', labelcolor=slope_color)
