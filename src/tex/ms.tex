@@ -40,6 +40,11 @@
 \author{co-authors}
 \email{}
 \affiliation{}
+% Jennifer Johnson
+% Keith Hawkins
+% Tawny Sit (log(g) corrections)
+% Natalie Myers (open clusters)
+% James Johnson
 
 \begin{abstract}
     Abstract.
@@ -103,11 +108,11 @@ We use data from the Milky Way Mapper (MWM; \todo{cite}), a program of the fifth
 
 Atmospheric parameters and chemical abundances were determined with the APOGEE Stellar Parameter and Chemical Abundance Pipeline \citep[ASPCAP;][]{garcia_perez_aspcap_2016}, which compares a grid of synthetic spectra \citep{hubeny_tlusty_2021} to the observed spectra using $\chi^2$ minimization. The line lists for most species are presented in \citet{smith_apogee_2021}, with additional Ce lines described by \citet{cunha_adding_2017}. All DR19 abundances assume local thermodynamic equilibrium (LTE). The spectral synthesis is further described by \citet{holtzman_apogee_2018} and \citet{jonsson_apogee_2020}.
 
-We select red giant branch (RGB; $1.0<\log g<3.5$) stars with $S/N>100$. We limit our sample to the ``optimal region'' for Ce abundances, $T_{\rm eff}>4000$ K and $\bracket{M}>-1.5$, defined by \citet{meszaros_sdss-v_2025}. We further remove stars with the BAD flag, any APOGEE spectrum flags, and abundance flags for Mg, Fe, and Ce, as well as stars observed in SDSS-IV outside the main sample (EXTRATARG flag). This produces a primary sample of \todo{122,533} stars. The right-hand panel of Figure \ref{fig:kiel-diagram} plots a Kiel diagram of this sample, color-coded by [Ce/H]. A summary of our sample selection criteria is presented in Table \ref{tab:sample}.
+We select red giant branch (RGB; $1.0<\log g<3.5$) stars with $S/N>100$. We limit our sample to the ``optimal region'' for Ce abundances, $T_{\rm eff}>4000$ K and $\bracket{M}>-1.5$, defined by \citet{meszaros_sdss-v_2025}. We further remove stars with the BAD flag, any APOGEE spectrum flags, and abundance flags for Mg, Fe, and Ce, as well as stars observed in SDSS-IV outside the main sample (EXTRATARG flag). This produces a primary sample of \todo{121,322} stars. The right-hand panel of Figure \ref{fig:kiel-diagram} plots a Kiel diagram of this sample, color-coded by [Ce/H]. A summary of our sample selection criteria is presented in Table \ref{tab:sample}.
 
 \subsection{Kinematics}
 
-The 6-D kinematic properties for stars in our sample are calculated using position, proper motion, parallax, and radial velocity measurements from {\it Gaia} DR3 \citep{gaia_collaboration_gaia_2023}. These coordinates are transformed into the Galactocentric cylindrical frame with {\tt astropy} \citep{astropy_collaboration_astropy_2013,astropy_collaboration_astropy_2018,astropy_collaboration_astropy_2022} using updated Solar position and motion parameters from \citet{hunt_multiple_2022}. Orbital parameters (such as the angular momentum $L_z$, energy $E$, guiding-center radius $R_g$, and maximum midplane distance $z_{\rm max}$) are calculated using the {\tt gala} package \citep{price-whelan_gala_2017} with the {\tt MilkyWayPotential2022} potential, assuming the circular velocity at the Solar position is $229\kms$ \citep{eilers_circular_2019}. \todo{Still missing kinematics for $\sim20000$ stars.}
+The 6-D kinematic properties for stars in our sample are calculated using position, proper motion, parallax, and radial velocity measurements from {\it Gaia} DR3 \citep{gaia_collaboration_gaia_2023}. We adopt distance estimates from \citet{zhang_parameters_2023}, the {\it Gaia} parallax, and \citet{bailer-jones_estimating_2021}, taking the first finite value from these sources in the order listed. These coordinates are transformed into the Galactocentric cylindrical frame with {\tt astropy} \citep{astropy_collaboration_astropy_2013,astropy_collaboration_astropy_2018,astropy_collaboration_astropy_2022} using updated Solar position and motion parameters from \citet{hunt_multiple_2022}. Orbital parameters (such as the angular momentum $L_z$, energy $E$, guiding-center radius $R_g$, and maximum midplane distance $z_{\rm max}$) are calculated using the {\tt gala} package \citep{price-whelan_gala_2017} with the {\tt MilkyWayPotential2022} potential, assuming the circular velocity at the Solar position is $229\kms$ \citep{eilers_circular_2019}.
 
 \begin{figure*}
     \centering
@@ -118,7 +123,7 @@ The 6-D kinematic properties for stars in our sample are calculated using positi
 
 \subsection{Stellar Ages}
 
-We use the StarFlow \citep{stone-martinez_starflow_2025} catalog of stellar ages for MWM DR19. \citet{stone-martinez_starflow_2025} use a deep generative model trained on asteroseismic data to estimate ages for evolved stars. Their model retains information about the parameter space distribution of the training data and accounts for asymmetric uncertainties. We adopt their recommended training space density threshold of $>3\times10^9$, resulting in estimated ages for \todo{106,524} stars between \todo{$-1.05\lesssim\bracket{Fe}\lesssim+0.5$}. The left-hand panel of Figure \ref{fig:kiel-diagram} compares the Kiel diagram of this stellar age sample against our full sample.
+We use the StarFlow \citep{stone-martinez_starflow_2025} catalog of stellar ages for MWM DR19. \citet{stone-martinez_starflow_2025} use a deep generative model trained on asteroseismic data to estimate ages for evolved stars. Their model retains information about the parameter space distribution of the training data and accounts for asymmetric uncertainties. We adopt their recommended training space density threshold of $>3\times10^9$, resulting in estimated ages for \todo{104,710} stars between \todo{$-1.05\lesssim\bracket{Fe}\lesssim+0.5$}. The left-hand panel of Figure \ref{fig:kiel-diagram} compares the Kiel diagram of this stellar age sample against our full sample.
 
 \subsection{Cerium Abundance Precision}
 
@@ -332,15 +337,22 @@ Additionally, using the best GCE model:
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figures/agb_enrichment_models.pdf}
-    \caption{The effect of adjustments to AGB yield predictions on GCE model predictions. In each panel, the gray filled (open) points are low-Ia (high-Ia) stars in the Solar neighborhood ($7\leq R_g<9\kpc$, $z_{\rm max}<0.5\kpc$) with $-0.1\leq\bracket{Mg}<+0.1$. The $\odot$ symbol marks the Solar age and [Ce/Mg], and the gray error bars represent the median uncertainties for the plotted sample. The colored curves plot the gas abundance evolution of various GCE models, with the blue curve representing the same model in each panel. {\bf (a)} Global enhancement of the AGB yields; the dashed curve is a model without a prompt Ce enrichment channel. The ``$\otimes$'' symbol represents the Solar $s$-process fraction \citep{arlandini_neutron_1999}. {\bf (b)} Multiplicative scaling of the AGB progenitor masses. {\bf (c)} Multiplicative scaling of the AGB progenitor metallicities.}
-    \label{fig:agb-enrichment-models}
+    \includegraphics[width=\linewidth]{figures/onezone_sfh.pdf}
+    \caption{The effect of GCE model parameters on the predicted age--[Ce/Mg] relation. In each panel, the gray filled (open) points are low-Ia (high-Ia) stars in the Solar neighborhood ($7\leq R_g<9\kpc$, $z_{\rm max}<0.5\kpc$) with $-0.1\leq\bracket{Mg}<+0.1$. The $\odot$ symbol marks the Solar age and [Ce/Mg], and the gray error bars represent the median uncertainties for the plotted sample. The colored curves plot the gas abundance evolution of various GCE models, with the blue curve representing the same model in each panel. {\bf (a)} The star formation efficiency timescale $\tau_\star$. {\bf (b)} The outflow mass-loading factor $\eta$. {\bf (c)} The form of the star formation history; the inset plot in the bottom right shows the normalized star formation rate of each SFH.}
+    \label{fig:onezone-sfh}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/onezone_agb.pdf}
+    \caption{The effect of adjustments to AGB yield predictions on GCE model predictions. The data points are the same as in Figure \ref{fig:onezone-sfh}. The colored curves plot the gas abundance evolution of various GCE models, with the blue curve representing the same model in each panel. {\bf (a)} Global enhancement of the AGB yields; the dashed curve is a model without a prompt Ce enrichment channel. The ``$\otimes$'' symbol represents the Solar $s$-process fraction \citep{arlandini_neutron_1999}. {\bf (b)} Multiplicative scaling of the AGB progenitor masses. {\bf (c)} Multiplicative scaling of the AGB progenitor metallicities.}
+    \label{fig:onezone-agb}
 \end{figure}
 
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/delayed_enrichment_models.pdf}
-    \caption{Caption}
+    \caption{\todo{Probably cut or significantly revamp this figure.}}
     \label{fig:delayed-enrichment-models}
 \end{figure}
 
