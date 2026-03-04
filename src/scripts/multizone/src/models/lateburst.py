@@ -11,7 +11,8 @@ from .gradient import gradient
 import math as m
 import os
 
-_BURST_TIME_ = END_TIME - 2 # Gyr
+_BURST_TIME_ = END_TIME - 5 # Gyr
+_AMPLITUDE_ = 2
 
 
 class lateburst(modified_exponential, gaussian):
@@ -36,7 +37,7 @@ class lateburst(modified_exponential, gaussian):
         modified_exponential.__init__(self,
             timescale = insideout.timescale(radius),
             rise = _TAU_RISE_)
-        gaussian.__init__(self, mean = _BURST_TIME_, amplitude = 1.5)
+        gaussian.__init__(self, mean = _BURST_TIME_, amplitude = _AMPLITUDE_)
         self._prefactor = 1
         self._prefactor = normalize(self, gradient, dt = dt, dr = dr)
 
