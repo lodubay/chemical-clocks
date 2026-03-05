@@ -145,7 +145,7 @@ def running_median(
     sorted_ages = data.sort_values(age_col)[[age_col, col]]
     # Calculate rolling median
     rolling_params = dict(
-        min_periods=int(window/10), step=int(window/10), on=age_col, center=True
+        min_periods=int(window/5), step=int(window/5), on=age_col, center=True
     )
     rolling_medians = sorted_ages.rolling(window, **rolling_params).median()
     # Rolling 16th and 84th percentiles
