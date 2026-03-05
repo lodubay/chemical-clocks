@@ -24,6 +24,8 @@ class fiducial_sf_law(J21_sf_law):
         The gas surface density at which there is a break in the
         Kennicutt-Schmidt relation. The star formation law is linear above this
         value. Assumes units of M$_\odot$ kpc$^{-2}$.
+    prefactor : real number [default : 1]
+        Pre-factor to scale the star formation efficiency.
     **kwargs : varying types
         Keyword arguments passed to ``J21_sf_law``.
         
@@ -35,8 +37,27 @@ class fiducial_sf_law(J21_sf_law):
     power-law with a cutoff at high gas surface density.
     
     """
-    def __init__(self, area, mode='sfr', index=1.5, Sigma_g_break=1e8, **kwargs):
+    def __init__(self, area, mode='sfr', index=1.5, Sigma_g_break=1e8, prefactor=1, **kwargs):
+        self.prefactor = prefactor
         # Set index1 to be different below an arbitrarily small Sigma_g1
         # to avoid divide-by-zero errors
         super().__init__(area, mode=mode, index1=1., Sigma_g1=1., index2=index, 
                          Sigma_g2=Sigma_g_break, **kwargs)
+    
+    def __call__(self, time, arg2):
+        return self.prefactor * super().__call__(time, arg2)
+    
+    @property
+    def prefactor(self):
+        """
+        Type : float
+            Pre-factor to scale the star formation efficiency timescale.
+        """
+        return self._prefactor
+    
+    @prefactor.setter
+    def prefactor(self, value):
+        if value > 0:
+            self._prefactor = value
+        else:
+            raise ValueError("SFE prefactor must be positive.")

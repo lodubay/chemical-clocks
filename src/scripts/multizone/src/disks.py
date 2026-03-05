@@ -107,6 +107,8 @@ class diskmodel(vice.milkyway):
         the pre-enrichment abundance of O, Mg, and Si.
     local_disk_ratio : ``float`` [default: 0.12]
         The thick-to-thin disk surface density ratio in the Solar annulus.
+    sfe_factor : ``float`` [default: 1]
+        Factor to scale the star formation efficiency timescale.
     kwargs : varying types
         Other keyword arguments to pass ``vice.milkyway``.
 
@@ -135,6 +137,7 @@ class diskmodel(vice.milkyway):
             pre_enrichment=float("-inf"), 
             pre_alpha_enhancement=0., 
             local_disk_ratio=0.12, 
+            sfe_factor=1,
             **kwargs
         ):
         # Set the yields
@@ -217,7 +220,8 @@ class diskmodel(vice.milkyway):
                 else:
                     # Simplified SF law, single power-law with cutoff
                     self.zones[i].tau_star = models.fiducial_sf_law(
-                        area, mode=self.mode)
+                        area, mode=self.mode, prefactor=sfe_factor
+                    )
 
         # Metallicity of infalling gas
         if not m.isinf(pre_enrichment):

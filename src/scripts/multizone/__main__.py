@@ -39,7 +39,7 @@ _DELAY_MODELS_ = [
     "greggio05_double"
 ]
 _YIELD_SETS_ = [
-    "fiducial", "mshift", "mscale", "Zscale", "straggler10", "straggler50", "karakas16"
+    "fiducial", "mshift", "mscale", "Zscale", "straggler10", "straggler50", "karakas16", "onlyagb"
 ]
 
 def parse():
@@ -179,6 +179,12 @@ None, the equilibrium yield settings are used. \
         default = None,
         type = float
     )
+    parser.add_argument("--sfe-factor",
+        help = "Factor to scale the SFE timescale (Greater than one for less\
+efficient star formation; default: 1).",
+        default = 1,
+        type = float
+    )
 
     return parser
 
@@ -227,6 +233,7 @@ def model(args):
         migration_radius_dep = args.migration_radial_dependence,
         migration_strength = args.migration_strength,
         local_disk_ratio = args.local_disk_ratio,
+        sfe_factor = args.sfe_factor,
     )
     if args.migration == "post-process":
         kwargs["simple"] = True
