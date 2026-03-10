@@ -22,21 +22,18 @@
 \newcommand{\Msun}{\,{\rm M}_\odot}
 \newcommand{\kms}{\,{\rm km}\,{\rm s}^{-1}}
 
-\shorttitle{What Makes the $[s/\alpha]$ Chemical Clock Tick?}
-\shortauthors{Dubay et al.}
-
 \begin{document}
 
 % Title
-\title{What Makes the $[s/\alpha]$ Chemical Clock Tick?}
-
-\correspondingauthor{Liam Dubay}
+\title{Right Twice a Day: Limitations on [Ce/Mg] as a Chemical Clock}
+\shorttitle{Right Twice a Day}
 
 % Author list
 \author[0000-0003-3781-0747]{Liam O.\ Dubay}
 \affiliation{\osuaffil}
 \affiliation{\ccappaffil}
 \email{dubay.11@osu.edu}
+\correspondingauthor{Liam Dubay}
 \author{co-authors}
 \email{}
 \affiliation{}
@@ -45,6 +42,8 @@
 % Tawny Sit (log(g) corrections)
 % Natalie Myers (open clusters)
 % James Johnson
+% Adrian Price-Whelan (orbits)
+\shortauthors{Dubay et al.}
 
 \begin{abstract}
     Abstract.
@@ -70,7 +69,8 @@ Literature notes
     \item \citet{nissen_high-precision_2015} finds a tight correlation between [Y/Mg] and isochronal age for Solar twins (similar $\log g$, $T_{\rm eff}$, and [Fe/H]), and proposes its use as a chronometer. An abundance precision of 0.04 dex would correspond to an age precision of 1 Gyr.
     \item \citet{nissen_high-precision_2016} show correlations between [Y/Fe] and [Ba/Fe] with age for stars younger than 6 Gyr. They propose [Y/Mg] and [Y/Al] as chemical clocks.
     \item \citet{slumstrup_ymg_2017} find the [Y/Mg] relation holds for Solar-metallicity RC stars in four open clusters.
-    \item \citet{feltzing_metallicity_2017} investigate the metallicity dependence of the [Y/Mg]--age correlation using abundances and isochronal ages from \citet{bensby_exploring_2014}. They find a strong dependence on metallicity, with stars at [Fe/H]$\approx-0.5$ showing a flat trend with age. They argue that this is due to the metallicity dependence of the Y yield: stars near Solar metallicity produce lots of first-peak elements (e.g., Sr, Y), while lower-metallicity stars instead produce more second-peak elements (e.g., Ba, La, Ce?).
+    \item \citet{feltzing_metallicity_2017} investigate the metallicity dependence of the [Y/Mg]--age correlation using abundances and isochronal ages from \citet{bensby_exploring_2014}. They find a strong dependence on metallicity, with stars at $\bracket{Fe}\approx-0.5$ showing a flat trend with age. They argue that this is due to the metallicity dependence of the Y yield: stars near Solar metallicity produce lots of first-peak elements (e.g., Sr, Y), while lower-metallicity stars instead produce more second-peak elements (e.g., Ba, La, Ce?).
+    \item \citet{baratella_gaia-eso_2021} measured $s$-process abundances in young open clusters, finding enhanced [Y/Fe] and strongly enhanced [Ba/Fe] ratios. They could not reconcile these values with GCE models, and they suggest other elements like Ce might be more reliable $s$-process tracers.
 \end{itemize}
 
 Paper goals
@@ -123,7 +123,7 @@ The 6-D kinematic properties for stars in our sample are calculated using positi
 
 \subsection{Stellar Ages}
 
-We use the StarFlow \citep{stone-martinez_starflow_2025} catalog of stellar ages for MWM DR19. \citet{stone-martinez_starflow_2025} use a deep generative model trained on asteroseismic data to estimate ages for evolved stars. Their model retains information about the parameter space distribution of the training data and accounts for asymmetric uncertainties. We adopt their recommended training space density threshold of $>3\times10^9$, resulting in estimated ages for \todo{104,710} stars between \todo{$-1.05\lesssim\bracket{Fe}\lesssim+0.5$}. The left-hand panel of Figure \ref{fig:kiel-diagram} compares the Kiel diagram of this stellar age sample against our full sample.
+We use the StarFlow \citep{stone-martinez_starflow_2025} catalog of stellar ages for MWM DR19. \citet{stone-martinez_starflow_2025} use a deep generative model trained on asteroseismic data to estimate ages for evolved stars. Their model retains information about the parameter space distribution of the training data and accounts for asymmetric uncertainties. We adopt their recommended training space density threshold of $>3\times10^9$, resulting in estimated ages for \todo{104,710} stars with $\bracket{Fe}\gtrsim-1.0$. The left-hand panel of Figure \ref{fig:kiel-diagram} compares the Kiel diagram of this stellar age sample against our full sample.
 
 \subsection{Cerium Abundance Precision}
 
@@ -251,7 +251,7 @@ Overall, Figure \ref{fig:median-trends-grid} complicates the picture of [Ce/Mg] 
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/residual_explainer.pdf}
-    \caption{Demonstration of Ce residual abundance calculation. Top row: median trend in [Ce/H] as a function of [Mg/H] (left) and age (right) for the high- and low-Ia populations. Bottom row: median trend in $\Delta$[Ce/H] as a function of [Mg/H] (left) and age (right). Both populations show similar trends with age in [Ce/H] and $\Delta$[Ce/H].}
+    \caption{Demonstration of Ce residual abundance calculation. Top row: median trend in [Ce/H] as a function of (a) [Mg/H] and (b) age for the high- and low-Ia populations. Bottom row: median trend in $\Delta$[Ce/H] as a function of (c) [Mg/H] and (d) age. Both populations show similar trends with age in [Ce/H] and $\Delta$[Ce/H].}
     \label{fig:residual-explainer}
 \end{figure}
 
@@ -301,13 +301,13 @@ We define our halo sample by the following cut in the $E-L_z$ plane:
     \bracket[Mg]{Mn}_{\rm acc.} <
     \begin{cases}
         -0.2, & \bracket[Fe]{Al}<-0.2; \\
-        -0.6-2\bracket[Fe]{Al}, & \bracket[Fe]{Al}\ge-0.2.
+        -0.6-2\times\bracket[Fe]{Al}, & \bracket[Fe]{Al}\ge-0.2.
     \end{cases}
     \label{eq:accreted-cut}
 \end{equation}
 \todo{Discuss abundance upper limits.} 
 
-Figure \ref{fig:halo} plots [Ce/Mg] as a function of [Mg/H] for the halo stars as compared to the Milky Way disk. Most of the accreted stars have $\bracket{Mg}<-0.8$, while the {\it in situ} stars have $\bracket{Mg}>-1.0$, so there is some overlap between the two populations. There is a positive correlation between [Ce/Mg] and [Mg/H] for accreted stars, with [Ce/Mg] increasing by $\sim0.2\dex$ over $\sim0.4\dex$ in [Mg/H]. The {\it in situ} stars show a negative correlation, and the highest-[Mg/H] halo stars have similar [Ce/Mg] ratios to the low-Ia disk population. Interestingly, the median trends of both populations overlap at $\bracket[Mg]{Ce}\approx0$ from $-1\lesssim\bracket{Mg}\lesssim-0.8$, despite being clearly separated in [Al/Fe]. \todo{The accreted halo stars sit at roughly Solar [Ce/Mg] ratios, in between the low-Ia and high-Ia disk populations.}
+Figure \ref{fig:halo} plots [Ce/Mg] as a function of [Mg/H] for the halo stars as compared to the Milky Way disk. Most of the accreted stars have $\bracket{Mg}<-0.8$, while the {\it in situ} stars have $\bracket{Mg}>-1.0$, so there is some overlap between the two populations. There is a positive correlation between [Ce/Mg] and [Mg/H] for accreted stars, with [Ce/Mg] increasing by $\sim0.2\dex$ over $\sim0.4\dex$ in [Mg/H]. The {\it in situ} stars show a negative correlation, and the highest-[Mg/H] halo stars have similar [Ce/Mg] ratios to the low-Ia disk population. Interestingly, the median trends of both populations overlap at $\bracket[Mg]{Ce}\approx0$ from $-1\lesssim\bracket{Mg}\lesssim-0.8$, despite being clearly separated in [Al/Fe]. \todo{The accreted halo stars sit at roughly Solar [Ce/Mg] ratios, in between the low-Ia and high-Ia disk populations. One explanation is more efficient star formation during the formation of the low-Ia population, which would lead to greater production of elements with shorter enrichment timescales, such as Mg, over the longer timescales of AGB stars.}
 
 \todo{Literature comparison.} \citet{skuladottir_neutron-capture_2020} studied n-capture trends in the Sculptor dwarf galaxy ($-2\lesssim\bracket{Fe}\lesssim-1$) and found that [Ba/Fe] ($\sim$pure $s$-process) increases with [Fe/H] before a plateau at the Solar value, [La/Fe] and [Nd/Fe] (mix of $s$ and $r$) decrease (but not as steeply as Eu), while [Y/Fe] shows a flat trend that is inconsistent with the Milky Way. \citet{hasselquist_apogee_2021} studied APOGEE abundances in five dwarf galaxies (LMC, SMC, GSE, Sgr, and Fnx) and found a consistent trend of increasing [Ce/Mg] with [Mg/H], with the most metal-rich stars (at $\bracket{Mg}\approx-0.5$) having [Ce/Mg] more consistent with the thin disk than the thick disk. \citet{shetrone_apache_2025} similarly show increasing [Ce/Fe] with [Fe/H] for stars in several dSph galaxies (mostly Fnx), which is consistent with the MW low-Ia disk until $\bracket{Fe}\approx-1$. \citet{razera_abundance_2022} and \citet{ernandes_abundances_2026} studied bulge spheroid stars from APOGEE and found relatively high $\bracket[Fe]{Ce}\approx+0.5$, peaking at $\bracket{Fe}\approx-0.8$ and declining to higher metallicities.
 
@@ -334,6 +334,13 @@ Additionally, using the best GCE model:
 \begin{itemize}
     \item Predict age--abundance trends for $s$- and $r$-process elements not in SDSS-V.
 \end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{figures/model_comparison.pdf}
+    \caption{Caption}
+    \label{fig:model-comparison}
+\end{figure}
 
 \begin{figure}
     \centering
