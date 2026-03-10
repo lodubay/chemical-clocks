@@ -9,26 +9,19 @@ from matplotlib.ticker import MultipleLocator
 import vice
 
 from multizone._globals import ZONE_WIDTH, END_TIME
-from utils import apply_alpha_cut, good_ages, plot_gas_abundance
-from plotting import ONE_COLUMN_WIDTH
+from utils import apply_alpha_cut, good_ages
+from plotting import ONE_COLUMN_WIDTH, colored_text_legend
 from colormaps import paultol
 import paths
 
 RADIUS = 8 # kpc, zone to plot gas evolution
 SOLAR_CE_S_FRAC = 0.77 # Solar s-process fraction (Arlandini et al. 1999)
 SOLAR_AGE = 4.6 # Gyr
-OUTPUT_NAMES = [
-    'fiducial', 
-    'low-sfe', 
-    'insideout-mscale', 
-    'Zscale',
-    'no-rproc'
-]
 
 
 def main(style='paper'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
-    plt.rcParams['axes.prop_cycle'] = plt.cycler('color', paultol.bright.colors)
+    plt.rcParams['axes.prop_cycle'] = plt.cycler('color', paultol.vibrant.colors)
     
     # Select Solar neighborhood & Solar metallicity stars only
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
@@ -64,7 +57,7 @@ def main(style='paper'):
         linewidth=0.2,
         rasterized=True
     )
-    # for ax in axs:
+    # for ax, col in zip(axs, ['ce_h_corr', 'ce_mg_corr']):
     ax.scatter(
         local_low_alpha['age'], local_low_alpha['ce_mg_corr'],
         **scatter_kwargs
@@ -75,7 +68,7 @@ def main(style='paper'):
     )
     # median errors
     ax.errorbar(
-        3, -0.6, 
+        2, 0.8, 
         xerr=[[age_err_low], [age_err_high]], 
         yerr=med_abund_err, 
         c=datacolor, capsize=0,
@@ -94,20 +87,41 @@ def main(style='paper'):
     )
 
     # Plot multizone model abundance evolution
+    output_names = [
+        'fiducial', 
+        'agb-only',
+        'low-sfe', 
+        'agb-Zscale',
+        'agb-mscale', 
+    ]
+    labels = [
+        'Fiducial',
+        r'No $r$-process',
+        r'${\rm SFE}\times0.5$',
+        r'$Z_{\rm AGB} \times2$',
+        r'$M_{\rm AGB} \times0.5$',
+    ]
+    linestyles = ['-', '--', '-', '-', '-']
+    colors = [paultol.vibrant.colors[i] for i in [0, 4, 2, 1, 3]]
     zone = int(RADIUS / ZONE_WIDTH)
-    for i, output_name in enumerate(OUTPUT_NAMES):
+    for i, output_name in enumerate(output_names):
         zone_path = str(
             paths.multizone / output_name / 'diskmodel.vice' / ('zone%d' % zone)
         )
         hist = vice.history(zone_path)
+        # for ax, col in zip(axs, ['[ce/h]', '[ce/mg]']):
         ax.plot(hist['lookback'], hist['[ce/mg]'], 'w-', lw=2)
-        ax.plot(hist['lookback'], hist['[ce/mg]'], label=output_name)
-    ax.legend()
+        ax.plot(
+            hist['lookback'], hist['[ce/mg]'], 
+            color=colors[i], ls=linestyles[i], label=labels[i]
+        )
+    # ax.legend()
+    colored_text_legend(ax)
     
     ax.set_xlabel('Age [Gyr]')
     ax.set_ylabel('[Ce/Mg]')
     ax.set_xlim((0, END_TIME))
-    ax.set_ylim((-0.8, 1))
+    ax.set_ylim((-0.7, 0.9))
     ax.xaxis.set_major_locator(MultipleLocator(5))
     ax.xaxis.set_minor_locator(MultipleLocator(1))
     ax.yaxis.set_major_locator(MultipleLocator(0.5))
