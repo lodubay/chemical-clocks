@@ -119,9 +119,9 @@ commas. (Default: '')",
         default = _globals.NSTARS
     )
     parser.add_argument("--name",
-        help = "The name of the output simulations (Default: 'diskmodel')",
+        help = "The name of the output simulations (Default: 'milkyway')",
         type = str,
-        default = "diskmodel"
+        default = "milkyway"
     )
     parser.add_argument("--elements",
         help = """Elements to simulation the enrichment for separated by \
@@ -199,7 +199,7 @@ def model(args):
         The command line arguments parsed via argparse.
     """
     # Create output dir (and parents) if it doesn't exist
-    fullpath = paths.multizone / args.name
+    fullpath = paths.multizone / args.name / "diskmodel"
     if not fullpath.parents[0].exists():
         fullpath.parents[0].mkdir(parents=True)
     # Save command-line arguments to a file
