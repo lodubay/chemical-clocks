@@ -93,6 +93,8 @@ def main(style='paper'):
         'low-sfe', 
         'agb-Zscale',
         'agb-mscale', 
+        # 'rdelay-exp5'
+        # 'karakas16'
     ]
     labels = [
         'Fiducial',
@@ -100,9 +102,11 @@ def main(style='paper'):
         r'${\rm SFE}\times0.5$',
         r'$Z_{\rm AGB} \times2$',
         r'$M_{\rm AGB} \times0.5$',
+        # r'Delayed $r$-proc.'
+        # 'Karakas16'
     ]
-    linestyles = ['-', '--', '-', '-', '-']
-    colors = [paultol.vibrant.colors[i] for i in [0, 4, 2, 1, 3]]
+    linestyles = ['-', '--', '-', '-', '-', '-']
+    colors = [paultol.vibrant.colors[i] for i in [0, 4, 2, 1, 3, 5]]
     zone = int(RADIUS / ZONE_WIDTH)
     for i, output_name in enumerate(output_names):
         zone_path = str(
@@ -119,7 +123,7 @@ def main(style='paper'):
     colored_text_legend(ax)
     
     ax.set_xlabel('Age [Gyr]')
-    ax.set_ylabel('[Ce/Mg]')
+    ax.set_ylabel('[Ce/Mg]', labelpad=-2)
     ax.set_xlim((0, END_TIME))
     ax.set_ylim((-0.7, 0.9))
     ax.xaxis.set_major_locator(MultipleLocator(5))

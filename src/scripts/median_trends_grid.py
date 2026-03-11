@@ -12,8 +12,6 @@ from plotting import setup_hayden_plot, iterate_rz_bins, colored_text_legend
 from colormaps import paultol
 import paths
 
-RBINS = [(3, 5), (5, 7), (7, 9), (9, 11), (11, 13)] # left to right
-ZBINS = [(1, 2), (0.5, 1), (0, 0.5)] # top to bottom
 ALPHA_BUFFER = 0.02 # dex, buffer around the [Mg/Fe] dividing line
 # SAMPLE_FRACTION = 0.25 # fraction of stars to plot in each panel
 SAMPLE_SIZE = 1000 # number of stars to plot in each panel, randomly sampled
