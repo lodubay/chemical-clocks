@@ -32,10 +32,15 @@ def main():
     starflow = fits_to_pandas(
         paths.data / 'MWM' / 'StarFlow_summary_v1_0_1.fits'
     )
+    # Flag good ages
+    starflow['use_age'] = (
+        (starflow['training_density'] > 3e9) & # Stone-Martinez et al. (2025) recommendation
+        (starflow['age'] > 0)
+    )
     # ensure SDSS IDs are the same between DR19 and StarFlow in every row
     assert np.all(np.where(mwm_full['sdss_id'] == starflow['sdss_id'], 1, 0))
     mwm_full = mwm_full.join(
-        starflow[['age', 'e_p_age', 'e_n_age', 'training_density', 'BITMASK']]
+        starflow[['age', 'e_p_age', 'e_n_age', 'training_density', 'BITMASK', 'use_age']]
     )
     # Drop contamination & confusion flag
     mwm_full.drop(labels='cc_flg', axis=1, inplace=True)
@@ -79,6 +84,7 @@ def main():
     # Calculate abundance ratios and errors in quadrature
     print('Calculating abundance ratios and coordinates...')
     sample['mg_fe'], sample['e_mg_fe'] = abundance_ratio(sample, 'mg', 'fe')
+    sample['fe_mg'], sample['e_fe_mg'] = abundance_ratio(sample, 'fe', 'mg')
     sample['ce_mg'], sample['e_ce_mg'] = abundance_ratio(sample, 'ce', 'mg')
     sample['ce_fe'], sample['e_ce_fe'] = abundance_ratio(sample, 'ce', 'fe')
     sample['c_n'], sample['e_c_n'] = abundance_ratio(sample, 'c', 'n')
