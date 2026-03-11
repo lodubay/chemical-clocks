@@ -12,82 +12,64 @@ from matplotlib.ticker import MultipleLocator
 import vice
 
 from multizone_stars import MultizoneStars
-from plotting import insert_colorbar_axes, TWO_COLUMN_WIDTH
+from plotting import setup_hayden_plot, iterate_rz_bins, insert_colorbar_axes
 from utils import plot_gas_abundance
 from stats import weighted_quantile, kde2D
 import paths
-from multizone._globals import MAX_SF_RADIUS, END_TIME
+from multizone._globals import END_TIME
 
-OUTPUT_NAME = 'insideout-mscale/diskmodel'
-
-ZONE_WIDTH = 0.1 # kpc
-GALR_BINS = [3, 5, 7, 9, 11, 13]
-ABSZ_BINS = [0, 0.5, 1, 2]
+OUTPUT_NAME = 'agb-mscale/diskmodel'
 
 
-def main(style='paper', cmap='viridis_r'):
+def main(style='paper', cmap='viridis'):
     # Import MWM sample
     sample = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     # Set up figure
     plt.style.use(paths.styles / f'{style}.mplstyle')
-    rows = len(ABSZ_BINS) - 1
-    cols = len(GALR_BINS) - 1
-    width = TWO_COLUMN_WIDTH
-    fig, axs = plt.subplots(
-        rows, cols, 
-        figsize=(width, (width/cols)*rows),
-        sharex=True, sharey=True,
-        gridspec_kw={'hspace': 0., 'wspace': 0.}
-    )
-    cax = insert_colorbar_axes(fig)
+    fig, axs = setup_hayden_plot()
+    # Enlarge for colorbar
+    figsize = fig.get_size_inches()
+    fig.set_size_inches((figsize[0], figsize[1] * 1.25))
     cmap = plt.get_cmap(cmap)
+    met_bins = np.arange(-0.8, 0.21, 0.2)
     cbar = fig.colorbar(
         ScalarMappable(
-            BoundaryNorm(GALR_BINS, cmap.N, extend='both'), 
+            BoundaryNorm(met_bins, cmap.N, extend='both'), 
             cmap
         ), 
-        cax=cax, 
-        label=r'$R_{\rm birth}$ [kpc]'
-    )
-    rolling_params = dict(
-        min_periods=100, step=100, window=1000, on='age', center=True
+        ax=axs,
+        shrink=0.6, 
+        aspect=30, 
+        fraction=0.1, 
+        pad=0.1,
+        orientation='horizontal',
+        label='[Mg/H]'
     )
     # Plot multizone output
     mzs = MultizoneStars.from_output(OUTPUT_NAME)
-    for i, row in enumerate(axs):
-        zlim = (ABSZ_BINS[-(i+2)], ABSZ_BINS[-(i+1)])
-        for j, ax in enumerate(row):
-            rlim = (GALR_BINS[j], GALR_BINS[j+1])
-            mzs_subset = mzs.region(rlim, zlim)
-            mzs_subset.scatter_plot(ax, 'age', '[ce/mg]', color='galr_origin',
-                                cmap=cbar.cmap, norm=cbar.norm)
-            plot_gas_abundance(ax, mzs_subset, 'lookback', '[ce/mg]', c='k', ls='--')
-            # Plot MWM median trends
-            sample_subset = sample[
-                (sample['Rg'] >= rlim[0]) &
-                (sample['Rg'] < rlim[1]) &
-                (sample['z_max'] >= zlim[0]) &
-                (sample['z_max'] < zlim[1])
-            ]
-            running_median(ax, sample_subset, 'ce_mg')
+    mzs.model_uncertainty(sample, inplace=True)
+    for i, j, zlim, rlim in iterate_rz_bins():
+        ax = axs[i,j]
+        mzs_subset = mzs.region(rlim, zlim)
+        mzs_subset.scatter_plot(
+            ax, 'age', '[ce/mg]', color='[mg/h]',
+            cmap=cbar.cmap, norm=cbar.norm
+        )
+        plot_gas_abundance(
+            ax, mzs_subset, 'lookback', '[ce/mg]', c='k', ls='--'
+        )
+        # Plot MWM median trends
+        sample_subset = sample[
+            (sample['Rg'] >= rlim[0]) &
+            (sample['Rg'] < rlim[1]) &
+            (sample['z_max'] >= zlim[0]) &
+            (sample['z_max'] < zlim[1])
+        ]
+        running_median(ax, sample_subset, 'ce_mg_corr')
     
     # Format axes
     axs[0,0].set_xlim((0, END_TIME))
     axs[0,0].set_ylim((-0.8, 0.8))
-    # Label bins in z-height
-    row_label_pos = (0.5, 0.95)
-    for i, ax in enumerate(axs[:,0]):
-        absz_lim = (ABSZ_BINS[-(i+2)], ABSZ_BINS[-(i+1)])
-        ax.text(row_label_pos[0], row_label_pos[1], 
-                r'$%s\leq |z| < %s$ kpc' % absz_lim,
-                transform=ax.transAxes, ha='center', va='top')
-    # Label bins in Rgal
-    for i, ax in enumerate(axs[0]):
-        galr_lim = (GALR_BINS[i], GALR_BINS[i+1])
-        ax.set_title(
-            r'$%s\leq R_{\rm{gal}} < %s$ kpc' % galr_lim, 
-            size=plt.rcParams['font.size']
-        )
     for ax in axs[-1]:
         ax.set_xlabel('Age [Gyr]')
     for ax in axs[:,0]:

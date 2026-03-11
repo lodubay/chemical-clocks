@@ -274,16 +274,16 @@ class MultizoneStars:
                                   galr_lim=galr_lim, absz_lim=absz_lim, 
                                   noisy=self.noisy)
     
-    def model_uncertainty(self, apogee_data=None, inplace=False, 
-                          seed=RANDOM_SEED, age_col='L23_AGE'):
+    def model_uncertainty(self, mwm_data=None, inplace=False, 
+                          seed=RANDOM_SEED, age_col='age'):
         """
         Forward-model observational uncertainties from median data errors.
         Star particle data are modified in-place, so only run this once!
         
         Parameters
         ----------
-        apogee_data : pandas.DataFrame or NoneType, optional
-            Full APOGEE data. If None, will be imported from ``sample.csv``.
+        mwm_data : pandas.DataFrame or NoneType, optional
+            Full MWM data. If None, will be imported from ``sample.csv``.
             The default is None.
         inplace : bool, optional
             If True, update the current class instance. If False, returns a 
@@ -296,38 +296,24 @@ class MultizoneStars:
         MultizoneStars instance or None
         """
         noisy_stars = self.stars.copy()
-        if apogee_data is None:
-            apogee_data = pd.read_csv(paths.data/'APOGEE/sample.csv')
+        if mwm_data is None:
+            mwm_data = pd.read_csv(paths.data/'MWM/sample.csv')
         rng = np.random.default_rng(seed)
-        if age_col == 'CN_AGE':
-            age_med_err = apogee_data['CN_AGE_ERR'].median()
-            age_noise = rng.normal(scale=age_med_err, size=noisy_stars.shape[0])
-            # prevent noise from producing negative ages
-            min_noise = -1 * noisy_stars['age']
-            noisy_stars['age'] += np.maximum(age_noise, min_noise)
-        else:
-            # Age uncertainty (Leung et al. 2023)
-            log_age_err = apogee_data['L23_LOG_AGE_ERR'].median()
-            log_age_noise = rng.normal(scale=log_age_err, 
-                                    size=noisy_stars.shape[0])
-            noisy_stars['age'] *= 10 ** log_age_noise
-        # [O/H] uncertainty
-        oh_med_err = apogee_data['O_H_ERR'].median()
-        oh_noise = rng.normal(scale=oh_med_err, size=noisy_stars.shape[0])
-        noisy_stars['[o/h]'] += oh_noise
-        # [Fe/H] uncertainty
-        feh_med_err = apogee_data['FE_H_ERR'].median()
-        feh_noise = rng.normal(scale=feh_med_err, size=noisy_stars.shape[0])
-        noisy_stars['[fe/h]'] += feh_noise
-        # [O/Fe] uncertainty 
-        # TODO derive [O/Fe] adjustments from [O/H] and [Fe/H] errors above
-        ofe_med_err = apogee_data['O_FE_ERR'].median()
-        ofe_noise = rng.normal(scale=ofe_med_err, size=noisy_stars.shape[0])
-        noisy_stars['[o/fe]'] += ofe_noise
-        # [Fe/O] uncertainty 
-        feo_med_err = apogee_data['FE_O_ERR'].median()
-        feo_noise = rng.normal(scale=feo_med_err, size=noisy_stars.shape[0])
-        noisy_stars['[fe/o]'] += feo_noise
+        mwm_ages = mwm_data[mwm_data['use_age']]
+        age_err_low = np.median(mwm_ages['age'] - mwm_ages['e_n_age'])
+        age_err_high = np.median(mwm_ages['e_p_age'] - mwm_ages['age'])
+        age_med_err = 0.5 * (age_err_low + age_err_high)
+        age_noise = rng.normal(scale=age_med_err, size=noisy_stars.shape[0])
+        # prevent noise from producing negative ages
+        min_noise = -1 * noisy_stars['age']
+        noisy_stars['age'] += np.maximum(age_noise, min_noise)
+        # Abundance uncertainty
+        mwm_col_list = ['e_mg_h', 'e_fe_h', 'e_ce_h', 'e_fe_mg', 'e_ce_mg', 'e_ce_fe']
+        vice_col_list = ['[mg/h]', '[fe/h]', '[ce/h]', '[fe/mg]', '[ce/mg]', '[ce/fe]']
+        for vice_col, mwm_col in zip(vice_col_list, mwm_col_list):
+            med_err = mwm_data[mwm_col].median()
+            noise = rng.normal(scale=med_err, size=noisy_stars.shape[0])
+            noisy_stars[vice_col] += noise
         if inplace:
             self.stars = noisy_stars
         else:

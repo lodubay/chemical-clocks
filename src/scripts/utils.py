@@ -164,6 +164,42 @@ class adjusted_agb(vice.yields.agb.interpolator):
 # DATA UTILITY FUNCTIONS
 # =============================================================================
 
+def vice_to_mwm_col(col):
+    """
+    Convert VICE output abundance labels to MWM labels.
+    
+    Parameters
+    ----------
+    col : str
+        Name of column in VICE multizone stars output.
+    
+    Returns
+    -------
+    str
+        Column label in MWM DataFrame.
+        
+    """
+    return col[1:-1].replace('/', '_')
+
+
+def mwm_to_vice_col(col):
+    """
+    Convert MWM abundance labels to VICE output labels.
+    
+    Parameters
+    ----------
+    col : str
+        Name of column in MWM DataFrame.
+    
+    Returns
+    -------
+    str
+        Column label in VICE output.
+        
+    """
+    return '[' + '/'.join(col.split('_')) + ']'
+
+
 def get_bin_centers(bin_edges):
     """
     Calculate the centers of bins defined by the given bin edges.

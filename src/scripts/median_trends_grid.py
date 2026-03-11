@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
 from utils import alpha_cut, binned_quantiles, sample_rows
-from plotting import colored_text_legend, TWO_COLUMN_WIDTH
+from plotting import setup_hayden_plot, iterate_rz_bins, colored_text_legend
 from colormaps import paultol
 import paths
 
@@ -41,82 +41,75 @@ def main(style='paper'):
         q=0.5, bin_edges=mg_bin_edges, min_count=10
     )
 
-    fig, axs = plt.subplots(
-        len(ZBINS), len(RBINS),
-        figsize=(TWO_COLUMN_WIDTH, 0.6*TWO_COLUMN_WIDTH), 
-        sharex=True, sharey=True,
-        gridspec_kw={'hspace': 0, 'wspace': 0},
-    )
+    fig, axs = setup_hayden_plot()
     plt.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.95)
     # scatterplot style arguments
     kwargs = dict(s=1, marker='.', rasterized=True, edgecolor='none')
     high_alpha_color = paultol.highcontrast.colors[2]
     low_alpha_color = paultol.highcontrast.colors[0]
 
-    for i, row in enumerate(axs):
-        zlim = ZBINS[i]
-        for j, ax in enumerate(row):
-            rlim = RBINS[j]
-            subset = mwm_rgb[
-                (mwm_rgb['Rg'] >= rlim[0]) &
-                (mwm_rgb['Rg'] < rlim[1]) &
-                (mwm_rgb['z_max'] >= zlim[0]) &
-                (mwm_rgb['z_max'] < zlim[1])
-            ]
-            low_alpha = subset[subset['low_alpha']]
-            high_alpha = subset[subset['high_alpha']]
-            # Scatter plot random sample of points
-            # sample = sample_rows(subset, int(SAMPLE_FRACTION * subset.shape[0]))
-            sample = sample_rows(subset, SAMPLE_SIZE)
-            low_alpha_sample = sample[sample['low_alpha']]
-            ax.scatter(
-                low_alpha_sample['mg_h'], low_alpha_sample['ce_mg_corr'], 
-                c=low_alpha_color, **kwargs
+    for i, j, zlim, rlim in iterate_rz_bins():
+        ax = axs[i,j]
+        subset = mwm_rgb[
+            (mwm_rgb['Rg'] >= rlim[0]) &
+            (mwm_rgb['Rg'] < rlim[1]) &
+            (mwm_rgb['z_max'] >= zlim[0]) &
+            (mwm_rgb['z_max'] < zlim[1])
+        ]
+        low_alpha = subset[subset['low_alpha']]
+        high_alpha = subset[subset['high_alpha']]
+        # Scatter plot random sample of points
+        # sample = sample_rows(subset, int(SAMPLE_FRACTION * subset.shape[0]))
+        sample = sample_rows(subset, SAMPLE_SIZE)
+        low_alpha_sample = sample[sample['low_alpha']]
+        ax.scatter(
+            low_alpha_sample['mg_h'], low_alpha_sample['ce_mg_corr'], 
+            c=low_alpha_color, **kwargs
+        )
+        high_alpha_sample = sample[sample['high_alpha']]
+        ax.scatter(
+            high_alpha_sample['mg_h'], high_alpha_sample['ce_mg_corr'], 
+            c=high_alpha_color, **kwargs
+        )
+        # Plot local trends for comparison
+        ax.plot(
+            *local_low_alpha_medians, 
+            linestyle='--', color=low_alpha_color, label='High-Ia',
+        )
+        ax.plot(
+            *local_high_alpha_medians, 
+            linestyle='--', color=high_alpha_color, label='Low-Ia',
+        )
+        # Plot median trends
+        if low_alpha.shape[0] >= 100:
+            ax.errorbar(
+                *binned_quantiles(
+                    low_alpha, 'ce_mg_corr', 'mg_h', 
+                    q=0.5, bin_edges=mg_bin_edges, min_count=10, 
+                    est_errors=True
+                ), 
+                fmt='s-', markersize=3, color=low_alpha_color, capsize=0
             )
-            high_alpha_sample = sample[sample['high_alpha']]
-            ax.scatter(
-                high_alpha_sample['mg_h'], high_alpha_sample['ce_mg_corr'], 
-                c=high_alpha_color, **kwargs
+        if high_alpha.shape[0] >= 100:
+            ax.errorbar(
+                *binned_quantiles(
+                    high_alpha, 'ce_mg_corr', 'mg_h', 
+                    q=0.5, bin_edges=mg_bin_edges, min_count=10,
+                    est_errors=True
+                ), 
+                fmt='o-', markersize=3, color=high_alpha_color, capsize=0
             )
-            # Plot local trends for comparison
-            ax.plot(
-                *local_low_alpha_medians, 
-                linestyle='--', color=low_alpha_color, label='High-Ia',
-            )
-            ax.plot(
-                *local_high_alpha_medians, 
-                linestyle='--', color=high_alpha_color, label='Low-Ia',
-            )
-            # Plot median trends
-            if low_alpha.shape[0] >= 100:
-                ax.errorbar(
-                    *binned_quantiles(
-                        low_alpha, 'ce_mg_corr', 'mg_h', 
-                        q=0.5, bin_edges=mg_bin_edges, min_count=10, 
-                        est_errors=True
-                    ), 
-                    fmt='s-', markersize=3, color=low_alpha_color, capsize=0
-                )
-            if high_alpha.shape[0] >= 100:
-                ax.errorbar(
-                    *binned_quantiles(
-                        high_alpha, 'ce_mg_corr', 'mg_h', 
-                        q=0.5, bin_edges=mg_bin_edges, min_count=10,
-                        est_errors=True
-                    ), 
-                    fmt='o-', markersize=3, color=high_alpha_color, capsize=0
-                )
-            # Indicate number of low- and high-Ia stars in region
-            ax.text(
-                0.91, 0.91, str(low_alpha.shape[0]), 
-                color=low_alpha_color, 
-                ha='right', va='top', transform=ax.transAxes,
-            )
-            ax.text(
-                0.91, 0.79, str(high_alpha.shape[0]), 
-                color=high_alpha_color, 
-                ha='right', va='top', transform=ax.transAxes,
-            )
+        # Indicate number of low- and high-Ia stars in region
+        ax.text(
+            0.91, 0.91, str(low_alpha.shape[0]), 
+            color=low_alpha_color, 
+            ha='right', va='top', transform=ax.transAxes,
+        )
+        ax.text(
+            0.91, 0.79, str(high_alpha.shape[0]), 
+            color=high_alpha_color, 
+            ha='right', va='top', transform=ax.transAxes,
+        )
     # Indicate median abundance errors
     axs[0,0].errorbar(
         0.4, -0.5, 
@@ -134,16 +127,8 @@ def main(style='paper'):
     axs[0,0].yaxis.set_minor_locator(MultipleLocator(0.1))
     for ax in axs[-1,:]:
         ax.set_xlabel('[Mg/H]')
-    for i, ax in enumerate(axs[0,:]):
-        ax.set_title(r'$%s\leq R_{\rm guide}<%s$ kpc' % RBINS[i], fontsize=8)
     for ax in axs[:,0]:
-        ax.set_ylabel('[Ce/Mg]')
-    for i, ax in enumerate(axs[:,-1]):
-        ax.yaxis.set_label_position('right')
-        ax.set_ylabel(
-            r'$%s\leq z_{\rm max}<%s$ kpc' % ZBINS[i], 
-            fontsize=8, labelpad=6
-        )
+        ax.set_ylabel('[Ce/Mg]', labelpad=-2)
     # Text-only lengend
     leg = colored_text_legend(axs[0,0], loc='upper left')
 
