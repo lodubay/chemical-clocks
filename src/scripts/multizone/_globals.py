@@ -40,6 +40,8 @@ GAS_DISK_SCALE_RADIUS = 3.6 # kpc
 
 # Exponential outflow scale radius
 ETA_SCALE_RADIUS = 5.0
+# Outflow mass-loading at Solar radius
+ETA_SOLAR = 0.4
 
 # Fraction of Ce in the Sun produced by the s-process (Arlandini et al. 1999)
 SOLAR_CE_S_FRAC = 0.77

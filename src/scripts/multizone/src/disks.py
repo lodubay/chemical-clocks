@@ -15,7 +15,7 @@ if vice.version[:2] < (1, 2):
 Johnson et al. (2021) figures. Current: %s""" % (vice.__version__))
 else: pass
 import importlib
-from .._globals import END_TIME, MAX_SF_RADIUS, ETA_SCALE_RADIUS
+from .._globals import END_TIME, MAX_SF_RADIUS, ETA_SCALE_RADIUS, ETA_SOLAR
 from .migration import diskmigration, gaussian_migration, no_migration
 from . import models, dtds, outflows, yields
 from .models.utils import get_bin_number, interpolate, modified_exponential
@@ -165,12 +165,11 @@ class diskmodel(vice.milkyway):
                     filename = analogdata_filename)
         # Outflow mass-loading factor
         if has_outflows:
-            if eta_solar is not None:
-                self.mass_loading = outflows.exponential(
-                    solar_value=eta_solar, scale_radius=ETA_SCALE_RADIUS
-                )
-            else:
-                self.mass_loading = outflows.equilibrium()
+            if eta_solar is None:
+                eta_solar = ETA_SOLAR
+            self.mass_loading = outflows.exponential(
+                solar_value=eta_solar, scale_radius=ETA_SCALE_RADIUS
+            )
         else:
             self.mass_loading = outflows.no_outflows
         # Prescription for disk surface density as a function of radius

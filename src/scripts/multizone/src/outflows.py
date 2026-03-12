@@ -5,7 +5,7 @@ Classes and methods for the outflow mass-loading factor.
 import math as m
 from numbers import Number
 import vice
-from .._globals import ETA_SCALE_RADIUS
+from .._globals import ETA_SCALE_RADIUS, ETA_SOLAR
 
 
 class exponential:
@@ -114,13 +114,6 @@ class equilibrium(exponential):
         eta_sun = yield_ratio - 1 + recycling + tau_star / tau_sfh
         scale_radius = -1 / (gradient * m.log(10))
         super().__init__(eta_sun, scale_radius)
-
-# Outflow prescriptions tuned to each yield set
-yZ1 = exponential(0.2, ETA_SCALE_RADIUS)
-
-yZ2 = exponential(1.4, ETA_SCALE_RADIUS)
-
-yZ3 = exponential(2.4, ETA_SCALE_RADIUS)
 
 def no_outflows(radius):
     """A dummy function returning 0 for all inputs."""
