@@ -91,6 +91,7 @@ def main(style='paper'):
         'fiducial', 
         'agb-only',
         'low-sfe', 
+        'lateburst',
         'agb-Zscale',
         'agb-mscale', 
         # 'rdelay-exp5'
@@ -100,6 +101,7 @@ def main(style='paper'):
         'Fiducial',
         r'No $r$-process',
         r'${\rm SFE}\times0.5$',
+        'Starburst',
         r'$Z_{\rm AGB} \times2$',
         r'$M_{\rm AGB} \times0.5$',
         # r'Delayed $r$-proc.'
