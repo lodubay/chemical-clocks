@@ -8,6 +8,7 @@
 \usepackage{siunitx}
 \DeclareSIUnit\year{yr}
 \DeclareSIUnit\parsec{pc}
+\DeclareSIUnit\Msun{M_\odot}
 
 % user-defined commands
 \newcommand{\todo}[1]{{\color{red}#1}}
@@ -320,20 +321,41 @@ We confirm the global correlation between [Ce/Mg] and age in the MWM DR19 datase
 \section{Galactic Chemical Evolution}
 \label{sec:gce}
 
-Run the following multi-zone models (all with inside-out SFH and Gaussian migration scheme):
+% Run the following multi-zone models (all with inside-out SFH and Gaussian migration scheme):
 
-\begin{itemize}
-    \item AGB yields only, at multiple scales. Show that AGB alone cannot match either the abundance distributions or the age relation.
-    \item AGB + prompt $r$-process, using the CCSN channel. This is comparable to the \citet{grisoni_modelling_2020} models, which assume a 1 Myr delay time for all NSM. Show this does not fix the problem with the age relation.
-    \item A model including a delayed NSM contribution. Hack this together using two GCE models, one of which uses the SN Ia channel for pseudo-NSM Ce enrichment, the other uses SN Ia for Fe production. Show the DTD timescale that's required to get the age relation to look like the data.
-    \item Similar to above, but with radial migration cranked to 11. Does radial migration contribute to some or all of the age trend?
-\end{itemize}
+% \begin{itemize}
+%     \item AGB yields only, at multiple scales. Show that AGB alone cannot match either the abundance distributions or the age relation.
+%     \item AGB + prompt $r$-process, using the CCSN channel. This is comparable to the \citet{grisoni_modelling_2020} models, which assume a 1 Myr delay time for all NSM. Show this does not fix the problem with the age relation.
+%     \item A model including a delayed NSM contribution. Hack this together using two GCE models, one of which uses the SN Ia channel for pseudo-NSM Ce enrichment, the other uses SN Ia for Fe production. Show the DTD timescale that's required to get the age relation to look like the data.
+%     \item Similar to above, but with radial migration cranked to 11. Does radial migration contribute to some or all of the age trend?
+% \end{itemize}
 
-Additionally, using the best GCE model:
+% Additionally, using the best GCE model:
 
-\begin{itemize}
-    \item Predict age--abundance trends for $s$- and $r$-process elements not in SDSS-V.
-\end{itemize}
+% \begin{itemize}
+%     \item Predict age--abundance trends for $s$- and $r$-process elements not in SDSS-V.
+% \end{itemize}
+
+\subsection{Model Setup}
+
+We next attempt to match the observed trends with a multi-zone chemical evolution model. We adopt the same basic setup as the models of \citet{johnson_stellar_2021}. Using the Versatile Integrator for Chemical Evolution \citep[VICE;][]{johnson_impact_2020}, we model the disk as a series of 200 concentric rings with a width of 100 pc, each a separate one-zone GCE model with instantaneous mixing. Stellar populations migrate between zones according to the prescription of \citet{dubay_galactic_2024}, and may enrich the zones they travel through with the products of SN Ia and AGB nucleosynthesis.
+
+% AGB yields
+
+% CCSN and SN Ia yields
+We adopt the empirical yields of \citet{weinberg_scale_2024} for CCSN and SN Ia nucleosynthesis. These yields are scaled to the mean Fe yield of CCSNe measured by \citet{rodriguez_iron_2023} and assume a CCSN plateau of $\bracket[Fe]{Mg}=+0.45$ to set the Mg yield. The population-averaged SN Ia yield of Fe is
+\begin{equation}
+    y_{\rm Fe}^{\rm Ia} = R_{\rm Ia} \bar m_{\rm Fe}^{\rm Ia} = 9.1\times10^{-4},
+\end{equation}
+assuming a time-integrated SN Ia rate of $R_{\rm Ia}=\SI{1.3e-3}{\per\Msun}$ \citep{maoz_star_2017} and a mean Fe yield per SN Ia of $\bar m_{\rm Fe}^{\rm Ia}=0.7\Msun$ \citep{howell_effect_2009}. These yields are a factor of $\sim2-3$ lower than theoretical predictions, but can still reproduce present-day gas abundances by appropriately scaling the outflows \citep[e.g.,][]{johnson_milky_2025}.
+
+We adopt an exponential prescription for the outflow mass-loading factor:
+\begin{equation}
+    \eta \equiv \frac{\dot\Sigma_{\rm gas}}{\dot\Sigma_\star} = \eta_\odot \exp\Big(\frac{R_{\rm gal}-R_\odot}{R_\eta}\Big),
+\end{equation}
+where we take $\eta_\odot=0.4$ and $R_\eta=5\kpc$ to reproduce a radial metallicity gradient of $-0.06\dex\kpc^{-1}$ \citep{mendez-delgado_gradients_2022}. \citet{johnson_milky_2025} discuss the motivation behind this prescription and the evidence for mass-loaded outflows in detail.
+
+\subsection{Model Results}
 
 \begin{figure}
     \centering
@@ -345,7 +367,7 @@ Additionally, using the best GCE model:
 \begin{figure*}
     \centering
     \includegraphics[width=\linewidth]{figures/model_cemg_mgh.pdf}
-    \caption{Stellar abundance distributions across the Galaxy predicted by the best model.}
+    \caption{Stellar abundance distributions across the Galaxy predicted by the best model. The layout is similar to Figure \ref{fig:median-trends-grid}. Each point represents a model stellar population, color-coded by age. For visual clarity, only a random sample of 10,000 points is plotted in each panel. The dashed curve plots the gas abundance track at the mean radius in each bin. The solid contours show the 10th, 30th, 50th, 70th, and 90th percentiles of the MWM data in each region.}
 \end{figure*}
 
 % \begin{figure}
