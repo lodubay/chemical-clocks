@@ -46,6 +46,7 @@ _YIELD_SETS_ = [
     "straggler10", 
     "straggler50", 
     "karakas16", 
+    "karakas16-mscale",
     "onlyagb",
     "rdelay",
     "rdelayx2"
