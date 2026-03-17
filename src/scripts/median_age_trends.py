@@ -162,7 +162,7 @@ def main(style='paper', cmap='viridis_r'):
     axs[1].set_xlabel('Age [Gyr]')
 
     for ax in axs:
-        colored_text_legend(ax, loc='center right')
+        colored_text_legend(ax, invert=True, loc='center right')
 
     plt.savefig(paths.figures / 'median_age_trends')
     plt.close()

@@ -119,7 +119,7 @@ def insert_colorbar_axes(fig, orientation='vertical', width=0.02, pad=0.01):
     return cax
 
 
-def colored_text_legend(ax, show_handles=False, **kwargs):
+def colored_text_legend(ax, show_handles=False, invert=False, **kwargs):
     """
     Make a text-only legend with color-coding.
 
@@ -128,6 +128,8 @@ def colored_text_legend(ax, show_handles=False, **kwargs):
     ax : matplotlib.axes.Axes
     show_handles : bool [default: False]
         If True, show legend handles while still changing text color
+    invert : bool [default: False]
+        If True, invert the order of the legend entries.
     kwargs passed to plt.legend()
 
     Returns
@@ -135,11 +137,14 @@ def colored_text_legend(ax, show_handles=False, **kwargs):
     leg : matplotlib.legend.Legend
     """
     handles, labels = ax.get_legend_handles_labels()
+    if invert:
+        handles = handles[::-1]
+        labels = labels[::-1]
     # Remove legend handles
     if show_handles:
-        leg = ax.legend(**kwargs)
+        leg = ax.legend(handles, labels, **kwargs)
     else:
-        leg = ax.legend(handlelength=0, handletextpad=0, markerscale=0, **kwargs)
+        leg = ax.legend(handles, labels, handlelength=0, handletextpad=0, markerscale=0, **kwargs)
         for line in leg.get_lines():
             line.set_visible(False)
     # Color-code legend text by line and point colors
