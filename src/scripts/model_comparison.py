@@ -94,7 +94,9 @@ def main(style='paper'):
         'lateburst',
         'agb-Zscale',
         'agb-mscale', 
-        # 'rdelay-exp5'
+        # 'rdelay-plaw',
+        # 'rdelay-exp5',
+        # 'rdelayx2-exp5'
         # 'karakas16'
     ]
     labels = [
@@ -104,7 +106,9 @@ def main(style='paper'):
         'Starburst',
         r'$Z_{\rm AGB} \times2$',
         r'$M_{\rm AGB} \times0.5$',
-        # r'Delayed $r$-proc.'
+        # 'Delayed plaw',
+        # 'Delayed 5 Gyr exp',
+        # 'Double r-proc.'
         # 'Karakas16'
     ]
     linestyles = ['-', '--', '-', '-', '-', '-']
