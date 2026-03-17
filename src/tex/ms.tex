@@ -12,8 +12,8 @@
 
 % user-defined commands
 \newcommand{\todo}[1]{{\color{red}#1}}
-\newcommand{\osuaffil}{Department of Astronomy, The Ohio State University, 140 W. 18th Ave, Columbus OH 43210, USA}
-\newcommand{\ccappaffil}{Center for Cosmology and AstroParticle Physics, The Ohio State University, 191 W. Woodruff Ave., Columbus OH 43210, USA}
+\newcommand{\osuaffil}{Department of Astronomy, The Ohio State University, 140 W. 18th Ave, Columbus, OH 43210, USA}
+\newcommand{\ccappaffil}{Center for Cosmology and AstroParticle Physics, The Ohio State University, 191 W. Woodruff Ave., Columbus, OH 43210, USA}
 
 \newcommand{\bracket}[2][H]{{\rm [#2/#1]}}
 \newcommand{\kpc}{\,{\rm kpc}}
@@ -53,9 +53,11 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Stellar ages are a vital component of galactic archaeology studies. Recent years have seen an explosion of large stellar age catalogs that encompass a wide swath of the Milky Way. However, the most precise age estimation techniques, such as asteroseismology, are observationally expensive and apply to a limited range of stellar parameters. ``Chemical clocks,'' or empirically-calibrated relations between stellar age and atmospheric abundance ratios, promise reliable spectroscopic age estimates over a wider parameter space. The best-studied chemical clock is [C/N], which has a strong foundation in stellar physics but can only be used for stars on the red giant branch (RGB).
+Stellar ages are a vital component of galactic archaeology studies. Recent years have seen an explosion of large stellar age catalogs that encompass a wide swath of the Milky Way. However, the most precise age estimation techniques, such as asteroseismology, are observationally expensive and can be applied over a limited range of stellar parameters. ``Chemical clocks,'' or empirically-calibrated relations between stellar age and atmospheric abundance ratios, promise reliable spectroscopic age estimates over a wider parameter space. The best-studied chemical clock is [C/N], which has a strong foundation in stellar physics but can only be used for stars on the red giant branch (RGB).
 
-A number of studies have proposed the use of $[s/\alpha]$\textemdash the ratio of elements produced by the slow neutron-capture process to the $\alpha$-elements produced in core-collapse supernovae (CCSNe)\textemdash as a chemical clock. \citet{nissen_high-precision_2015} reported a tight correlation between [Y/Mg] and isochronal age for Solar twins and proposed its use as a sensitive chronometer. 
+A number of studies have proposed the use of $[s/\alpha]$\textemdash the ratio of elements produced by the slow neutron-capture process to the $\alpha$-elements produced in core-collapse supernovae (CCSNe)\textemdash as a chemical clock. \citet{nissen_high-precision_2015} reported a tight correlation between [Y/Mg] and isochronal age for Solar twins and proposed its use as a sensitive chronometer. \citet{slumstrup_ymg_2017} also found this correlation in Solar-metallicity red clump stars. Using asteroseismic ages for red giants, \citet{casali_tracing_2025} found a tight correlation between [$s/\alpha$] and age for several $s$-process and $\alpha$-elements (in particular, [Ce/Mg] and [Zr/Ti]). 
+
+However, there is some evidence that $[s/\alpha]$ may not be a universal chemical clock. \citet{feltzing_metallicity_2017} found that the [Y/Mg]--age relation depends strongly on metallicity in the Solar neighborhood. 
 
 \begin{itemize}
     \item $[s/\alpha]$ correlates strongly with stellar age for a number of $s$-process elements \citep{casali_tracing_2025}.
@@ -338,22 +340,31 @@ We confirm the global correlation between [Ce/Mg] and age in the MWM DR19 datase
 
 \subsection{Model Setup}
 
-We next attempt to match the observed trends with a multi-zone chemical evolution model. We adopt the same basic setup as the models of \citet{johnson_stellar_2021}. Using the Versatile Integrator for Chemical Evolution \citep[VICE;][]{johnson_impact_2020}, we model the disk as a series of 200 concentric rings with a width of 100 pc, each a separate one-zone GCE model with instantaneous mixing. Stellar populations migrate between zones according to the prescription of \citet{dubay_galactic_2024}, and may enrich the zones they travel through with the products of SN Ia and AGB nucleosynthesis.
+We next attempt to match the observed trends with a multi-zone chemical evolution model. We adopt the same basic setup as the models of \citet{johnson_stellar_2021}. Using the Versatile Integrator for Chemical Evolution \citep[VICE;][]{johnson_impact_2020}, we model the disk as a series of concentric rings with a width of 100 pc, each of which is a separate one-zone GCE model with instantaneous mixing. Stellar populations migrate between zones according to the prescription of \citet{dubay_galactic_2024}, and may enrich the zones they travel through with the products of SN Ia and AGB nucleosynthesis.
 
 % AGB yields
+Cerium enrichment in our models proceeds through a prompt, metallicity-independent $r$-process channel, and a delayed, metallicity-dependent $s$-process channel. We assume that massive stars contribute the $r$-process yield. Adopting a Solar $r$-process fraction for Ce of $f_{\rm Ce,\odot}^r=0.23$ \citep{arlandini_neutron_1999}, we assign the CCSN yield of Ce to be
+\begin{equation}
+    y_{\rm Ce}^{\rm CC} = f_{\rm Ce,\odot}^r (Z_{\rm Ce,\odot} / Z_{\rm Mg,\odot}) y_{\rm Mg}^{\rm CC}.
+    \label{eq:rproc-yield}
+\end{equation}
+This results in a CCSN ``plateau'' of $\bracket[Mg]{Ce}_{\rm CC}=\log_{10}(f_{\rm Ce,\odot}^r) \approx -0.64$, akin to the low-Ia $\bracket[Fe]{\alpha}$ plateau.
+For AGB stars, we adopt the yield grids of \citet{cristallo_evolution_2011,cristallo_evolution_2015}. \todo{Figure X shows the dependence of the Ce yield on the mass and metallicity of the AGB stars. The yield peaks sharply at $Z=X$ and the median enrichment time is Y.} We have also tested the yields of \citet{karakas_stellar_2016} and \citet{karakas_heavy-element_2018}. These produce roughly a factor of 2 more Ce, but after scaling our CCSN yields and outflows to match, they predict similar abundance evolution to our fiducial models.
 
 % CCSN and SN Ia yields
 We adopt the empirical yields of \citet{weinberg_scale_2024} for CCSN and SN Ia nucleosynthesis. These yields are scaled to the mean Fe yield of CCSNe measured by \citet{rodriguez_iron_2023} and assume a CCSN plateau of $\bracket[Fe]{Mg}=+0.45$ to set the Mg yield. The population-averaged SN Ia yield of Fe is
 \begin{equation}
     y_{\rm Fe}^{\rm Ia} = R_{\rm Ia} \bar m_{\rm Fe}^{\rm Ia} = 9.1\times10^{-4},
 \end{equation}
-assuming a time-integrated SN Ia rate of $R_{\rm Ia}=\SI{1.3e-3}{\per\Msun}$ \citep{maoz_star_2017} and a mean Fe yield per SN Ia of $\bar m_{\rm Fe}^{\rm Ia}=0.7\Msun$ \citep{howell_effect_2009}. These yields are a factor of $\sim2-3$ lower than theoretical predictions, but can still reproduce present-day gas abundances by appropriately scaling the outflows \citep[e.g.,][]{johnson_milky_2025}.
+assuming a time-integrated SN Ia rate of $R_{\rm Ia}=\SI{1.3e-3}{\per\Msun}$ \citep{maoz_star_2017} and a mean Fe yield per SN Ia of $\bar m_{\rm Fe}^{\rm Ia}=0.7\Msun$ \citep{howell_effect_2009}. These yields are a factor of $\sim2-3$ lower than theoretical predictions, but can still reproduce present-day gas abundances by appropriately scaling the outflows \citep[e.g.,][]{johnson_milky_2025}. For the SN Ia delay-time distribution, we adopt the ``plateau DTD'' of \citet{dubay_galactic_2024}, which reproduces the low-Ia sequence more closely than a $t^{-1}$ power-law.
 
 We adopt an exponential prescription for the outflow mass-loading factor:
 \begin{equation}
     \eta \equiv \frac{\dot\Sigma_{\rm gas}}{\dot\Sigma_\star} = \eta_\odot \exp\Big(\frac{R_{\rm gal}-R_\odot}{R_\eta}\Big),
 \end{equation}
 where we take $\eta_\odot=0.4$ and $R_\eta=5\kpc$ to reproduce a radial metallicity gradient of $-0.06\dex\kpc^{-1}$ \citep{mendez-delgado_gradients_2022}. \citet{johnson_milky_2025} discuss the motivation behind this prescription and the evidence for mass-loaded outflows in detail.
+
+For our fiducial model, we adopt the ``inside-out'' star formation history from \citet{johnson_stellar_2021}. This SFH can reproduce the \citet{feuillet_spatial_2019} stellar age--metallicity and age--[$\alpha$/Fe] relations across the disk, although it does not reproduce the Milky Way's $\alpha$-bimodality \citep{johnson_stellar_2021}. Our primary goal is to explain the Ce abundance patterns in the high-Ia population, but the lack of a distinct low-Ia disk is a limitation of our models. Star formation proceeds according to a \citet{schmidt_rate_1959} law $\dot\Sigma_\star\propto\Sigma_g^k$ with $k=1.5$ \citep{kennicutt_global_1998}, with the detailed implementation described by \citet{johnson_milky_2025}. The star formation rate in each zone is normalized to reproduce the double-exponential radial stellar density profile of \citet{bland-hawthorn_galaxy_2016}.
 
 \subsection{Model Results}
 
@@ -363,6 +374,12 @@ where we take $\eta_\odot=0.4$ and $R_\eta=5\kpc$ to reproduce a radial metallic
     \caption{Comparison of [Ce/Mg]--age trends predicted by multi-zone models. The blue curve represents the gas abundance evolution in fiducial model, and all other curves represent models that differ by one parameter. The gray filled (open) points represent low-Ia (high-Ia) stars in the Solar neighborhood ($7\leq R_g<9\kpc$, $z_{\rm max}<0.5\kpc$) with $-0.1\leq\bracket{Mg}<+0.1$. The gray error bars indicate the median uncertainties for the plotted sample, the $\odot$ symbol marks the Solar age and [Ce/Mg] value, and the $\otimes$ symbol represents the Solar $s$-process fraction \citep{arlandini_neutron_1999}.}
     \label{fig:model-comparison}
 \end{figure}
+
+Figure \ref{fig:model-comparison} compares the predicted [Ce/Mg]--age relation from our models against observed trends for Solar-metallicity stars in the Solar neighborhood. The fiducial model starts at the CCSN plateau of $\bracket[Mg]{Ce}_{\rm CC}\approx -0.64$ and rises steadily to a maximum of $\bracket[Mg]{Ce}\approx+0.2$ at a lookback time of 7 Gyr, then slowly declines by $\sim0.1\dex$ to the present day. The model completely fails to reproduce the trend observed in the data, over-predicting [Ce/Mg] for the oldest stars and under-predicting for the youngest. The model also fails to reproduce the Solar [Ce/Mg] at the age of the Sun, which could be fixed by scaling down the AGB yield by $\sim30\%$, although this would worsen the under-prediction for the youngest stars. \todo{This may not be as big of a problem if the Sun was born at a smaller radius, where [Ce/Mg] ratios are lower.}
+
+We explore two modifications to the star formation history in Figure \ref{fig:model-comparison}. First, we reduce the SFE by half (i.e., doubling $\tau_\star$), which leads to a more gradual increase in [Ce/Mg] over time \todo{(why?)}. This alleviates the over-prediction problem for old stars, but results in a [Ce/Mg]--age relation that is flat, not increasing, over the past $5\Gyr$. Reducing the SFE also worsens agreement with the data in the [Fe/Mg]--[Mg/H] plane. \todo{Second, we add a Gaussian burst in the SFR.}
+
+In theory, an $r$-process channel with long delay times could increase [Ce/Mg] over time. However, Figure \ref{fig:model-comparison} illustrates that the $r$-process contribution is small, $\sim0.1\dex$, over most of the model's evolution. The Solar $r/s$ ratio would need to be much higher than expected in order for a delayed $r$-process channel to have a significant effect at late times.
 
 \begin{figure*}
     \centering
@@ -414,7 +431,7 @@ Model conclusions:
 \section*{Acknowledgements}
 
 % From the Center for Belonging and Social Change, https://cbsc.osu.edu/about-us/land-acknowledgement
-We would like to acknowledge the land that The Ohio State University occupies is the ancestral and contemporary territory of the Shawnee, Potawatomi, Delaware, Miami, Peoria, Seneca, Wyandotte, Ojibwe and many other Indigenous peoples. Specifically, the university resides on land ceded in the 1795 Treaty of Greeneville and the forced removal of tribes through the Indian Removal Act of 1830. As a land grant institution, we want to honor the resiliency of these tribal nations and recognize the historical contexts that has and continues to affect the Indigenous peoples of this land.
+We would like to acknowledge the land that The Ohio State University occupies is the ancestral and contemporary territory of the Shawnee, Potawatomi, Delaware, Miami, Peoria, Seneca, Wyandotte, Ojibwe, and many other Indigenous peoples. Specifically, the university resides on land ceded in the 1795 Treaty of Greeneville and the forced removal of tribes through the Indian Removal Act of 1830. As a land grant institution, we want to honor the resiliency of these tribal nations and recognize the historical contexts that have and continue to affect the Indigenous peoples of this land.
 
 \software{}
 
