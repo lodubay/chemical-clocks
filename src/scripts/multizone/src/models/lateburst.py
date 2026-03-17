@@ -11,7 +11,7 @@ from .gradient import gradient
 import math as m
 import os
 
-_BURST_TIME_ = END_TIME - 5 # Gyr
+_BURST_TIME_ = END_TIME - 3 # Gyr
 _AMPLITUDE_ = 2
 
 
