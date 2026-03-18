@@ -12,6 +12,8 @@ mfecc = 0.058
 mfeia = 0.7
 # Rate of SNe Ia per solar mass of stars
 Ria = 1.3e-3 # Maoz & Graur (2017)
+# [alpha/Fe] plateau value for pure-alpha elements
+afecc = 0.45
 
 def ccsn_ratio(Fexp=0.75, Mmin=0.08, Mmax=120, Mthresh=8, dm=0.01, 
                imf=vice.imf.kroupa):
@@ -48,7 +50,6 @@ def ccsn_ratio(Fexp=0.75, Mmin=0.08, Mmax=120, Mthresh=8, dm=0.01,
 
 # IMF-averaged CCSN yields
 # yield calibration is based on Weinberg++ 2024, eq. 10
-afecc = 0.45 # [alpha/Fe] plateau value for pure-alpha elements
 Rcc = ccsn_ratio(Fexp=Fexp) # CCSNe per unit stellar mass
 mmgcc = mfecc * 10 ** afecc * vice.solar_z["mg"] / vice.solar_z["fe"]
 vice.yields.ccsne.settings["mg"] = Rcc * mmgcc

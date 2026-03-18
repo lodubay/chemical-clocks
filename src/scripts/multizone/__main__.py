@@ -39,17 +39,11 @@ _DELAY_MODELS_ = [
     "greggio05_double"
 ]
 _YIELD_SETS_ = [
-    "fiducial", 
-    "mshift", 
-    "mscale", 
-    "Zscale", 
-    "straggler10", 
-    "straggler50", 
-    "karakas16", 
-    "karakas16-mscale",
-    "onlyagb",
-    "rdelay",
-    "rdelayx2"
+    "yZ1", 
+    "yZ2", 
+    "W24", 
+    "J21",
+    "JW20"
 ]
 
 def parse():
@@ -145,10 +139,37 @@ underscores. (Default: \"fe_o\")""",
         default = _globals.ZONE_WIDTH
     )
     parser.add_argument("--yields",
-        help = "The nucleosynthetic yield set to use. (Default: 'fiducial')",
+        help = "The nucleosynthetic yield set to use. (Default: 'yZ1')",
         type = str,
         choices = _YIELD_SETS_,
-        default = "fiducial"
+        default = "yZ1"
+    )
+    parser.add_argument("--agb-yields",
+        help = "Source for AGB yields (default: 'cristallo11').",
+        type = str,
+        choices = ["cristallo11", "karakas16"],
+        default = "cristallo11"
+    )
+    parser.add_argument("--agb-amp",
+        help = "Amplify the total AGB yield by the given factor (default: 1).",
+        type = float,
+        default = 1
+    )
+    parser.add_argument("--agb-mscale",
+        help = "Mass scaling for the AGB yield (default: 1).",
+        type = float,
+        default = 1
+    )
+    parser.add_argument("--agb-Zscale",
+        help = "Metallicity scaling for the AGB yield (default: 1).",
+        type = float,
+        default = 1
+    )
+    parser.add_argument("--r-channel",
+        help = "Channel to assign r-process contribution (default: 'ccsne').",
+        type = str,
+        choices = ["ccsne", "sneia", "none"],
+        default = "ccsne"
     )
     parser.add_argument("--seed", 
         help = "Seed for the random number generator.",
@@ -233,6 +254,11 @@ def model(args):
         RIa_kwargs = RIa_kwargs,
         delay = args.minimum_delay,
         yields = args.yields,
+        agb_yields = args.agb_yields,
+        agb_amp = args.agb_amp,
+        agb_mscale = args.agb_mscale,
+        agb_Zscale = args.agb_Zscale,
+        r_channel = args.r_channel,
         seed = args.seed,
         radial_gas_velocity = args.radial_gas_velocity,
         has_outflows = not args.no_outflows,

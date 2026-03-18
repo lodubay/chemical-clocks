@@ -1,3 +1,2 @@
-__all__ = ["fiducial", "utils"]
-from . import fiducial
-from . import utils
+__all__ = ["adjusted_agb"]
+from .utils import adjusted_agb

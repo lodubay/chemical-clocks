@@ -15,9 +15,10 @@ if vice.version[:2] < (1, 2):
 Johnson et al. (2021) figures. Current: %s""" % (vice.__version__))
 else: pass
 import importlib
-from .._globals import END_TIME, MAX_SF_RADIUS, ETA_SCALE_RADIUS, ETA_SOLAR
+from .._globals import END_TIME, MAX_SF_RADIUS, ETA_SCALE_RADIUS, SOLAR_CE_S_FRAC
 from .migration import diskmigration, gaussian_migration, no_migration
-from . import models, dtds, outflows, yields
+from . import models, dtds, outflows
+from .yields.utils import adjusted_agb
 from .models.utils import get_bin_number, interpolate, modified_exponential
 from .models.diskmodel import two_component_disk, BHG16
 import math as m
@@ -123,7 +124,12 @@ class diskmodel(vice.milkyway):
             evol_kwargs = {},
             verbose = True, 
             migration_mode = "gaussian", 
-            yields = "fiducial",
+            yields = "yZ1",
+            agb_yields = "cristallo11",
+            agb_amp = 1,
+            agb_mscale = 1,
+            agb_Zscale = 1,
+            r_channel = "ccsne",
             delay = 0.04, 
             RIa = "plateau", 
             RIa_kwargs={}, 
@@ -140,8 +146,31 @@ class diskmodel(vice.milkyway):
             sfe_factor=1,
             **kwargs
         ):
-        # Set the yields
+        # Set the yields for Mg, Fe
         importlib.import_module(f'.yields.{yields}', 'multizone.src')
+        # Set the AGB yield of Ce
+        vice.yields.agb.settings["ce"] = adjusted_agb(
+            "ce", 
+            study=agb_yields,
+            amp=agb_amp,
+            mscale=agb_mscale,
+            Zscale=agb_Zscale,
+        )
+        # Set the r-process yield of Ce
+        rproc_yield = (1 - SOLAR_CE_S_FRAC) * (
+            vice.yields.ccsne.settings["mg"] * vice.solar_z["ce"] / vice.solar_z["mg"]
+        )
+        if r_channel == "ccsne":
+            vice.yields.ccsne.settings["ce"] = rproc_yield
+            vice.yields.sneia.settings["ce"] = 0.
+        elif r_channel == "sneia":
+            vice.yields.ccsne.settings["ce"] = 0.
+            vice.yields.sneia.settings["ce"] = rproc_yield
+        elif r_channel == "none":
+            vice.yields.ccsne.settings["ce"] = 0.
+            vice.yields.sneia.settings["ce"] = 0.
+        else:
+            raise ValueError("Unsupported value for 'r_channel'.")
         super().__init__(zone_width = zone_width, name = name,
             verbose = verbose, **kwargs)
         # Migration prescription
@@ -165,11 +194,18 @@ class diskmodel(vice.milkyway):
                     filename = analogdata_filename)
         # Outflow mass-loading factor
         if has_outflows:
-            if eta_solar is None:
-                eta_solar = ETA_SOLAR
-            self.mass_loading = outflows.exponential(
-                solar_value=eta_solar, scale_radius=ETA_SCALE_RADIUS
-            )
+            if eta_solar is not None:
+                self.mass_loading = outflows.exponential(
+                    solar_value=eta_solar, scale_radius=ETA_SCALE_RADIUS
+                )
+            elif yields == "J21" or yields == "JW20":
+                self.mass_loading = vice.milkyway.default_mass_loading
+            elif yields == "yZ1":
+                self.mass_loading = outflows.yZ1
+            elif yields == "yZ2":
+                self.mass_loading = outflows.yZ2
+            else:
+                self.mass_loading = outflows.equilibrium()
         else:
             self.mass_loading = outflows.no_outflows
         # Prescription for disk surface density as a function of radius

@@ -3,7 +3,6 @@ Utility functions for multizone.src.yields
 """
 
 from numbers import Number
-import vice
 from vice.toolkit.interpolation.interp_scheme_2d import interp_scheme_2d
 from vice.yields.agb._grid_reader import yield_grid
 
