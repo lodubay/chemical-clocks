@@ -4,75 +4,46 @@ Utility functions for multizone.src.yields
 
 from numbers import Number
 import vice
+from vice.toolkit.interpolation.interp_scheme_2d import interp_scheme_2d
+from vice.yields.agb._grid_reader import yield_grid
 
-class decompose_agb_grid:
+
+class agb_interpolator(interp_scheme_2d):
     """
-    Allows for an AGB yield grid to be broken into multiple components,
-    with each component individually scaled and shifted in mass or metallicity.
-
-    This class is designed some fraction of the AGB yield to be from
-    blue stragglers (i.e., AGB stars with a ZAMS mass of 2 Msun but an age
-    of a 1 Msun star).
-    """
-    def __init__(
-            self, element, study='cristallo11', 
-            amplitudes=1, mshifts=0, mscales=1, Zscales=1
-        ):
-        params = [amplitudes, mshifts, mscales, Zscales]
-        iterables = [p for p in params if isinstance(p, list)]
-        # Error handling: ensure iterable parameters are same length
-        if same_length(iterables):
-            ncomponents = len(iterables[0])
-            # Turn non-iterable parameters into lists
-            for i, param in enumerate(params):
-                if not isinstance(param, list):
-                    params[i] = [param] * ncomponents
-        else:
-            raise ValueError('If multiple parameters are iterable, all must \
-have the same length.')
-        # Each component is an adjusted_agb instance with its own amplitude,
-        # mass and metallicity scalings
-        self.components = [
-            adjusted_agb(
-                element, 
-                study=study, 
-                amp=params[0][i], 
-                dm=params[1][i], 
-                mscale=params[2][i], 
-                Zscale=params[3][i]
-            ) for i in range(ncomponents)
-        ]
-
-    def __call__(self, mass, metallicity):
-        return sum([comp(mass, metallicity) for comp in self.components])
-
-    @property
-    def components(self):
-        """
-        list of adjusted_agb instances
-        """
-        return self._components
+    Custom AGB yield interpolator that forces 0 yield at 0 metallicity,
+    0 yield at 0 mass, and enforces non-negative yields.
     
-    @components.setter
-    def components(self, value):
-        try:
-            if all([isinstance(c, adjusted_agb) for c in value]):
-                self._components = value
-            else:
-                raise TypeError('All components must be instances of adjusted_agb')
-        except:
-            raise TypeError('Components must be iterable! Got: %s' % type(value))
-
+    Inherits from vice.toolkit.interpolator.interp_scheme_2d.
+    """
+    def __init__(self, element, study='cristallo11'):
+        # let the grid reader function do the error handling
+        yields, masses, metallicities = yield_grid(element, study=study)
+        # enforce yield of 0 at 0 mass
+        new_masses = [0] + list(masses)
+        # enforce yield of 0 at 0 metallicity
+        new_metallicities = [0] + list(metallicities)
+        new_yields = [[0] * len(new_metallicities)]
+        for row in yields:
+            new_yields.append([0] + list(row))
+        super().__init__(new_masses, new_metallicities, new_yields)
+    
+    def __call__(self, mass, metallicity):
+        return max(super().__call__(mass, metallicity), 0)
+    
     @property
-    def ncomponents(self):
-        """
-        ncomponents : int
-            Number of individual AGB grid components.
-        """
-        return len(self.components)
+    def masses(self):
+        return super().xcoords
+    
+    @property
+    def metallicities(self):
+        return super().ycoords
+    
+    @property
+    def yields(self):
+        return super().zcoords
 
 
-class adjusted_agb(vice.yields.agb.interpolator): 
+class adjusted_agb(agb_interpolator): 
     """
     Provides for manual adjustments to the AGB yield grid for a given study. 
     Yields can be scaled or shifted in mass and metallicity space.
@@ -96,7 +67,7 @@ class adjusted_agb(vice.yields.agb.interpolator):
         one, input metallicity is *decreased* by the given factor, effectively
         scaling up all metallicities in the grid.
 
-    Inherits from vice.yields.agb.interpolator
+    Inherits from agb_interpolator
     """
     def __init__(self, element, study='cristallo11', amp=1, dm=0, mscale=1, Zscale=1):
         if dm != 0 and mscale != 1:
@@ -108,11 +79,8 @@ class adjusted_agb(vice.yields.agb.interpolator):
         super().__init__(element, study=study)
     
     def __call__(self, mass, metallicity): 
-        return max(
-            self.amp * super().__call__(
-                mass * 1 / self.mscale - self.dm, metallicity * 1 / self.Zscale
-            ),
-            0. # prevent negative yields from interpolation
+        return self.amp * super().__call__(
+            mass * 1 / self.mscale - self.dm, metallicity * 1 / self.Zscale
         )
     
     @property
@@ -188,6 +156,73 @@ class adjusted_agb(vice.yields.agb.interpolator):
                 raise ValueError('Zscale must be positive.')
         else:
             raise TypeError(f'Parameter "Zscale" must be numeric, got: {type(value)}')
+        
+
+class decompose_agb_grid:
+    """
+    Allows for an AGB yield grid to be broken into multiple components,
+    with each component individually scaled and shifted in mass or metallicity.
+
+    This class is designed some fraction of the AGB yield to be from
+    blue stragglers (i.e., AGB stars with a ZAMS mass of 2 Msun but an age
+    of a 1 Msun star).
+    """
+    def __init__(
+            self, element, study='cristallo11', 
+            amplitudes=1, mshifts=0, mscales=1, Zscales=1
+        ):
+        params = [amplitudes, mshifts, mscales, Zscales]
+        iterables = [p for p in params if isinstance(p, list)]
+        # Error handling: ensure iterable parameters are same length
+        if same_length(iterables):
+            ncomponents = len(iterables[0])
+            # Turn non-iterable parameters into lists
+            for i, param in enumerate(params):
+                if not isinstance(param, list):
+                    params[i] = [param] * ncomponents
+        else:
+            raise ValueError('If multiple parameters are iterable, all must \
+have the same length.')
+        # Each component is an adjusted_agb instance with its own amplitude,
+        # mass and metallicity scalings
+        self.components = [
+            adjusted_agb(
+                element, 
+                study=study, 
+                amp=params[0][i], 
+                dm=params[1][i], 
+                mscale=params[2][i], 
+                Zscale=params[3][i]
+            ) for i in range(ncomponents)
+        ]
+
+    def __call__(self, mass, metallicity):
+        return sum([comp(mass, metallicity) for comp in self.components])
+
+    @property
+    def components(self):
+        """
+        list of adjusted_agb instances
+        """
+        return self._components
+    
+    @components.setter
+    def components(self, value):
+        try:
+            if all([isinstance(c, adjusted_agb) for c in value]):
+                self._components = value
+            else:
+                raise TypeError('All components must be instances of adjusted_agb')
+        except:
+            raise TypeError('Components must be iterable! Got: %s' % type(value))
+
+    @property
+    def ncomponents(self):
+        """
+        ncomponents : int
+            Number of individual AGB grid components.
+        """
+        return len(self.components)
 
 
 def same_length(items):
