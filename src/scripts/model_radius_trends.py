@@ -5,16 +5,15 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
-from matplotlib.colors import BoundaryNorm, Normalize
+from matplotlib.colors import BoundaryNorm
 import vice
 
 from utils import apply_alpha_cut, binned_quantiles, good_ages, get_bin_centers
 from plotting import colored_text_legend, ONE_COLUMN_WIDTH
-from colormaps import paultol
 import paths
 from multizone._globals import ZONE_WIDTH
 
-OUTPUT_NAME = 'karakas16-mscale'
+OUTPUT_NAMES = ['karakas16', 'karakas16-mscale']
 
 def main(style='paper', cmap='viridis_r'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
@@ -23,89 +22,99 @@ def main(style='paper', cmap='viridis_r'):
     radius_bin_edges = np.arange(3, 15.1, 2)
     age_bin_edges = np.arange(-0.5, 11.6, 1)
 
-    # Select only low-alpha, near-midplane stars
+    # Select stars near the midplane with good ages
     mwm_rgb = apply_alpha_cut(mwm_rgb)
-    mwm_rgb['delta_ce_h'] = np.nan * np.ones(mwm_rgb.shape[0])
-    all_lowz = mwm_rgb[(mwm_rgb['z_max'] < 0.5)].copy()
+    lowz_ages = mwm_rgb[(mwm_rgb['z_max'] < 0.5) & (mwm_rgb['use_age'])].copy()
     
     # Set up figure
-    fig, ax = plt.subplots(figsize=(ONE_COLUMN_WIDTH, ONE_COLUMN_WIDTH))
+    fig, axs = plt.subplots(
+        2, 1,
+        figsize=(ONE_COLUMN_WIDTH, 1.8*ONE_COLUMN_WIDTH),
+        sharex=True, sharey=True,
+        gridspec_kw={'hspace': 0.}
+    )
     radial_cmap = plt.get_cmap(cmap)
     norm = BoundaryNorm(radius_bin_edges, radial_cmap.N)
     xlim = (0, 13)
-    ylim = (-0.5, 0.8)
+    ylim = (-0.7, 0.8)
 
-    lowz_ages = good_ages(all_lowz)
-    low_alpha_ages = lowz_ages[lowz_ages['low_alpha']]
-    high_alpha_ages = lowz_ages[lowz_ages['high_alpha']]
-    # Plot all stars
-    pcm = ax.hexbin(
-        lowz_ages['age'], lowz_ages['ce_mg_corr'],
-        C=np.ones(lowz_ages.shape[0]),
-        reduce_C_function=np.sum,
-        gridsize=(30, 12),
-        cmap='binary',
-        linewidths=0.2,
-        mincnt=0,
-        extent=[xlim[0], xlim[1], ylim[0], ylim[1]]
+    for ax in axs:
+        # Plot all stars
+        pcm = ax.hexbin(
+            lowz_ages['age'], lowz_ages['ce_mg_corr'],
+            C=np.ones(lowz_ages.shape[0]),
+            reduce_C_function=np.sum,
+            gridsize=(30, 12),
+            cmap='binary',
+            linewidths=0.2,
+            mincnt=0,
+            extent=[xlim[0], xlim[1], ylim[0], ylim[1]]
+        )
+        # Plot median age trends binned by radius
+        for j in range(len(radius_bin_edges)-1):
+            radius_bin = radius_bin_edges[j:j+2]
+            mean_radius = np.mean(radius_bin)
+            lowz_subset = lowz_ages[
+                (lowz_ages['Rg'] >= radius_bin[0]) &
+                (lowz_ages['Rg'] < radius_bin[1])
+            ]
+            age_medians = binned_quantiles(
+                lowz_subset, 'ce_mg_corr', 'age',
+                q=0.5, bin_edges=age_bin_edges, min_count=20, est_errors=True
+            )
+            ax.plot(
+                *age_medians[:-1], '--', 
+                color=radial_cmap(norm(mean_radius)), zorder=1,
+                label=f'{int(mean_radius)} kpc'
+            )
+    fig.colorbar(
+        pcm, 
+        ax=axs, 
+        orientation='horizontal', 
+        pad=0.1,
+        label='Number of stars'
     )
-    # Plot low-alpha trends binned by radius
-    for j in range(len(radius_bin_edges)-1):
-        radius_bin = radius_bin_edges[j:j+2]
-        mean_radius = np.mean(radius_bin)
-        low_alpha_subset = low_alpha_ages[
-            (low_alpha_ages['Rg'] >= radius_bin[0]) &
-            (low_alpha_ages['Rg'] < radius_bin[1])
-        ]
-        low_alpha_age_medians = binned_quantiles(
-            low_alpha_subset, 'ce_mg_corr', 'age',
-            q=0.5, bin_edges=age_bin_edges, min_count=10, est_errors=True
-        )
-        # axs[i].plot(*low_alpha_age_medians, '-', color='w', linewidth=2)
-        ax.plot(
-            *low_alpha_age_medians[:-1], '--', 
-            color=radial_cmap(norm(mean_radius)), zorder=1,
-            label=f'{int(mean_radius)} kpc'
-        )
-    fig.colorbar(pcm, ax=ax, orientation='horizontal', label='Number of stars')
     # Indicate median abundance errors
     mwm_rgb_ages = good_ages(mwm_rgb)
     age_err_low = np.median(mwm_rgb_ages['age'] - mwm_rgb_ages['e_n_age'])
     age_err_high = np.median(mwm_rgb_ages['e_p_age'] - mwm_rgb_ages['age'])
     med_abund_err = mwm_rgb_ages['e_ce_h'].median()
-    ax.errorbar(
-        10, 0.6, 
+    axs[0].errorbar(
+        10, 0.5, 
         xerr=[[age_err_low], [age_err_high]], 
         yerr=med_abund_err, 
-        c='gray', capsize=0, #elinewidth=0.5,
+        c='gray', capsize=0,
     )
 
     # Plot multizon evolution
-    for radius in get_bin_centers(radius_bin_edges):
-        zone = int(radius / ZONE_WIDTH)
-        zone_path = str(
-            paths.multizone / OUTPUT_NAME / 'diskmodel.vice' / ('zone%d' % zone)
-        )
-        hist = vice.history(zone_path)
-        # ax.plot(hist['lookback'], hist['[ce/mg]'], 'w-', lw=2)
-        ax.plot(
-            hist['lookback'], hist['[ce/mg]'], 
-            color=radial_cmap(norm(radius)), ls='-'
-        )
+    labels = ['Fiducial', r'$M_{\rm AGB} \times0.5$']
+    for i, output_name in enumerate(OUTPUT_NAMES):
+        for radius in get_bin_centers(radius_bin_edges):
+            zone = int(radius / ZONE_WIDTH)
+            zone_path = str(
+                paths.multizone / output_name / 'diskmodel.vice' / ('zone%d' % zone)
+            )
+            hist = vice.history(zone_path)
+            axs[i].plot(
+                hist['lookback'], hist['[ce/mg]'], 
+                color=radial_cmap(norm(radius)), ls='-'
+            )
+            axs[i].set_title(labels[i], y=0.95, pad=0, va='top')
 
-    ax.set_xlim(xlim)
-    ax.set_ylim(ylim)
+    axs[0].set_xlim(xlim)
+    axs[0].set_ylim(ylim)
 
-    ax.yaxis.set_major_locator(MultipleLocator(0.5))
-    ax.yaxis.set_minor_locator(MultipleLocator(0.1))
-    ax.xaxis.set_major_locator(MultipleLocator(5))
-    ax.xaxis.set_minor_locator(MultipleLocator(1))
+    axs[0].yaxis.set_major_locator(MultipleLocator(0.5))
+    axs[0].yaxis.set_minor_locator(MultipleLocator(0.1))
+    axs[0].xaxis.set_major_locator(MultipleLocator(5))
+    axs[0].xaxis.set_minor_locator(MultipleLocator(1))
 
-    ax.set_ylabel('[Ce/Mg]')
-    ax.set_xlabel('Age [Gyr]')
+    axs[0].set_ylabel('[Ce/Mg]')
+    axs[1].set_ylabel('[Ce/Mg]')
+    axs[1].set_xlabel('Age [Gyr]')
 
-    handles, labels = ax.get_legend_handles_labels()
-    leg = colored_text_legend(ax, invert=True, loc='center right')
+    handles, labels = axs[1].get_legend_handles_labels()
+    leg = colored_text_legend(axs[1], invert=True, loc='center right')
 
     plt.savefig(paths.figures / 'model_radius_trends')
     plt.close()
