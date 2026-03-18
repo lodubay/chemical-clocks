@@ -53,17 +53,15 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Stellar ages are a vital component of galactic archaeology studies. Recent years have seen an explosion of large stellar age catalogs that encompass a wide swath of the Milky Way. However, the most precise age estimation techniques, such as asteroseismology, are observationally expensive and can be applied over a limited range of stellar parameters. ``Chemical clocks,'' or empirically-calibrated relations between stellar age and atmospheric abundance ratios, promise reliable spectroscopic age estimates over a wider parameter space. The best-studied chemical clock is [C/N], which has a strong foundation in stellar physics but can only be used for stars on the red giant branch (RGB).
+Stellar ages are a vital component of galactic archaeology studies. Recent years have seen an explosion of large stellar age catalogs that encompass a wide swath of the Milky Way. However, most age estimation techniques are observationally expensive or apply to a limited range of stellar parameters. ``Chemical clocks,'' or empirically-calibrated relations between stellar age and atmospheric abundance ratios, promise reliable spectroscopic age estimates over a wider parameter space. The best-studied chemical clock is [C/N], which has a strong foundation in stellar physics but can only be used for stars on the red giant branch (RGB).
 
-A number of studies have proposed the use of $[s/\alpha]$\textemdash the ratio of elements produced by the slow neutron-capture process to the $\alpha$-elements produced in core-collapse supernovae (CCSNe)\textemdash as a chemical clock. \citet{nissen_high-precision_2015} reported a tight correlation between [Y/Mg] and isochronal age for Solar twins and proposed its use as a sensitive chronometer. \citet{slumstrup_ymg_2017} also found this correlation in Solar-metallicity red clump stars. Using asteroseismic ages for red giants, \citet{casali_tracing_2025} found a tight correlation between [$s/\alpha$] and age for several $s$-process and $\alpha$-elements (in particular, [Ce/Mg] and [Zr/Ti]). 
+A number of studies have proposed the use of $[s/\alpha]$\textemdash the ratio of elements produced by the slow neutron-capture process to the $\alpha$-elements produced in core-collapse supernovae (CCSNe)\textemdash as a chemical clock. \citet{nissen_high-precision_2015} reported a tight correlation between [Y/Mg] and isochronal age for Solar twins and proposed its use as a sensitive chronometer. \citet{slumstrup_ymg_2017} also found this correlation in Solar-metallicity red clump stars. \citet{casali_tracing_2025} found a tight correlation between [$s/\alpha$] and asteroseismic age for several $s$-process and $\alpha$-elements (in particular, [Ce/Mg] and [Zr/Ti]). \citet{casali_tracing_2025} calibrated these chemical clocks on age and metallicity and applied them to the full APOGEE survey, yielding several hundred thousand age estimates.
 
-However, there is some evidence that $[s/\alpha]$ may not be a universal chemical clock. \citet{feltzing_metallicity_2017} found that the [Y/Mg]--age relation depends strongly on metallicity in the Solar neighborhood. 
+However, there is some evidence that $[s/\alpha]$ may not be a universal chemical clock. \citet{feltzing_metallicity_2017} found that the [Y/Mg]--age relation depends strongly on metallicity in the Solar neighborhood. \citet{ratcliffe_chemical_2024} found that the age--$[s/\alpha]$ relation varies with the guiding-center radius and birth radius of the star.
 
-\begin{itemize}
-    \item $[s/\alpha]$ correlates strongly with stellar age for a number of $s$-process elements \citep{casali_tracing_2025}.
-    \item The [$s/\alpha$]--age relation may vary by region in the Galaxy \citep{ratcliffe_chemical_2024}, complicating its usefulness as an age indicator.
-    \item The [$s/\alpha$]--age correlation is not theoretically justified---GCE models don't predict that the youngest stars have the highest [$s/\alpha$] \citep[e.g.,][]{grisoni_modelling_2020}.
-\end{itemize}
+From a theoretical perspective, the $[s/\alpha]$ chemical clock's mechanism is not understood. Galactic chemical evolution models with standard AGB yields predict qualitatively different evolution than observed \citep[e.g.,][]{grisoni_modelling_2020,ratcliffe_chemical_2024}.
+
+We quantify the [Ce/Mg]--age relation as a function of metallicity, $\alpha$-enhancement, and Galactic position using data from the Milky Way Mapper program of the Sloan Digital Sky Survey (SDSS-V). We then explore possible mechanisms for the relation, such as modifications to the star formation history and yield prescription, in multizone GCE models. In Section \ref{sec:data}, we describe our observational dataset. In Section \ref{sec:results}, we present the chemical abundance trends in our sample. In Section \ref{sec:gce}, we compare our results with chemical evolution model predictions. In Section \ref{sec:conclusions}, we summarize our conclusions.
 
 Literature notes
 \begin{itemize}
@@ -76,11 +74,11 @@ Literature notes
     \item \citet{baratella_gaia-eso_2021} measured $s$-process abundances in young open clusters, finding enhanced [Y/Fe] and strongly enhanced [Ba/Fe] ratios. They could not reconcile these values with GCE models, and they suggest other elements like Ce might be more reliable $s$-process tracers.
 \end{itemize}
 
-Paper goals
-\begin{itemize}
-    \item Quantify the age--[$s/\alpha$] relation as a function of metallicity and Galactic position using SDSS-V. Is the relation universal or does it depend on other factors?
-    \item Can GCE models match the age--[$s/\alpha$] relation? How much do we need to break yield predictions or enrichment timescales to do so?
-\end{itemize}
+% Paper goals
+% \begin{itemize}
+%     \item Quantify the age--[$s/\alpha$] relation as a function of metallicity and Galactic position using SDSS-V. Is the relation universal or does it depend on other factors?
+%     \item Can GCE models match the age--[$s/\alpha$] relation? How much do we need to break yield predictions or enrichment timescales to do so?
+% \end{itemize}
 
 \section{Observational Data}
 \label{sec:data}
