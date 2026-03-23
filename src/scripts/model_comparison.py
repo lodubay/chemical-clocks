@@ -68,7 +68,7 @@ def main(style='paper'):
     )
     # median errors
     ax.errorbar(
-        2, 0.8, 
+        3, -0.5, 
         xerr=[[age_err_low], [age_err_high]], 
         yerr=med_abund_err, 
         c=datacolor, capsize=0,
@@ -119,7 +119,6 @@ def main(style='paper'):
         # 'Double r-proc.'
         # 'Karakas16'
     ]
-    linestyles = ['-', '--', '-', '-', '-', '-']
     colors = [paultol.vibrant.colors[i] for i in [0, 4, 2, 1, 3, 5]]
     zone = int(RADIUS / ZONE_WIDTH)
     for i, output_name in enumerate(output_names):
@@ -131,7 +130,7 @@ def main(style='paper'):
         ax.plot(hist['lookback'], hist['[ce/mg]'], 'w-', lw=2)
         ax.plot(
             hist['lookback'], hist['[ce/mg]'], 
-            color=colors[i], ls=linestyles[i], label=labels[i]
+            color=colors[i], ls='-', label=labels[i]
         )
     # ax.legend()
     colored_text_legend(ax)
