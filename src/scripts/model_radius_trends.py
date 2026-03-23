@@ -13,7 +13,8 @@ from plotting import colored_text_legend, ONE_COLUMN_WIDTH
 import paths
 from multizone._globals import ZONE_WIDTH
 
-OUTPUT_NAMES = ['yZ2-k16-fiducial', 'yZ2-k16-mscale']
+OUTPUT_NAMES = ['yZ1-c11-mscale', 'yZ2-k16-mscale']
+LABELS = [r'$y/Z_\odot=1$, C11+C15', r'$y/Z_\odot=2$, KL16+K18']
 
 def main(style='paper', cmap='viridis_r'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
@@ -25,6 +26,9 @@ def main(style='paper', cmap='viridis_r'):
     # Select stars near the midplane with good ages
     mwm_rgb = apply_alpha_cut(mwm_rgb)
     lowz_ages = mwm_rgb[(mwm_rgb['z_max'] < 0.5) & (mwm_rgb['use_age'])].copy()
+    age_err_low = np.median(lowz_ages['age'] - lowz_ages['e_n_age'])
+    age_err_high = np.median(lowz_ages['e_p_age'] - lowz_ages['age'])
+    med_abund_err = lowz_ages['e_ce_h'].median()
     
     # Set up figure
     fig, axs = plt.subplots(
@@ -67,6 +71,13 @@ def main(style='paper', cmap='viridis_r'):
                 color=radial_cmap(norm(mean_radius)), zorder=1,
                 label=f'{int(mean_radius)} kpc'
             )
+        # Indicate median abundance errors
+        ax.errorbar(
+            3, -0.5, 
+            xerr=[[age_err_low], [age_err_high]], 
+            yerr=med_abund_err, 
+            c='gray', capsize=0,
+        )
     fig.colorbar(
         pcm, 
         ax=axs, 
@@ -74,20 +85,8 @@ def main(style='paper', cmap='viridis_r'):
         pad=0.1,
         label='Number of stars'
     )
-    # Indicate median abundance errors
-    mwm_rgb_ages = good_ages(mwm_rgb)
-    age_err_low = np.median(mwm_rgb_ages['age'] - mwm_rgb_ages['e_n_age'])
-    age_err_high = np.median(mwm_rgb_ages['e_p_age'] - mwm_rgb_ages['age'])
-    med_abund_err = mwm_rgb_ages['e_ce_h'].median()
-    axs[0].errorbar(
-        10, 0.5, 
-        xerr=[[age_err_low], [age_err_high]], 
-        yerr=med_abund_err, 
-        c='gray', capsize=0,
-    )
 
-    # Plot multizon evolution
-    labels = ['Fiducial', r'$M_{\rm AGB} \times0.5$']
+    # Plot multizone evolution
     for i, output_name in enumerate(OUTPUT_NAMES):
         for radius in get_bin_centers(radius_bin_edges):
             zone = int(radius / ZONE_WIDTH)
@@ -99,7 +98,7 @@ def main(style='paper', cmap='viridis_r'):
                 hist['lookback'], hist['[ce/mg]'], 
                 color=radial_cmap(norm(radius)), ls='-'
             )
-            axs[i].set_title(labels[i], y=0.95, pad=0, va='top')
+            axs[i].set_title(LABELS[i], y=0.95, pad=0, va='top')
 
     axs[0].set_xlim(xlim)
     axs[0].set_ylim(ylim)
@@ -113,8 +112,9 @@ def main(style='paper', cmap='viridis_r'):
     axs[1].set_ylabel('[Ce/Mg]')
     axs[1].set_xlabel('Age [Gyr]')
 
-    handles, labels = axs[1].get_legend_handles_labels()
-    leg = colored_text_legend(axs[1], invert=True, loc='center right')
+    for ax in axs:
+        handles, labels = ax.get_legend_handles_labels()
+        leg = colored_text_legend(ax, invert=True, loc='center right')
 
     plt.savefig(paths.figures / 'model_radius_trends')
     plt.close()
