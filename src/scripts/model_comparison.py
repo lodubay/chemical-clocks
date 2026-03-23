@@ -88,12 +88,16 @@ def main(style='paper'):
 
     # Plot multizone model abundance evolution
     output_names = [
-        'fiducial', 
-        'agb-only',
-        'low-sfe', 
-        'lateburst',
-        'agb-Zscale',
-        'agb-mscale', 
+        'yZ1-c11-fiducial', 
+        'yZ1-c11-onlyagb',
+        # 'yZ2-cristallo11',
+        # 'yZ2-cristallo11-x2',
+        # 'yZ2-cristallo11-x2-mscale'
+        'yZ1-c11-lowsfe', 
+        'yZ1-c11-lateburst',
+        'yZ1-c11-Zscale',
+        'yZ1-c11-mscale', 
+
         # 'rdelay-plaw',
         # 'rdelay-exp5',
         # 'rdelayx2-exp5'
@@ -102,10 +106,14 @@ def main(style='paper'):
     labels = [
         'Fiducial',
         r'No $r$-process',
+        # r'$y/Z_\odot=2$',
+        # 'Double yields',
+        # r'Double yields ($M_{\rm AGB} \times0.5$)',
         r'${\rm SFE}\times0.5$',
         'Starburst',
         r'$Z_{\rm AGB} \times2$',
         r'$M_{\rm AGB} \times0.5$',
+
         # 'Delayed plaw',
         # 'Delayed 5 Gyr exp',
         # 'Double r-proc.'

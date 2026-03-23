@@ -13,7 +13,7 @@ from plotting import colored_text_legend, ONE_COLUMN_WIDTH
 import paths
 from multizone._globals import ZONE_WIDTH
 
-OUTPUT_NAMES = ['karakas16', 'karakas16-mscale']
+OUTPUT_NAMES = ['yZ2-k16-fiducial', 'yZ2-k16-mscale']
 
 def main(style='paper', cmap='viridis_r'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
