@@ -6,11 +6,11 @@ from a simple stellar population (SSP) model.
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MultipleLocator
+from matplotlib.ticker import MultipleLocator, FuncFormatter
 import vice
 
 import paths
-from plotting import TWO_COLUMN_WIDTH
+from plotting import TWO_COLUMN_WIDTH, colored_text_legend
 from colormaps import paultol
 from multizone._globals import END_TIME
 from multizone.src.yields.utils import adjusted_agb
@@ -20,6 +20,7 @@ SOLAR_Z = 0.014
 
 def main(style='paper'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
+    plt.rcParams['axes.prop_cycle'] = plt.cycler('color', paultol.bright.colors)
     fig, axs = plt.subplots(
         1, 3, 
         figsize=(TWO_COLUMN_WIDTH, 0.33*TWO_COLUMN_WIDTH), 
@@ -36,46 +37,73 @@ def main(style='paper'):
     vice.yields.sneia.settings['fe'] = Ria * mfeia # absolute scale is arbitrary
 
     # First panel: IMF-weighted yields
-    labels = ['c11-mx1', 'k16-mx1', 'c11-mx0.5', 'k16-mx0.5']
-    agb_studies = ['cristallo11', 'karakas16', 'cristallo11', 'karakas16']
-    mass_scales = [1, 1, 0.5, 0.5]
-    linestyles = ['-', '-', '--', '--']
-    markers=['o', 'o', 'none', 'none']
-    colors = [paultol.highcontrast.colors[i] for i in [0, 1, 0, 1]]
+    labels = ['C11+C15', 'KL16+K18']
     logprefactor = 8
-    for i in range(len(agb_studies)):
-        interp = adjusted_agb('ce', study=agb_studies[i], mscale=mass_scales[i])
-        masses = [m * mass_scales[i] for m in interp.masses[1:]] # exclude 0
+    for i, study in enumerate(['cristallo11', 'karakas16']):
+        interp = adjusted_agb('ce', study=study)
+        masses = interp.masses[1:] # exclude 0
         yields = len(masses) * [0]
         for j in range(len(yields)):
             yields[j] = 10**logprefactor * interp(masses[j], SOLAR_Z) * masses[j]**-1.3
-        axs[0].plot(masses, yields, marker=markers[i], linestyle=linestyles[i], color=colors[i], label=labels[i])
+        axs[0].plot(masses, yields, marker='.', label=labels[i])
 
-    axs[0].set_xlim((0., 6.5))
-    axs[0].set_ylim((0, 2.5))
+    axs[0].set_xlim((0.5, 7.5))
+    axs[0].set_ylim((0, None))
     axs[0].set_xlabel(r'$M_{\rm ZAMS}\,[M_\odot]$')
     axs[0].set_ylabel(r'IMF-weighted Ce Yield [$\times10^{-%s}$]' % logprefactor)
     axs[0].xaxis.set_minor_locator(MultipleLocator(0.5))
-    axs[0].legend()
+    axs[0].yaxis.set_minor_locator(MultipleLocator(0.1))
+    colored_text_legend(axs[0])
 
     # Second panel: cumulative enrichment as a function of time 
     # for a Solar metallicity SSP
+    agb_studies = ['cristallo11', 'karakas16', 'cristallo11', 'karakas16']
+    mass_scales = [1, 1, 0.5, 0.5]
+    linestyles = ['-', '-', '--', '--']
+    colors = [paultol.bright.colors[i] for i in [0, 1, 0, 1]]
+    markers = ['o', 'o', 's', 's']
+    ms = 3
     for i in range(len(agb_studies)):
         vice.yields.agb.settings['ce'] = adjusted_agb('ce', study=agb_studies[i], mscale=mass_scales[i])
         mass, time = vice.single_stellar_population('ce', Z=0.014, time=END_TIME, dt=1e-3)
         mass = [_ / mass[-1] for _ in mass]
         axs[1].plot(time, mass, ls=linestyles[i], c=colors[i])
+        # Plot median enrichment times
+        idx = 0
+        while mass[idx] < 0.5: idx += 1
+        axs[1].plot(time[idx], 1.0, markers[i], c=colors[i], markersize=ms)
 
     # Compare against Fe from SNe Ia
     mass, time = vice.single_stellar_population('fe', time=END_TIME, dt=1e-3, RIa=plateau(), delay=0.04)
     mass = [_ / mass[-1] for _ in mass]
-    axs[1].plot(time, mass, '-', c=paultol.highcontrast.colors[2], label='Fe; plateau DTD')
+    axs[1].plot(time, mass, '-', c=paultol.bright.colors[2])
+    # Plot median enrichment time
+    idx = 0
+    while mass[idx] < 0.5: idx += 1
+    axs[1].plot(time[idx], 1.0, '^', c=paultol.bright.colors[2], markersize=ms)
 
     axs[1].set_xscale('log')
     axs[1].set_xlim((4e-2, 20))
     axs[1].set_xlabel('Age [Gyr]')
     axs[1].set_ylabel(r'$M_{\rm Ce}/M_{\rm Ce,final}$')
-    axs[1].legend(loc='upper left')
+    axs[1].yaxis.set_minor_locator(MultipleLocator(0.05))
+    axs[1].xaxis.set_major_formatter(FuncFormatter(lambda y, _: '{:g}'.format(y)))
+    axs[1].text(
+        0.5, 0.85, r'$M_{\rm AGB}\times1$', 
+        transform=axs[1].transAxes, 
+        ha='right', va='bottom'
+    )
+    axs[1].text(
+        0.6, 0.5, r'$R_{\rm Ia}$', 
+        color=paultol.bright.colors[2],
+        transform=axs[1].transAxes, 
+        ha='right', va='bottom'
+    )
+    axs[1].text(
+        0.95, 0.05, r'$M_{\rm AGB}\times0.5$', 
+        transform=axs[1].transAxes, 
+        ha='right', va='bottom'
+    )
 
     # Third panel: total enrichment from an SSP as a function of metallicity
     mstar = 1e6
@@ -83,7 +111,7 @@ def main(style='paper'):
     logprefactor = 8
     for i, study in enumerate(['cristallo11', 'karakas16']):
         vice.yields.agb.settings['ce'] = adjusted_agb('ce', study=study)
-        color = paultol.highcontrast.colors[i]
+        color = paultol.bright.colors[i]
         # Get interpolation
         mass_yields = len(logzvals) * [0]
         for j in range(len(logzvals)):
@@ -116,13 +144,15 @@ def main(style='paper'):
             idx = diff.index(min(diff))
             grid_logz.append(logzvals[idx])
             grid_yields.append(mass_yields[idx])
-        axs[2].plot(grid_logz, grid_yields, 'o', color=color)
+        axs[2].plot(grid_logz, grid_yields, '.', color=color)
 
     axs[2].set_xlim((-2.1, 0.6))
-    axs[2].set_ylim((0, None))
+    axs[2].set_ylim((0, 1.5))
     axs[2].set_xlabel(r'$\log_{10}(Z/Z_\odot)$')
     axs[2].set_ylabel(r'$M_{\rm Ce}/M_\star\,[\times10^{-%s}]$' % logprefactor)
     axs[2].xaxis.set_minor_locator(MultipleLocator(0.2))
+    axs[2].yaxis.set_major_locator(MultipleLocator(0.5))
+    axs[2].yaxis.set_minor_locator(MultipleLocator(0.1))
 
     plt.savefig(paths.figures / 'ssp_yields')
     plt.close()
