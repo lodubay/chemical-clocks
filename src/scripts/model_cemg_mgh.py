@@ -53,6 +53,7 @@ def main(style='paper', cmap='Spectral_r'):
     mzs.model_uncertainty(sample, inplace=True)
     for i, rlim in enumerate(RBINS):
         ax = axs[i]
+        ax.set_title(r'$%s\leq R_g<%s$ kpc' % rlim)
         mzs_subset = mzs.region(rlim, absz_lim=ZLIM)
         mzs_subset.scatter_plot(
             ax, '[mg/h]', '[ce/mg]', color='age',
@@ -70,8 +71,8 @@ def main(style='paper', cmap='Spectral_r'):
         plot_kde2D_contours(ax, sample_subset, 'mg_h', 'ce_mg_corr')
     
     # Format axes
-    axs[0].set_xlim((-0.8, 0.6))
-    axs[0].set_ylim((-0.8, 0.8))
+    axs[0].set_xlim((-0.9, 0.6))
+    axs[0].set_ylim((-0.9, 0.7))
     for ax in axs:
         ax.set_xlabel('[Mg/H]')
     axs[0].set_ylabel('[Ce/Mg]', labelpad=-2)
