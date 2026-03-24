@@ -348,9 +348,17 @@ Cerium enrichment in our models proceeds through a prompt, metallicity-independe
 \end{equation}
 This results in a CCSN ``plateau'' of $\bracket[Mg]{Ce}_{\rm CC}=\log_{10}(f_{\rm Ce,\odot}^r) \approx -0.64$, akin to the low-Ia $\bracket[Fe]{\alpha}$ plateau. We have also explored a delayed neutron star merger channel for $r$-process enrichment, but due to the low Solar $r$-process fraction of Ce, it has a small effect on the model evolution.
 
-For AGB stars, we adopt two sets of yield grids: those of \citet[][hereafter C11+C15]{cristallo_evolution_2011,cristallo_evolution_2015}, and those of \citet{karakas_stellar_2016} and \citet[][hereafter KL16+K18]{karakas_heavy-element_2018}. \todo{Figure X shows the dependence of the Ce yield on the mass and metallicity of the AGB stars. The yield peaks sharply at $Z=X$ and the median enrichment time is Y.} We have also tested the yields of \citet{karakas_stellar_2016} and \citet{karakas_heavy-element_2018}. These produce roughly a factor of 2 more Ce, but after scaling our CCSN yields and outflows to match, they predict similar abundance evolution to our fiducial models.
+\begin{figure*}
+    \centering
+    \includegraphics[width=\textwidth]{figures/ssp_yields.pdf}
+    \caption{Caption.}
+    \label{fig:ssp-yields}
+\end{figure*}
 
-% CCSN and SN Ia yields
+For AGB stars, we adopt two sets of yield grids: those of \citet[][hereafter C11+C15]{cristallo_evolution_2011,cristallo_evolution_2015}, and those of \citet{karakas_stellar_2016} and \citet[][hereafter KL16+K18]{karakas_heavy-element_2018}. \todo{Briefly cover the differences between them}. \todo{Figure X shows the dependence of the Ce yield on the mass and metallicity of the AGB stars. The yield peaks sharply at $Z=X$ and the median enrichment time is Y.} We have also tested the yields of \citet{karakas_stellar_2016} and \citet{karakas_heavy-element_2018}. These produce roughly a factor of 2 more Ce, but after scaling our CCSN yields and outflows to match, they predict similar abundance evolution to our fiducial models.
+
+% CCSN yields
+\citet{weinberg_scale_2024} used a measurement of the mean Fe yield of CCSNe by \citet{rodriguez_iron_2023} to calibrate an empirical scale for CCSN yields. They found 
 We adopt the empirical yields of \citet{weinberg_scale_2024} for CCSN and SN Ia nucleosynthesis. These yields are scaled to the mean Fe yield of CCSNe measured by \citet{rodriguez_iron_2023} and assume a CCSN plateau of $\bracket[Fe]{Mg}=+0.45$ to set the Mg yield. The population-averaged SN Ia yield of Fe is
 \begin{equation}
     y_{\rm Fe}^{\rm Ia} = R_{\rm Ia} \bar m_{\rm Fe}^{\rm Ia} = 9.1\times10^{-4},
@@ -370,7 +378,7 @@ For our fiducial model, we adopt the ``inside-out'' star formation history from 
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/model_comparison.pdf}
-    \caption{Comparison of [Ce/Mg]--age trends predicted by multi-zone models. The blue curve represents the gas abundance evolution in fiducial model, and all other curves represent models that differ by one parameter. The gray filled (open) points represent low-Ia (high-Ia) stars in the Solar neighborhood ($7\leq R_g<9\kpc$, $z_{\rm max}<0.5\kpc$) with $-0.1\leq\bracket{Mg}<+0.1$. The gray error bars indicate the median uncertainties for the plotted sample, the $\odot$ symbol marks the Solar age and [Ce/Mg] value, and the $\otimes$ symbol represents the Solar $s$-process fraction \citep{arlandini_neutron_1999}.}
+    \caption{Comparison of [Ce/Mg]--age trends predicted by multi-zone models. The blue curve represents the gas abundance evolution in fiducial model, and all other curves represent models that differ by one parameter. All models adopt the $y/Z_\odot=1$ CCSN yield scale and the C11+C15 AGB yields. The gray filled (open) points represent low-Ia (high-Ia) stars in the Solar neighborhood ($7\leq R_g<9\kpc$, $z_{\rm max}<0.5\kpc$) with $-0.1\leq\bracket{Mg}<+0.1$. The gray error bars indicate the median uncertainties for the plotted sample, the $\odot$ symbol marks the Solar age and [Ce/Mg] value, and the $\otimes$ symbol represents the Solar $s$-process fraction \citep{arlandini_neutron_1999}.}
     \label{fig:model-comparison}
 \end{figure}
 
@@ -390,7 +398,7 @@ In theory, an $r$-process channel with long delay times could increase [Ce/Mg] o
 \begin{figure*}
     \centering
     \includegraphics[width=\linewidth]{figures/model_cemg_mgh.pdf}
-    \caption{Stellar abundance distributions across the Galaxy predicted by the best model. The layout is similar to Figure \ref{fig:median-trends-grid}. Each point represents a model stellar population, color-coded by age. For visual clarity, only a random sample of 10,000 points is plotted in each panel. The dashed curve plots the gas abundance track at the mean radius in each bin. The solid contours show the 10th, 30th, 50th, 70th, and 90th percentiles of the MWM data in each region.}
+    \caption{Stellar abundance distributions in three different radial bins predicted by the model with $y/Z_\odot=2$, KL16+K18, and $M_{\rm AGB}\times0.5$. The layout is similar to Figure \ref{fig:median-trends-grid}. Each point represents a model stellar population, color-coded by age. For visual clarity, only a random sample of 10,000 points is plotted in each panel. The dashed curve plots the gas abundance track at the mean radius in each bin. The solid contours show the 10th, 30th, 50th, 70th, and 90th percentiles of the MWM data in each region.}
 \end{figure*}
 
 % \begin{figure}
