@@ -115,6 +115,7 @@ def main(style='paper', cmap='viridis_r'):
     for ax in axs:
         handles, labels = ax.get_legend_handles_labels()
         leg = colored_text_legend(ax, invert=True, loc='center right')
+    fig.suptitle(r'Models with $M_{\rm AGB}\times0.5$', y=0.92)
 
     plt.savefig(paths.figures / 'model_radius_trends')
     plt.close()
