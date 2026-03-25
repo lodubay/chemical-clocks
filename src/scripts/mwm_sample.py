@@ -8,11 +8,6 @@ from scipy.interpolate import interpn
 from astropy.io import fits
 import astropy.units as u
 import astropy.coordinates as coord
-from galpy.orbit import Orbit
-from galpy.potential import MWPotential2014
-from galpy.actionAngle import estimateDeltaStaeckel
-import gala.dynamics as gd
-import gala.potential as gp
 
 from utils import fits_to_pandas, get_bin_centers
 import paths
@@ -20,6 +15,8 @@ import paths
 LOGG_CUT = (1.0, 3.5)
 TEFF_CUT = (4000, 5500)
 ABUND_ERR_CUT = 0.2
+SNR_CUT = 100
+MET_CUT = -1.5 # Meszaros et al. (2025) recommendation for Ce
 
 def main():
     # Import full DR19 catalog (takes a while)
@@ -55,8 +52,9 @@ def main():
         (mwm_full['sdss4_apogee_extra_target_flags'] == 0) &
         (mwm_full['flag_bad'] == 0) & 
         (mwm_full['spectrum_flags'] == 0) &
-        (mwm_full['snr'] > 100) &
-        (mwm_full['m_h_atm'] > -1.5) & # Meszaros et al. (2025) recommendation
+        # Cuts for accurate Ce abundances
+        (mwm_full['snr'] > SNR_CUT) &
+        (mwm_full['m_h_atm'] > MET_CUT) &
         # RGB
         (mwm_full['logg'] > LOGG_CUT[0]) & 
         (mwm_full['logg'] < LOGG_CUT[1]) &
@@ -96,16 +94,6 @@ def main():
     missing_orbits = sample[sample['Rg'].isna()]
     print('Removing %s stars with missing orbit info...' % missing_orbits.shape[0])
     sample.dropna(subset=['Rg', 'z_max'], axis=0, how='any', inplace=True)
-    # print('Computing orbits...')
-    # rguide, zmax, ecc, energy, Lz = orbit_dynamics(
-    #     mwm_good['ra'], mwm_good['dec'], mwm_good['r_med_photogeo']/1000,
-    #     mwm_good['pmra'], mwm_good['pmde'], mwm_good['v_rad']
-    # )
-    # mwm_good['galpy_r_guide'] = rguide
-    # mwm_good['galpy_z_max'] = zmax
-    # mwm_good['galpy_ecc'] = ecc
-    # mwm_good['galpy_E'] = energy
-    # mwm_good['galpy_Lz'] = Lz
     # Apply log(g) calibrations
     print('Applying log(g) calibrations...')
     sample = logg_calibrations(sample)
@@ -146,75 +134,6 @@ def abundance_ratio(catalog, elem1, elem2='fe_h'):
     ratio = catalog[elem1] - catalog[elem2]
     error = np.sqrt(catalog[f'e_{elem1}']**2 + catalog[f'e_{elem2}']**2)
     return ratio, error
-    
-
-def orbit_dynamics(ra, dec, dist, pmra, pmdec, vrad, approx='staeckel'):
-    """
-    Integrate orbits and compute orbital dynamics with galpy.
-
-    Parameters
-    ----------
-    ra : array-like
-        Right ascension in degrees.
-    dec : array-like
-        Declination in degrees.
-    dist : array-like
-        Distance from Sun in kpc.
-    pmra : array-like
-        Proper motion in RA in mas/yr.
-    pmdec : array-like
-        Proper motion in Dec in mas/yr.
-    vrad : array-like
-        Radial velocity in km/s.
-    approx : str, optional [default: 'staeckel']
-        Type of analytic approximation to use. Passed to galpy methods.
-    """
-    ra = np.array(ra)
-    dec = np.array(dec)
-    dist = np.array(dist)
-    pmra = np.array(pmra)
-    pmdec = np.array(pmdec)
-    vrad = np.array(vrad)
-    args = [ra, dec, dist, pmra, pmdec, vrad]
-    if [ra.shape == a.shape for a in args[1:]]:
-        # Define galactocentric coordinate frame
-        with coord.galactocentric_frame_defaults.set('v4.0'):
-            galcen_frame = coord.Galactocentric()
-        sky_coords = coord.SkyCoord(
-            ra=ra*u.deg, 
-            dec=dec*u.deg, 
-            distance=dist*u.kpc,
-            pm_ra_cosdec=pmra*u.mas/u.yr, 
-            pm_dec=pmdec*u.mas/u.yr,
-            radial_velocity=vrad*u.km/u.s,
-            frame=coord.ICRS()
-        )
-        galcen_coords = sky_coords.transform_to(galcen_frame)
-        orbits = Orbit(galcen_coords)
-        galcen_coords.representation_type = 'cylindrical'
-        delta = estimateDeltaStaeckel(
-            MWPotential2014, 
-            galcen_coords.rho, 
-            galcen_coords.z, 
-            no_median=True
-        )
-        kwargs = dict(pot=MWPotential2014, type=approx, delta=delta)
-        rguide = orbits.rguiding(**kwargs)
-        zmax = orbits.zmax(analytic=True, **kwargs)
-        ecc = orbits.e(analytic=True, **kwargs)
-        energies = orbits.E(pot=MWPotential2014)
-        Lz = orbits.L(pot=MWPotential2014)[:,2]
-        # stars_w0 = gd.PhaseSpacePosition(galcen_coords.data)
-        # mw_potential = gp.MilkyWayPotential()
-        # stars_orbit = mw_potential.integrate_orbit(stars_w0, dt=0.5 * u.Myr, t1=0, t2=4 * u.Gyr, cython_if_possible=True)
-        # rguide = stars_orbit[0].guiding_radius().value
-        # zmax = stars_orbit.zmax().value
-        # ecc = stars_orbit.eccentricity()
-        # energies = stars_orbit.energy()[0].to(u.km**2/u.s**2)
-        # Lz = stars_orbit.angular_momentum()[2,0].to(u.km*u.kpc/u.s)
-        return rguide, zmax, ecc, energies, Lz
-    else:
-        raise ValueError('Input arrays must have the same length.')
 
 
 def add_kinematics(df, id_name='sdss_id', verbose=False):
@@ -282,13 +201,6 @@ def add_kinematics(df, id_name='sdss_id', verbose=False):
             kinematic_dr3.L[:,1],
             kinematic_dr3.L[:,2],
             kinematic_dr3.ecc,
-            # kinematic_dr3.parallax,
-            # kinematic_dr3.ra,
-            # kinematic_dr3.dec,
-            # kinematic_dr3.phot_g_mean_mag,
-            # kinematic_dr3.phot_bp_mean_mag,
-            # kinematic_dr3.phot_rp_mean_mag,
-            # kinematic_dr3.ruwe,
             kinematic_dr3.z_max,
             kinematic_dr3.R_guide,
             kinematic_dr3['flags']
@@ -339,6 +251,20 @@ def compute_upper_limits(df):
 def abund_limit_func(teff, snr, alpha=0, beta=1, gamma=1, delta=1):
     """
     Generic upper limit function based on Teff and S/N from Shetrone et al. (2025).
+
+    Parameters
+    ----------
+    teff : float or array-like
+        Effective temperature in K.
+    snr : float or array-like
+        Signal-to-noise ratio.
+    alpha, beta, gamma, delta : float, optional
+        Element-specific coefficients for the upper limits.
+
+    Returns
+    -------
+    float or array-like
+        Upper limit on [X/H] for the given Teff, S/N, and coefficients.
     """
     return alpha + beta*(teff/1000) + gamma*(np.log10(snr)) + delta*(np.log10(snr))**2
 
@@ -387,6 +313,28 @@ def logg_calibrations(df):
 
 
 def apply_elem_offsets(mgh, logg, xh, offsets, grid):
+    """
+    Apply an offset to an element abundance for a single star.
+    
+    Parameters
+    ----------
+    mgh : float
+        [Mg/H] for the given star.
+    logg : float
+        Surface gravity for the given star.
+    xh : float
+        Abundance value to be calibrated.
+    offsets : array-like
+        Grid of offset values for the given abundance.
+    grid : tuple of ndarray of float
+        The [Mg/H] and log(g) values defining the grid. Passed to
+        scipy.interpolate.interpn.
+
+    Returns
+    -------
+    float
+        log(g)-corrected abundance.
+    """
     interp_point = np.array([mgh, logg])
     star_offset = interpn(grid, offsets, interp_point, bounds_error=False, fill_value=None)[0]
     corr_xh = xh + star_offset
