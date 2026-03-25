@@ -9,7 +9,6 @@ from matplotlib.colors import Normalize, LogNorm, BoundaryNorm
 from matplotlib.ticker import MultipleLocator
 
 from plotting import ONE_COLUMN_WIDTH
-from utils import good_ages
 import paths
 
 XLIM = (-0.7, 0.5)
@@ -17,7 +16,7 @@ YLIM = (-0.8, 0.8)
 
 def main(style='paper'):
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    mwm_rgb = good_ages(mwm_rgb)
+    mwm_rgb = mwm_rgb[mwm_rgb['good_age']].copy()
     plt.style.use(paths.styles / f'{style}.mplstyle')
     fig, ax = plt.subplots(figsize=(ONE_COLUMN_WIDTH, 0.7*ONE_COLUMN_WIDTH))
     cmap = plt.get_cmap('Spectral_r')

@@ -17,38 +17,6 @@ from stats import median_standard_error
 # SCIENCE FUNCTIONS
 # =============================================================================
 
-def good_ages(df):
-    """
-    Perform quality cuts for good StarFlow ages.
-    """
-    return df[
-        (df['training_density'] > 3e9) & # Stone-Martinez et al. (2025) recommendation
-        (df['age'] > 0)
-    ].copy()
-
-
-def apply_alpha_cut(df, buffer=0.02):
-    """
-    Divide sample into high- and low-alpha populations.
-
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        DataFrame with MWM sample.
-    buffer : float [default: 0.02]
-        Buffer in [Mg/Fe] between the dividing line and the start of the 
-        high- or low-alpha populations.
-
-    Returns
-    -------
-    pandas.DataFrame
-        Same dataframe with two new boolean columns, 'high_alpha' and 'low_alpha'.
-    """
-    df['low_alpha'] = df['mg_fe'] < alpha_cut(df['fe_h']) - buffer
-    df['high_alpha'] = df['mg_fe'] > alpha_cut(df['fe_h']) + buffer
-    return df
-
-
 def alpha_cut(feh):
     """
     Dividing line between low- and high-alpha populations at a given [Fe/H].
@@ -68,96 +36,6 @@ def alpha_cut(feh):
         0.09,
         0.09 - 0.13*feh
     )
-
-
-class adjusted_agb(vice.yields.agb.interpolator): 
-    """
-    Provides for manual adjustments to the AGB yield grid for a given study. 
-    Yields can be scaled or shifted in mass and metallicity space.
-
-    Parameters
-    ----------
-    element : str
-    study : str, optional [default: 'cristallo11']
-    amp : float, optional [default: 1]
-        Amplitude of AGB yields. If one, the yield scale is unchanged.
-    dm : float, optional [default: 0]
-        Linear shift to ZAMS mass of AGB progenitors. If positive, input
-        mass is *decreased*, effectively increasing all masses in the grid.
-    Zscale : float, optional [default: 1]
-        Multiplicative shift to metallicity of AGB progenitors. If greater than 
-        one, input metallicity is *decreased* by the given factor, effectively
-        scaling up all metallicities in the grid.
-
-    Inherits from vice.yields.agb.interpolator
-    """
-    def __init__(self, element, study='cristallo11', amp=1, dm=0, Zscale=1):
-        self.amp = amp
-        self.dm = dm
-        self.Zscale = Zscale
-        super().__init__(element, study=study)
-    
-    def __call__(self, mass, metallicity): 
-        return max(
-            self.amp * super().__call__(
-                mass - self.dm, metallicity * 1 / self.Zscale
-            ),
-            0. # prevent negative yields from interpolation
-        )
-    
-    @property
-    def amp(self):
-        """
-        amp : float
-            Amplitude of AGB yields. If one, the yield scale is unchanged.
-        """
-        return self._amp
-    
-    @amp.setter
-    def amp(self, value):
-        if isinstance(value, Number):
-            if value > 0:
-                self._amp = value
-            else:
-                raise ValueError('Yield amplitude must be positive.')
-        else:
-            raise TypeError(f'Parameter "amp" must be numeric, got: {type(value)}')
-    
-    @property
-    def dm(self):
-        """
-        dm : float
-            Linear shift to ZAMS mass of AGB progenitors. If positive, input
-            mass is *decreased*, effectively increasing all masses in the grid.
-        """
-        return self._dm
-    
-    @dm.setter
-    def dm(self, value):
-        if isinstance(value, Number):
-            self._dm = value
-        else:
-            raise TypeError(f'Parameter "dm" must be numeric, got: {type(value)}')
-    
-    @property
-    def Zscale(self):
-        """
-        Zscale : float
-            Multiplicative shift to metallicity of AGB progenitors. If greater 
-            than one, input metallicity is *decreased* by the given factor,
-            effectively scaling up all metallicities in the grid.
-        """
-        return self._Zscale
-    
-    @Zscale.setter
-    def Zscale(self, value):
-        if isinstance(value, Number):
-            if value > 0:
-                self._Zscale = value
-            else:
-                raise ValueError('Zscale must be positive.')
-        else:
-            raise TypeError(f'Parameter "Zscale" must be numeric, got: {type(value)}')
 
 
 # =============================================================================

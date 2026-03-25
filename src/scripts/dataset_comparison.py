@@ -10,7 +10,7 @@ from matplotlib.ticker import MultipleLocator
 from astropy.io import ascii
 
 from mwm_sample import abundance_ratio
-from utils import good_ages, fits_to_pandas
+from utils import fits_to_pandas
 from plotting import truncate_colormap, ONE_COLUMN_WIDTH
 import paths
 
@@ -28,7 +28,7 @@ def main(style='paper'):
 
     # Plot full MWM DR19 sample
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    mwm_ages = good_ages(mwm_rgb)
+    mwm_ages = mwm_rgb[mwm_rgb['good_age']].copy()
     pcm0 = axs[0].hexbin(
         mwm_ages['age'], mwm_ages['ce_mg'],
         C=np.ones(mwm_ages.shape[0]),

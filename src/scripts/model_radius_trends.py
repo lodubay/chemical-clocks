@@ -8,7 +8,7 @@ from matplotlib.ticker import MultipleLocator
 from matplotlib.colors import BoundaryNorm
 import vice
 
-from utils import apply_alpha_cut, binned_quantiles, good_ages, get_bin_centers
+from utils import binned_quantiles, get_bin_centers
 from plotting import colored_text_legend, ONE_COLUMN_WIDTH
 import paths
 from multizone._globals import ZONE_WIDTH
@@ -24,8 +24,7 @@ def main(style='paper', cmap='viridis_r'):
     age_bin_edges = np.arange(-0.5, 11.6, 1)
 
     # Select stars near the midplane with good ages
-    mwm_rgb = apply_alpha_cut(mwm_rgb)
-    lowz_ages = mwm_rgb[(mwm_rgb['z_max'] < 0.5) & (mwm_rgb['use_age'])].copy()
+    lowz_ages = mwm_rgb[(mwm_rgb['z_max'] < 0.5) & (mwm_rgb['good_age'])].copy()
     age_err_low = np.median(lowz_ages['age'] - lowz_ages['e_n_age'])
     age_err_high = np.median(lowz_ages['e_p_age'] - lowz_ages['age'])
     med_abund_err = lowz_ages['e_ce_h'].median()

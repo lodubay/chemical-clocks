@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from utils import good_ages, binned_quantiles, get_bin_centers
+from utils import binned_quantiles, get_bin_centers
 import paths
 from plotting import TWO_COLUMN_WIDTH
 
@@ -14,7 +14,7 @@ CN_AGE_COEF = np.array([-1.721,  0.806,  -0.077,  0.276, -0.643, 10.048])
 
 def main(style='paper'):
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    mwm_rgb = good_ages(mwm_rgb)
+    mwm_rgb = mwm_rgb[mwm_rgb['good_age']].copy()
     mwm_rgb['log_age'] = np.log10(mwm_rgb['age'])
     mwm_rgb = generate_cn_ages(mwm_rgb)
 

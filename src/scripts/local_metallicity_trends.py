@@ -12,7 +12,7 @@ from scipy import stats
 
 from plotting import ONE_COLUMN_WIDTH, insert_colorbar_axes
 from colormaps import paultol
-from utils import good_ages, apply_alpha_cut, sample_rows, get_bin_centers
+from utils import sample_rows, get_bin_centers
 import paths
 
 MET_COL = 'fe_h' # Column with metallicity values
@@ -29,8 +29,7 @@ def main(style='paper'):
 
     # Data
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    mwm_rgb = good_ages(mwm_rgb).copy()
-    mwm_rgb = apply_alpha_cut(mwm_rgb)
+    mwm_rgb = mwm_rgb[mwm_rgb['good_age']].copy()
     local_sample = mwm_rgb[
         (mwm_rgb['Rg'] >= RLIM[0]) &
         (mwm_rgb['Rg'] < RLIM[1]) &

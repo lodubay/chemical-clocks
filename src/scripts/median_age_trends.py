@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from matplotlib.colors import BoundaryNorm, Normalize
 
-from utils import apply_alpha_cut, binned_quantiles, good_ages
+from utils import binned_quantiles
 from plotting import insert_colorbar_axes, colored_text_legend, ONE_COLUMN_WIDTH
 from colormaps import paultol
 import paths
@@ -22,7 +22,6 @@ def main(style='paper', cmap='viridis_r'):
     mg_bin_edges = np.arange(-0.75, 0.76, 0.1)
 
     # Select only low-alpha, near-midplane stars
-    mwm_rgb = apply_alpha_cut(mwm_rgb)
     mwm_rgb['delta_ce_h'] = np.nan * np.ones(mwm_rgb.shape[0])
     all_lowz = mwm_rgb[(mwm_rgb['z_max'] < 0.5)].copy()
 
@@ -69,7 +68,7 @@ def main(style='paper', cmap='viridis_r'):
     xlim = (0, 13)
     ylim = [(-0.5, 0.7), (-0.6, 0.6)]
 
-    lowz_ages = good_ages(all_lowz)
+    lowz_ages = all_lowz[all_lowz['good_age']].copy()
     low_alpha_ages = lowz_ages[lowz_ages['low_alpha']]
     high_alpha_ages = lowz_ages[lowz_ages['high_alpha']]
     for i, col in enumerate(['ce_mg', 'delta_ce_h']):
@@ -135,7 +134,7 @@ def main(style='paper', cmap='viridis_r'):
             )
     fig.colorbar(pcm, cax=cax, orientation='horizontal', extend='max', label='Number of stars')
     # Indicate median abundance errors
-    mwm_rgb_ages = good_ages(mwm_rgb)
+    mwm_rgb_ages = mwm_rgb[mwm_rgb['good_age']].copy()
     age_err_low = np.median(mwm_rgb_ages['age'] - mwm_rgb_ages['e_n_age'])
     age_err_high = np.median(mwm_rgb_ages['e_p_age'] - mwm_rgb_ages['age'])
     med_abund_err = mwm_rgb_ages['e_ce_h'].median()

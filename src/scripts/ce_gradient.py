@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from matplotlib.colors import BoundaryNorm, Normalize
 
-from utils import apply_alpha_cut, binned_quantiles, good_ages
+from utils import binned_quantiles
 from plotting import insert_colorbar_axes, colored_text_legend, ONE_COLUMN_WIDTH
 import paths
 
@@ -21,10 +21,9 @@ def main(style='paper', cmap='jet'):
     fine_ce_bins = np.arange(-0.8, 0.81, 0.05)
 
     # Select only low-alpha, near-midplane stars
-    mwm_rgb = apply_alpha_cut(mwm_rgb)
-    all_lowz = good_ages(mwm_rgb[(mwm_rgb['z_max'] < 0.5)].copy())
-    all_low_alpha = good_ages(mwm_rgb[(mwm_rgb['z_max'] < 0.5) & (mwm_rgb['low_alpha'])].copy())
-    all_high_alpha = good_ages(mwm_rgb[(mwm_rgb['z_max'] < 0.5) & (mwm_rgb['high_alpha'])].copy())
+    all_lowz = mwm_rgb[(mwm_rgb['z_max'] < 0.5) & (mwm_rgb['good_age'])].copy()
+    all_low_alpha = all_lowz[(mwm_rgb['low_alpha'])].copy()
+    all_high_alpha = all_lowz[(mwm_rgb['high_alpha'])].copy()
     
     # Set up figure
     fig, axs = plt.subplots(

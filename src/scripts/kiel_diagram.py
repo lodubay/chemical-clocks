@@ -10,7 +10,6 @@ from matplotlib.ticker import MultipleLocator
 import paths
 from mwm_sample import LOGG_CUT, TEFF_CUT
 from plotting import colored_text_legend, insert_colorbar_axes, TWO_COLUMN_WIDTH
-from utils import good_ages
 from colormaps import paultol
 
 
@@ -32,7 +31,7 @@ def main(style='paper'):
         label='Full sample'
     )
     # Indicate stars with good ages
-    mwm_ages = good_ages(mwm_rgb)
+    mwm_ages = mwm_rgb[mwm_rgb['good_age']].copy()
     axs[0].scatter(
         mwm_ages['teff'], mwm_ages['logg'],
         rasterized=True, s=1, marker='.', edgecolors='none', 

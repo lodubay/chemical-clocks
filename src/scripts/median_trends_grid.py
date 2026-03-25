@@ -7,12 +7,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
-from utils import alpha_cut, binned_quantiles, sample_rows
+from utils import binned_quantiles, sample_rows
 from plotting import setup_hayden_plot, iterate_rz_bins, colored_text_legend
 from colormaps import paultol
 import paths
 
-ALPHA_BUFFER = 0.02 # dex, buffer around the [Mg/Fe] dividing line
 # SAMPLE_FRACTION = 0.25 # fraction of stars to plot in each panel
 SAMPLE_SIZE = 1000 # number of stars to plot in each panel, randomly sampled
 
@@ -20,9 +19,6 @@ def main(style='paper'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    # Divide by low/high alpha
-    mwm_rgb['low_alpha'] = mwm_rgb['mg_fe'] < alpha_cut(mwm_rgb['fe_h']) - ALPHA_BUFFER
-    mwm_rgb['high_alpha'] = mwm_rgb['mg_fe'] > alpha_cut(mwm_rgb['fe_h']) + ALPHA_BUFFER
     # Local sample for comparison
     local_sample = mwm_rgb[
         (mwm_rgb['Rg'] >= 7) &

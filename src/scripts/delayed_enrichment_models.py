@@ -9,8 +9,8 @@ from matplotlib.ticker import MultipleLocator
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import vice
 
+from multizone.src.yields.utils import adjusted_agb
 from onezone_sfh import normalize, expfall, exprise, constant, lateburst
-from utils import alpha_cut, adjusted_agb, good_ages
 from plotting import latex_float, ONE_COLUMN_WIDTH
 from colormaps import paultol
 import paths
@@ -35,7 +35,7 @@ def main(style='paper'):
     
     # Select Solar neighborhood & Solar metallicity stars only
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    mwm_rgb = good_ages(mwm_rgb).copy()
+    mwm_rgb = mwm_rgb[mwm_rgb['good_age']].copy()
     local_sample = mwm_rgb[
         (mwm_rgb['Rg'] >= 7.5) &
         (mwm_rgb['Rg'] < 8.5) &
@@ -44,12 +44,8 @@ def main(style='paper'):
         (mwm_rgb['mg_h'] < 0.1)
     ].copy()
 
-    local_high_alpha = local_sample[
-        local_sample['mg_fe'] >= alpha_cut(local_sample['fe_h'])
-    ]
-    local_low_alpha = local_sample[
-        local_sample['mg_fe'] < alpha_cut(local_sample['fe_h'])
-    ]
+    local_high_alpha = local_sample[local_sample['high_alpha']]
+    local_low_alpha = local_sample[local_sample['low_alpha']]
 
     # Median errors
     age_err_low = np.median(local_sample['age'] - local_sample['e_n_age'])

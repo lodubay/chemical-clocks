@@ -9,7 +9,6 @@ from matplotlib.ticker import MultipleLocator
 import vice
 
 from multizone._globals import ZONE_WIDTH, END_TIME
-from utils import apply_alpha_cut, good_ages
 from plotting import ONE_COLUMN_WIDTH, colored_text_legend
 from colormaps import paultol
 import paths
@@ -25,7 +24,7 @@ def main(style='paper'):
     
     # Select Solar neighborhood & Solar metallicity stars only
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    mwm_rgb = good_ages(mwm_rgb).copy()
+    mwm_rgb = mwm_rgb[mwm_rgb['good_age']].copy()
     local_sample = mwm_rgb[
         (mwm_rgb['Rg'] >= 7) &
         (mwm_rgb['Rg'] < 9) &
@@ -34,7 +33,6 @@ def main(style='paper'):
         (mwm_rgb['mg_h'] < 0.1)
     ].copy()
     # Divide high and low alpha
-    local_sample = apply_alpha_cut(local_sample, buffer=0.02)
     local_high_alpha = local_sample[local_sample['high_alpha']]
     local_low_alpha = local_sample[local_sample['low_alpha']]
 

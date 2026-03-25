@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
-from utils import binned_quantiles, apply_alpha_cut, sample_rows, good_ages
+from utils import binned_quantiles, sample_rows
 from plotting import colored_text_legend, ONE_COLUMN_WIDTH
 from colormaps import paultol
 import paths
@@ -17,8 +17,6 @@ SAMPLE_FRACTION = 0.25
 def main(style='paper'):
     # Import MWM sample
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    # Divide by low/high alpha
-    mwm_rgb = apply_alpha_cut(mwm_rgb)
 
     mg_bin_edges = np.arange(-0.55, 0.56, 0.1)
     age_bin_edges = np.arange(0.5, 11.6, 1)
@@ -66,7 +64,7 @@ def main(style='paper'):
 
     # Scatter plot random sample of points
     sample = sample_rows(
-        good_ages(mwm_rgb_local), 
+        mwm_rgb_local[mwm_rgb_local['good_age']], 
         int(SAMPLE_FRACTION * mwm_rgb_local.shape[0])
     )
     low_alpha_sample = local_low_alpha.loc[sample[sample['low_alpha']].index]
@@ -142,7 +140,7 @@ def main(style='paper'):
     )
     # Plot median trends with age
     low_alpha_age_medians = binned_quantiles(
-        good_ages(local_low_alpha), 'ce_h_corr', 'age',
+        local_low_alpha[local_low_alpha['good_age']], 'ce_h_corr', 'age',
         q=0.5, bin_edges=age_bin_edges, min_count=10
     )
     axs[0,1].plot(
@@ -150,7 +148,7 @@ def main(style='paper'):
         label='High-Ia'
     )
     high_alpha_age_medians = binned_quantiles(
-        good_ages(local_high_alpha), 'ce_h_corr', 'age',
+        local_high_alpha[local_high_alpha['good_age']], 'ce_h_corr', 'age',
         q=0.5, bin_edges=age_bin_edges, min_count=10
     )
     axs[0,1].plot(
@@ -169,7 +167,7 @@ def main(style='paper'):
     )
     # Plot median trends with age
     low_alpha_age_medians = binned_quantiles(
-        good_ages(local_low_alpha), 'delta_ce_h', 'age',
+        local_low_alpha[local_low_alpha['good_age']], 'delta_ce_h', 'age',
         q=0.5, bin_edges=age_bin_edges, min_count=10
     )
     axs[1,1].plot(
@@ -177,7 +175,7 @@ def main(style='paper'):
         label='High-Ia'
     )
     high_alpha_age_medians = binned_quantiles(
-        good_ages(local_high_alpha), 'delta_ce_h', 'age',
+        local_high_alpha[local_high_alpha['good_age']], 'delta_ce_h', 'age',
         q=0.5, bin_edges=age_bin_edges, min_count=10
     )
     axs[1,1].plot(

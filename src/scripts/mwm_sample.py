@@ -9,7 +9,7 @@ from astropy.io import fits
 import astropy.units as u
 import astropy.coordinates as coord
 
-from utils import fits_to_pandas, get_bin_centers
+from utils import fits_to_pandas, get_bin_centers, alpha_cut
 import paths
 
 LOGG_CUT = (1.0, 3.5)
@@ -30,14 +30,14 @@ def main():
         paths.data / 'MWM' / 'StarFlow_summary_v1_0_1.fits'
     )
     # Flag good ages
-    starflow['use_age'] = (
+    starflow['good_age'] = (
         (starflow['training_density'] > 3e9) & # Stone-Martinez et al. (2025) recommendation
         (starflow['age'] > 0)
     )
     # ensure SDSS IDs are the same between DR19 and StarFlow in every row
     assert np.all(np.where(mwm_full['sdss_id'] == starflow['sdss_id'], 1, 0))
     mwm_full = mwm_full.join(
-        starflow[['age', 'e_p_age', 'e_n_age', 'training_density', 'BITMASK', 'use_age']]
+        starflow[['age', 'e_p_age', 'e_n_age', 'good_age']]
     )
     # Drop contamination & confusion flag
     mwm_full.drop(labels='cc_flg', axis=1, inplace=True)
@@ -85,6 +85,8 @@ def main():
     sample['fe_mg'], sample['e_fe_mg'] = abundance_ratio(sample, 'fe', 'mg')
     sample['ce_mg'], sample['e_ce_mg'] = abundance_ratio(sample, 'ce', 'mg')
     sample['ce_fe'], sample['e_ce_fe'] = abundance_ratio(sample, 'ce', 'fe')
+    sample['mn_mg'], sample['e_mn_mg'] = abundance_ratio(sample, 'mn', 'mg')
+    sample['al_fe'], sample['e_al_fe'] = abundance_ratio(sample, 'al', 'fe')
     sample['c_n'], sample['e_c_n'] = abundance_ratio(sample, 'c', 'n')
     # Require Gaia distances
     sample.dropna(axis=0, how='any', subset=['r_med_photogeo'], inplace=True)
@@ -97,6 +99,8 @@ def main():
     # Apply log(g) calibrations
     print('Applying log(g) calibrations...')
     sample = logg_calibrations(sample)
+    # Apply [alpha/Fe] population cut
+    sample = apply_alpha_cut(sample)
 
     # Export catalogs
     print('Exporting high-quality RGB sample (sample.csv)...')
@@ -339,6 +343,28 @@ def apply_elem_offsets(mgh, logg, xh, offsets, grid):
     star_offset = interpn(grid, offsets, interp_point, bounds_error=False, fill_value=None)[0]
     corr_xh = xh + star_offset
     return corr_xh
+
+
+def apply_alpha_cut(df, buffer=0.02):
+    """
+    Divide sample into high- and low-alpha populations.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        DataFrame with MWM sample.
+    buffer : float [default: 0.02]
+        Buffer in [Mg/Fe] between the dividing line and the start of the 
+        high- or low-alpha populations.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Same dataframe with two new boolean columns, 'high_alpha' and 'low_alpha'.
+    """
+    df['low_alpha'] = df['mg_fe'] < alpha_cut(df['fe_h']) - buffer
+    df['high_alpha'] = df['mg_fe'] > alpha_cut(df['fe_h']) + buffer
+    return df
     
 
 if __name__ == '__main__':

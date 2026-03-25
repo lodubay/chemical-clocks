@@ -10,7 +10,7 @@ from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MultipleLocator
 from matplotlib.cm import ScalarMappable
 
-from utils import get_bin_centers, binned_quantiles, apply_alpha_cut
+from utils import get_bin_centers, binned_quantiles
 from plotting import truncate_colormap, insert_colorbar_axes, ONE_COLUMN_WIDTH
 import paths
 
@@ -30,7 +30,6 @@ def main(style='paper', cmap_name='autumn'):
 
     # Load MWM data
     calib_data = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    calib_data = apply_alpha_cut(calib_data)
     calib_data['fe_mg'] = -calib_data['mg_fe']
 
     # Plot

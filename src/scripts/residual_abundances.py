@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
-from utils import alpha_cut, binned_quantiles, sample_rows, good_ages
+from utils import binned_quantiles, sample_rows
 from plotting import colored_text_legend, TWO_COLUMN_WIDTH
 from colormaps import paultol
 import paths
@@ -22,9 +22,6 @@ def main(style='paper'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    # Divide by low/high alpha
-    mwm_rgb['low_alpha'] = mwm_rgb['mg_fe'] < alpha_cut(mwm_rgb['fe_h']) - ALPHA_BUFFER
-    mwm_rgb['high_alpha'] = mwm_rgb['mg_fe'] > alpha_cut(mwm_rgb['fe_h']) + ALPHA_BUFFER
 
     mg_bin_edges = np.arange(-0.75, 0.76, 0.1)
     age_bin_edges = np.arange(0.5, 11.6, 1)
@@ -60,11 +57,11 @@ def main(style='paper'):
     )
     # Calculate median trend with age (only stars with good ages)
     local_low_alpha_age_medians = binned_quantiles(
-        good_ages(local_low_alpha), 'delta_ce_h', 'age',
+        local_low_alpha[local_low_alpha['good_age']], 'delta_ce_h', 'age',
         q=0.5, bin_edges=age_bin_edges, min_count=10
     )
     local_high_alpha_age_medians = binned_quantiles(
-        good_ages(local_high_alpha), 'delta_ce_h', 'age',
+        local_high_alpha[local_high_alpha['good_age']], 'delta_ce_h', 'age',
         q=0.5, bin_edges=age_bin_edges, min_count=10
     )
 
@@ -94,7 +91,7 @@ def main(style='paper'):
             high_alpha = subset[subset['high_alpha']].copy()
             # Select random sample of stars for scatter plot (good ages only)
             sample = sample_rows(
-                good_ages(subset), 
+                subset[subset['good_age']], 
                 # int(SAMPLE_FRACTION * subset.shape[0])
                 SAMPLE_SIZE
             )
@@ -119,7 +116,7 @@ def main(style='paper'):
                 )
                 # Plot median trend with age
                 age_medians = binned_quantiles(
-                    good_ages(low_alpha), 'delta_ce_h', 'age',
+                    low_alpha[low_alpha['good_age']], 'delta_ce_h', 'age',
                     q=0.5, bin_edges=age_bin_edges, min_count=10
                 )
                 ax.plot(
@@ -144,7 +141,7 @@ def main(style='paper'):
                 )
                 # Plot median trend with age
                 age_medians = binned_quantiles(
-                    good_ages(high_alpha), 'delta_ce_h', 'age',
+                    high_alpha[high_alpha['good_age']], 'delta_ce_h', 'age',
                     q=0.5, bin_edges=age_bin_edges, min_count=10
                 )
                 ax.plot(
@@ -163,7 +160,7 @@ def main(style='paper'):
             # Horizontal line for reference
             ax.plot([0, 12], [0, 0], linestyle=':', color='gray', zorder=0)
     # Indicate median abundance errors
-    mwm_rgb_ages = good_ages(mwm_rgb)
+    mwm_rgb_ages = mwm_rgb[mwm_rgb['good_age']]
     age_err_low = np.median(mwm_rgb_ages['age'] - mwm_rgb_ages['e_n_age'])
     age_err_high = np.median(mwm_rgb_ages['e_p_age'] - mwm_rgb_ages['age'])
     med_abund_err = mwm_rgb_ages['e_ce_h'].median()
