@@ -11,9 +11,7 @@ from matplotlib.ticker import MultipleLocator
 
 import paths
 from plotting import TWO_COLUMN_WIDTH, colored_text_legend
-from mwm_sample import abundance_ratio
 from colormaps import paultol
-from utils import apply_alpha_cut
 
 DENSITY_COLORMAP = 'binary_r'
 
@@ -21,8 +19,6 @@ DENSITY_COLORMAP = 'binary_r'
 def main(style='paper'):
     # Get data
     data = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    data['mn_mg'], data['e_mn_mg'] = abundance_ratio(data, 'mn', 'mg')
-    data['al_fe'], data['e_al_fe'] = abundance_ratio(data, 'al', 'fe')
     # Upper limits from Shetrone et al. (2025)
     data = data[data['lim_ce_h_flag'] == 0]
     # Kinematically-selected halo
@@ -31,7 +27,6 @@ def main(style='paper'):
     # Kinematically-selected disk stars
     disk = data[data['E']/1e5 < halo_ELz_cut(data['Lz']/1e3)].copy()
     # disk = data[(data['z_max'] < 3) & (data['vphi'] < -120)]
-    disk = apply_alpha_cut(disk)
     low_ia = disk[disk['high_alpha']]
     # Chemically-selected accreted stars
     accreted = halo[halo['mn_mg'] < halo_chem_cut(halo['al_fe'])]
@@ -72,7 +67,7 @@ def main(style='paper'):
     ax0.xaxis.set_minor_locator(MultipleLocator(0.5))
     ax0.yaxis.set_major_locator(MultipleLocator(0.5))
     ax0.yaxis.set_minor_locator(MultipleLocator(0.1))
-    xlim = (-5, 5)
+    xlim = (-6.5, 4.5)
     ylim = (-2.5, 0)
     ax0.set_xlim(xlim)
     ax0.set_ylim(ylim)
@@ -97,15 +92,15 @@ def main(style='paper'):
         **scatter_kwargs
     )
     # Indicate boundary
-    Lz_arr = np.arange(-5, 5.1, 0.1)
+    Lz_arr = np.arange(-6.5, 5.1, 0.1)
     ax0.plot(Lz_arr, halo_ELz_cut(Lz_arr), '-', color='k')
     ax0.text(
-        2, -0.5, 'Halo', 
+        1.5, -0.5, 'Halo', 
         fontsize=plt.rcParams['axes.titlesize'], 
         color=halo_color
     )
     ax0.text(
-        -3.5, -2, 'Disk', 
+        -4, -2, 'Disk', 
         fontsize=plt.rcParams['axes.titlesize']
     )
 
@@ -157,7 +152,7 @@ def main(style='paper'):
 
     # [Ce/Mg] - [Mg/H] plane
     ax2.set_xlabel('[Mg/H]')
-    ax2.set_ylabel(r'[Ce/Mg]$_{\rm corr}$')
+    ax2.set_ylabel('[Ce/Mg]')
     ax2.xaxis.set_major_locator(MultipleLocator(0.5))
     ax2.xaxis.set_minor_locator(MultipleLocator(0.1))
     ax2.yaxis.set_major_locator(MultipleLocator(0.5))
@@ -168,7 +163,7 @@ def main(style='paper'):
     ax2.set_ylim(ylim)
     scatter_kwargs['s'] = 8
     pc = ax2.hexbin(
-        disk['mg_h'], disk['ce_mg_corr'],
+        disk['mg_h'], disk['ce_mg'],
         C=np.ones(disk.shape[0]),
         gridsize=(50, 18),
         zorder=1,
@@ -182,42 +177,97 @@ def main(style='paper'):
     )
     # Plot chemically-selected accreted stars
     ax2.scatter(
-        accreted['mg_h'], accreted['ce_mg_corr'],
+        accreted['mg_h'], accreted['ce_mg'],
         c=accreted_color, marker='D', zorder=2,
         label='Accreted',
         **scatter_kwargs
     )
     # Plot in-situ halo stars
     ax2.scatter(
-        insitu['mg_h'], insitu['ce_mg_corr'], 
+        insitu['mg_h'], insitu['ce_mg'], 
         c=insitu_color, marker='o', zorder=1,
         label=insitu_label,
         **scatter_kwargs
     )
-    # Rolling median of low-Ia stars
-    sorted_low_ia = low_ia.sort_values('mg_h')[['mg_h', 'ce_mg_corr']]
+    # Rolling median, 16th and 84th percentiles of low-Ia stars
+    sorted_low_ia = low_ia.sort_values('mg_h')[['mg_h', 'ce_mg']]
     rolling_low_ia = sorted_low_ia.rolling(
         1000, min_periods=1000, step=100, on='mg_h', center=True
-    ).median()
-    ax2.plot(rolling_low_ia['mg_h'], rolling_low_ia['ce_mg_corr'], 'w-', linewidth=2)
+    )
     ax2.plot(
-        rolling_low_ia['mg_h'], rolling_low_ia['ce_mg_corr'], 
+        rolling_low_ia['mg_h'].median(), rolling_low_ia['ce_mg'].median(), 
+        'w-', linewidth=2
+    )
+    ax2.plot(
+        rolling_low_ia['mg_h'].median(), rolling_low_ia['ce_mg'].median(), 
         '--', color=low_ia_color, label='Low-Ia'
     )
+    # Indicate dispersion
+    # for q in [0.16, 0.84]:
+    #     ax2.plot(
+    #         rolling_low_ia['mg_h'].quantile(q), 
+    #         rolling_low_ia['ce_mg'].quantile(q), 
+    #         'w-', linewidth=2
+    #     )
+    #     ax2.plot(
+    #         rolling_low_ia['mg_h'].quantile(q), 
+    #         rolling_low_ia['ce_mg'].quantile(q), 
+    #         ':', color=low_ia_color
+    #     )
     # Rolling median of in-situ stars
-    sorted_insitu = insitu.sort_values('mg_h')[['mg_h', 'ce_mg_corr']]
+    sorted_insitu = insitu.sort_values('mg_h')[['mg_h', 'ce_mg']]
     rolling_insitu = sorted_insitu.rolling(
         100, min_periods=100, step=10, on='mg_h', center=True
-    ).median()
-    ax2.plot(rolling_insitu['mg_h'], rolling_insitu['ce_mg_corr'], 'w-', linewidth=2)
-    ax2.plot(rolling_insitu['mg_h'], rolling_insitu['ce_mg_corr'], '-', color=insitu_color)
+    )
+    ax2.plot(
+        rolling_insitu['mg_h'].median(), 
+        rolling_insitu['ce_mg'].median(), 
+        'w-', linewidth=2
+    )
+    ax2.plot(
+        rolling_insitu['mg_h'].median(), 
+        rolling_insitu['ce_mg'].median(), 
+        '-', color=insitu_color
+    )
+    # Indicate dispersion
+    # for q in [0.16, 0.84]:
+    #     ax2.plot(
+    #         rolling_insitu['mg_h'].quantile(q), 
+    #         rolling_insitu['ce_mg'].quantile(q), 
+    #         'w-', linewidth=2
+    #     )
+    #     ax2.plot(
+    #         rolling_insitu['mg_h'].quantile(q), 
+    #         rolling_insitu['ce_mg'].quantile(q), 
+    #         ':', color=insitu_color
+    #     )
     # Rolling median of accreted stars
-    sorted_accreted = accreted.sort_values('mg_h')[['mg_h', 'ce_mg_corr']]
+    sorted_accreted = accreted.sort_values('mg_h')[['mg_h', 'ce_mg']]
     rolling_accreted = sorted_accreted.rolling(
         100, min_periods=100, step=10, on='mg_h', center=True
-    ).median()
-    ax2.plot(rolling_accreted['mg_h'], rolling_accreted['ce_mg_corr'], 'w-', linewidth=2)
-    ax2.plot(rolling_accreted['mg_h'], rolling_accreted['ce_mg_corr'], '-', color=accreted_color)
+    )
+    ax2.plot(
+        rolling_accreted['mg_h'].median(), 
+        rolling_accreted['ce_mg'].median(), 
+        'w-', linewidth=2
+    )
+    ax2.plot(
+        rolling_accreted['mg_h'].median(), 
+        rolling_accreted['ce_mg'].median(), 
+        '-', color=accreted_color
+    )
+    # Indicate dispersion
+    # for q in [0.16, 0.84]:
+    #     ax2.plot(
+    #         rolling_accreted['mg_h'].quantile(q), 
+    #         rolling_accreted['ce_mg'].quantile(q), 
+    #         'w-', linewidth=2
+    #     )
+    #     ax2.plot(
+    #         rolling_accreted['mg_h'].quantile(q), 
+    #         rolling_accreted['ce_mg'].quantile(q), 
+    #         ':', color=accreted_color
+    #     )
     # Indicate grid edges
     mgh_arr = np.arange(-2.5, 1.25, 0.25)
     ax2.plot(mgh_arr, -2.1 - mgh_arr, 'k:') # edge of stars flagged bad
@@ -249,8 +299,9 @@ def halo_ELz_cut(Lz):
     """
     Arbitrary halo cut - find a better one in the literature
     """
-    # return -0.55 - np.exp(Lz / 2.5)
-    return -0.7 - np.exp(Lz / 1.5)
+    # # return -0.55 - np.exp(Lz / 2.5)
+    return np.where(Lz<-3, 0, -0.7 - np.exp(Lz / 1.5))
+    # return -0.6 - np.exp(Lz / 1.2)
     # return np.where(Lz<0, -0.7 - np.exp(Lz / 1.5), -3)
 
 
