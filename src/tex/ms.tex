@@ -39,15 +39,16 @@
 \email{}
 \affiliation{}
 % Jennifer Johnson
+% James Johnson
 % Keith Hawkins
 % Tawny Sit (log(g) corrections)
 % Natalie Myers (open clusters)
-% James Johnson
 % Adrian Price-Whelan (orbits)
 \shortauthors{Dubay et al.}
 
 \begin{abstract}
     Abstract.
+    The observed trend requires a delay time for Ce enrichment an order of magnitude longer than predicted by theoretical yields for AGB stars.
 \end{abstract}
 
 \section{Introduction}
@@ -338,40 +339,41 @@ We confirm the global correlation between [Ce/Mg] and age in the MWM DR19 datase
 
 \subsection{Model Setup}
 
-We next attempt to match the observed trends with a multi-zone chemical evolution model. We adopt the same basic setup as the models of \citet{johnson_stellar_2021}. Using the Versatile Integrator for Chemical Evolution \citep[VICE;][]{johnson_impact_2020}, we model the disk as a series of concentric rings with a width of 100 pc, each of which is a separate one-zone GCE model with instantaneous mixing. Stellar populations migrate between zones according to the prescription of \citet{dubay_galactic_2024}, and may enrich the zones they travel through with the products of SN Ia and AGB nucleosynthesis.
+We next attempt to match the observed trends with a multi-zone chemical evolution model. We adopt the same basic setup as the models of \citet{johnson_stellar_2021}. Using the Versatile Integrator for Chemical Evolution \citep[VICE;][]{johnson_impact_2020}, we model the disk as a series of concentric rings with a width of 100 pc, each of which is a separate one-zone GCE model with instantaneous mixing. Stellar populations migrate between zones according to the prescription of \citet{dubay_galactic_2024}, and may enrich the zones they travel through with the products of SN Ia and AGB nucleosynthesis. We adopt a \citet{kroupa_variation_2001} initial mass function (IMF).
 
 % AGB yields
-Cerium enrichment in our models proceeds through a prompt, metallicity-independent $r$-process channel, and a delayed, metallicity-dependent $s$-process channel. We assume that massive stars contribute the $r$-process yield. Adopting a Solar $r$-process fraction for Ce of $f_{\rm Ce,\odot}^r=0.23$ \citep{arlandini_neutron_1999}, we assign the CCSN yield of Ce to be
+Cerium enrichment in our models proceeds through a prompt, metallicity-independent $r$-process channel, and a delayed, metallicity-dependent $s$-process channel. We assume that massive stars contribute the $r$-process yield. Assuming a Solar $r$-process fraction for Ce of $f_{\rm Ce,\odot}^r=0.23$ \citep{arlandini_neutron_1999}, we assign the CCSN yield of Ce to be
 \begin{equation}
     y_{\rm Ce}^{\rm CC} = f_{\rm Ce,\odot}^r (Z_{\rm Ce,\odot} / Z_{\rm Mg,\odot}) y_{\rm Mg}^{\rm CC}.
     \label{eq:rproc-yield}
 \end{equation}
-This results in a CCSN ``plateau'' of $\bracket[Mg]{Ce}_{\rm CC}=\log_{10}(f_{\rm Ce,\odot}^r) \approx -0.64$, akin to the low-Ia $\bracket[Fe]{\alpha}$ plateau. We have also explored a delayed neutron star merger channel for $r$-process enrichment, but due to the low Solar $r$-process fraction of Ce, it has a small effect on the model evolution.
+This results in a CCSN ``plateau'' of $\bracket[Mg]{Ce}_{\rm CC}=\log_{10}(f_{\rm Ce,\odot}^r) \approx -0.64$, akin to the low-Ia $\bracket[Fe]{\alpha}$ plateau. We have also explored a delayed neutron star merger channel for $r$-process enrichment, but due to the low Solar $r$-process fraction of Ce, it has a small effect on our models.
 
 \begin{figure*}
     \centering
     \includegraphics[width=\textwidth]{figures/ssp_yields.pdf}
-    \caption{Caption.}
+    \caption{{\it Left:} The IMF-weighted Ce mass yield from AGB stars as a function of ZAMS mass at Solar metallicity. {\it Center:} The net mass of Ce produced by AGB stars over time from a single stellar population at Solar metallicity. The $y$-axis is normalized to the value at $t=13.2\Gyr$. The solid curves represent the un-altered yields, the dashed curves plot the mass-scaled yields with $M_{\rm AGB}\times0.5$, and the green curve plots the cumulative SN Ia enrichment curve for reference. The points along the top axis indicate the ages at which 50\% of the total mass has been produced by the un-altered yields (circles), SN Ia yield (triangle), and mass-scaled yields (squares). {\it Right:} The mass of Ce produced by a $13.2\Gyr$ old stellar population as a function of metallicity normalized by the initial mass. The points mark values of the metallicity grid for each study, the solid lines represent linear interpolation between each grid value, and the dotted lines represent a linear extrapolation beyond the grid boundaries. \todo{Is the middle panel necessary? I could just state the median delay times; plus $R_{\rm Ia}$ isn't relevant to the paper.}}
     \label{fig:ssp-yields}
 \end{figure*}
 
-For AGB stars, we adopt two sets of yield grids: those of \citet[][hereafter C11+C15]{cristallo_evolution_2011,cristallo_evolution_2015}, and those of \citet{karakas_stellar_2016} and \citet[][hereafter KL16+K18]{karakas_heavy-element_2018}. \todo{Briefly cover the differences between them}. \todo{Figure X shows the dependence of the Ce yield on the mass and metallicity of the AGB stars. The yield peaks sharply at $Z=X$ and the median enrichment time is Y.} We have also tested the yields of \citet{karakas_stellar_2016} and \citet{karakas_heavy-element_2018}. These produce roughly a factor of 2 more Ce, but after scaling our CCSN yields and outflows to match, they predict similar abundance evolution to our fiducial models.
+For AGB stars, we explore two sets of yield grids: those of \citet[][hereafter C11+C15]{cristallo_evolution_2011,cristallo_evolution_2015}, and those of \citet{karakas_stellar_2016} and \citet[][hereafter KL16+K18]{karakas_heavy-element_2018}. \todo{Briefly cover the differences between them}. Figure \ref{fig:ssp-yields} shows the dependence of the Ce yield on mass and metallicity. For both yield sets, most Ce is produced by $2-3\Msun$ AGB stars, resulting in a median enrichment timescale of $\sim600\Myr$. The yield also peaks at $\bracket{M}\approx-0.4$ and declines sharply above Solar metallicity for both sets, although the KL16+K18 yields produce more Ce overall by roughly a factor of 2.
 
 % CCSN yields
-\citet{weinberg_scale_2024} used a measurement of the mean Fe yield of CCSNe by \citet{rodriguez_iron_2023} to calibrate an empirical scale for CCSN yields. They found 
-We adopt the empirical yields of \citet{weinberg_scale_2024} for CCSN and SN Ia nucleosynthesis. These yields are scaled to the mean Fe yield of CCSNe measured by \citet{rodriguez_iron_2023} and assume a CCSN plateau of $\bracket[Fe]{Mg}=+0.45$ to set the Mg yield. The population-averaged SN Ia yield of Fe is
-\begin{equation}
-    y_{\rm Fe}^{\rm Ia} = R_{\rm Ia} \bar m_{\rm Fe}^{\rm Ia} = 9.1\times10^{-4},
-\end{equation}
-assuming a time-integrated SN Ia rate of $R_{\rm Ia}=\SI{1.3e-3}{\per\Msun}$ \citep{maoz_star_2017} and a mean Fe yield per SN Ia of $\bar m_{\rm Fe}^{\rm Ia}=0.7\Msun$ \citep{howell_effect_2009}. These yields are a factor of $\sim2-3$ lower than theoretical predictions, but can still reproduce present-day gas abundances by appropriately scaling the outflows \citep[e.g.,][]{johnson_milky_2025}. For the SN Ia delay-time distribution, we adopt the ``plateau DTD'' of \citet{dubay_galactic_2024}, which reproduces the low-Ia sequence more closely than a $t^{-1}$ power-law.
+In order for our models to reach a consistent value of [Ce/Mg], we adopt a different CCSN yield scale for each AGB yield set. 
+\citet{weinberg_scale_2024} used a measurement of the mean Fe yield of CCSNe by \citet{rodriguez_iron_2023} to calibrate an empirical scale for CCSN yields. They found that the population-averaged yield of Mg is approximately equal to the Solar abundance, in other words $y_{\rm Mg}^{\rm CC}/Z_{\rm Mg,\odot}\approx1$. In comparison, theoretical yield predictions typically range over $y^{\rm CC}/Z_\odot\approx2-3$. We find that in order for our models to reach super-Solar [Ce/Mg] by the present day, we require $y^{\rm CC}/Z_\odot=1$ for the C11+C15 yields and $y^{\rm CC}/Z_\odot=1$ for the KL16+K18 yields. \citet{johnson_milky_2025} discuss the consequences of the CCSN yield scale on the chemical evolution of the Milky Way disk. We adopt the Solar abundances of \citet{asplund_chemical_2009}, and we adopt $y_{\rm Mg}^{\rm CC}=7.06\times10^{-4}$ for $y/Z_\odot=1$ and $y_{\rm Mg}^{\rm CC}=1.41\times10^{-3}$ for $y/Z_\odot=2$.
+% We adopt the empirical yields of \citet{weinberg_scale_2024} for CCSN and SN Ia nucleosynthesis. These yields are scaled to the mean Fe yield of CCSNe measured by \citet{rodriguez_iron_2023} and assume a CCSN plateau of $\bracket[Fe]{Mg}=+0.45$ to set the Mg yield. The population-averaged SN Ia yield of Fe is
+% \begin{equation}
+%     y_{\rm Fe}^{\rm Ia} = R_{\rm Ia} \bar m_{\rm Fe}^{\rm Ia} = 9.1\times10^{-4},
+% \end{equation}
+% assuming a time-integrated SN Ia rate of $R_{\rm Ia}=\SI{1.3e-3}{\per\Msun}$ \citep{maoz_star_2017} and a mean Fe yield per SN Ia of $\bar m_{\rm Fe}^{\rm Ia}=0.7\Msun$ \citep{howell_effect_2009}. These yields are a factor of $\sim2-3$ lower than theoretical predictions, but can still reproduce present-day gas abundances by appropriately scaling the outflows \citep[e.g.,][]{johnson_milky_2025}. For the SN Ia delay-time distribution, we adopt the ``plateau DTD'' of \citet{dubay_galactic_2024}, which reproduces the low-Ia sequence more closely than a $t^{-1}$ power-law.
 
-We adopt an exponential prescription for the outflow mass-loading factor:
+We use a prescription for mass-loaded outflows to reproduce the present-day gas metallicity as a function of radius. We implement an exponential prescription for the outflow mass-loading factor:
 \begin{equation}
     \eta \equiv \frac{\dot\Sigma_{\rm gas}}{\dot\Sigma_\star} = \eta_\odot \exp\Big(\frac{R_{\rm gal}-R_\odot}{R_\eta}\Big),
 \end{equation}
-where we take $\eta_\odot=0.4$ and $R_\eta=5\kpc$ to reproduce a radial metallicity gradient of $-0.06\dex\kpc^{-1}$ \citep{mendez-delgado_gradients_2022}. \citet{johnson_milky_2025} discuss the motivation behind this prescription and the evidence for mass-loaded outflows in detail.
+where we adopt $\eta_\odot=0.4$ and $R_\eta=5\kpc$ to reproduce a radial metallicity gradient of $-0.06\dex\kpc^{-1}$ \citep{mendez-delgado_gradients_2022}. This is a practical choice to reproduce stellar abundances across the Milky Way disk with few additional parameters. \citet{johnson_milky_2025} discuss the for mass-loaded outflows in disk galaxies. Similar results can also be achieved using radial gas flows, but their implementation in GCE models is less straightforward \citep{johnson_constraints_2025}.
 
-For our fiducial model, we adopt the ``inside-out'' star formation history from \citet{johnson_stellar_2021}. This SFH can reproduce the \citet{feuillet_spatial_2019} stellar age--metallicity and age--[$\alpha$/Fe] relations across the disk, although it does not reproduce the Milky Way's $\alpha$-bimodality \citep{johnson_stellar_2021}. Our primary goal is to explain the Ce abundance patterns in the high-Ia population, but the lack of a distinct low-Ia disk is a limitation of our models. Star formation proceeds according to a \citet{schmidt_rate_1959} law $\dot\Sigma_\star\propto\Sigma_g^k$ with $k=1.5$ \citep{kennicutt_global_1998}, with the detailed implementation described by \citet{johnson_milky_2025}. The star formation rate in each zone is normalized to reproduce the double-exponential radial stellar density profile of \citet{bland-hawthorn_galaxy_2016}.
+For our fiducial model, we adopt the ``inside-out'' star formation history from \citet{johnson_stellar_2021}. This SFH can reproduce the stellar age--metallicity and age--[$\alpha$/Fe] relations across the disk from \citet{feuillet_spatial_2019}, although it does not reproduce the Milky Way's $\alpha$-bimodality \citep{johnson_stellar_2021}. Our primary goal is to explain the Ce abundance patterns in high-Ia stars, but the lack of a distinct low-Ia population is a limitation of our models. Star formation proceeds according to a \citet{schmidt_rate_1959} law $\dot\Sigma_\star\propto\Sigma_g^k$ with $k=1.5$ \citep{kennicutt_global_1998}, with the detailed implementation described by \citet{johnson_milky_2025}. The star formation rate in each zone is normalized to reproduce the double-exponential radial stellar density profile of \citet{bland-hawthorn_galaxy_2016}.
 
 \subsection{Model Results}
 
@@ -382,11 +384,20 @@ For our fiducial model, we adopt the ``inside-out'' star formation history from 
     \label{fig:model-comparison}
 \end{figure}
 
-Figure \ref{fig:model-comparison} compares the predicted [Ce/Mg]--age relation from our models against observed trends for Solar-metallicity stars in the Solar neighborhood. The fiducial model starts at the CCSN plateau of $\bracket[Mg]{Ce}_{\rm CC}\approx -0.64$ and rises steadily to a maximum of $\bracket[Mg]{Ce}\approx+0.2$ at a lookback time of 7 Gyr, then slowly declines by $\sim0.1\dex$ to the present day. The model completely fails to reproduce the trend observed in the data, over-predicting [Ce/Mg] for the oldest stars and under-predicting for the youngest. The model also fails to reproduce the Solar [Ce/Mg] at the age of the Sun, which could be fixed by scaling down the AGB yield by $\sim30\%$, although this would worsen the under-prediction for the youngest stars. \todo{This may not be as big of a problem if the Sun was born at a smaller radius, where [Ce/Mg] ratios are lower.}
-
-We explore two modifications to the star formation history in Figure \ref{fig:model-comparison}. First, we reduce the SFE by half (i.e., doubling $\tau_\star$), which leads to a more gradual increase in [Ce/Mg] over time \todo{(why?)}. This alleviates the over-prediction problem for old stars, but results in a [Ce/Mg]--age relation that is flat, not increasing, over the past $5\Gyr$. Reducing the SFE also worsens agreement with the data in the [Fe/Mg]--[Mg/H] plane. \todo{Second, we add a Gaussian burst in the SFR.}
+Figure \ref{fig:model-comparison} compares the predicted [Ce/Mg]--age relation from our models against observed trends for Solar-metallicity stars in the Solar neighborhood. These models all adopt the $y/Z_\odot=1$ and C11+C15 yields, but the models at the higher yield scale show similar trends. The fiducial model starts at the CCSN plateau of $\bracket[Mg]{Ce}_{\rm CC}\approx -0.64$ and rises steadily to a maximum of $\bracket[Mg]{Ce}\approx+0.2$ at a lookback time of 7 Gyr, then slowly declines by $\sim0.1\dex$ to the present day. The model completely fails to reproduce the trend observed in the data, over-predicting [Ce/Mg] for the oldest stars and under-predicting for the youngest. The fiducial model also fails to reproduce the Solar [Ce/Mg] at the age of the Sun, which could be fixed by scaling down the AGB yield by $\sim30\%$, although this would worsen the under-prediction for the youngest stars. 
+% \todo{This may not be as big of a problem if the Sun was born at a smaller radius, where [Ce/Mg] ratios are lower.}
 
 In theory, an $r$-process channel with long delay times could increase [Ce/Mg] over time. However, Figure \ref{fig:model-comparison} illustrates that the $r$-process contribution is small, $\sim0.1\dex$, over most of the model's evolution. The Solar $r/s$ ratio would need to be much higher than expected in order for a delayed $r$-process channel to have a significant effect at late times.
+
+We explore two modifications to the star formation history in Figure \ref{fig:model-comparison}. First, we reduce the star formation efficiency (SFE) by half (i.e., doubling $\tau_\star$), which leads to a more gradual increase in [Ce/Mg] over time \todo{(why?)}. This alleviates the over-prediction problem for old stars, but results in a [Ce/Mg]--age relation that is flat, not increasing, over the past $5\Gyr$. Reducing the SFE also worsens agreement with the data for other observables, such as the [Fe/Mg]--[Mg/H] and age--metallicity relations. Second, we add a recent starburst described by a Gaussian in time:
+\begin{equation}
+    \dot\Sigma_{\rm \star, burst}(t) = \dot\Sigma_{\rm \star,fiducial}(t) \Big(1 + A_b e^{-(t-t_b)^2/2\sigma^2_b}\Big),
+\end{equation}
+where $A_b=2$ is the amplitude of the starburst, $t_b=10.2\Gyr$ is the time of the local maximum star formation rate, and $\sigma_b=1\Gyr$ is the width of the Gaussian. We find that such a starburst leads to an increase in [Ce/Mg] over $\sim2\Gyr$, but the trend is not long-term.
+
+We next investigate modifications to the metallicity and mass dependence of the AGB yields. Figure \ref{fig:ssp-yields} shows that the Ce yield falls off dramatically above Solar metallicity. By scaling up the metallicity for a given yield (effectively shifting the distribution to higher $Z$), Solar-metallicity AGB stars can produce a greater mass of Ce. Figure \ref{fig:model-comparison} shows the result for a model with AGB metallicities scaled by a factor of 2 ($Z_{\rm AGB}\times2$). [Ce/Mg] increases slower, as the yield at low metallicities is reduced, while at later times the [Ce/Mg] surprasses that of the fiducial model. The metallicity scaling is effective in the Solar neighborhood, but detrimental to the [Ce/Mg] ratios in the outer galaxy, where the gas metallicity is too low.
+
+\todo{Discuss mass-scaled yields.} Figure \ref{fig:ssp-yields} shows that AGB stars below $2\Msun$ contribute very little Ce. As a result, the median enrichment time (i.e., the time after star formation at which 50\% of the total Ce mass has been produced) for both yield sets is only $\sim600\Myr$, whereas the Milky Way data show increasing [Ce/Mg] over the past $\sim6\Gyr$.
 
 \begin{figure}
     \centering
@@ -395,32 +406,16 @@ In theory, an $r$-process channel with long delay times could increase [Ce/Mg] o
     \label{fig:model-radius-trends}
 \end{figure}
 
+\todo{Discuss Figure \ref{fig:model-radius-trends}.}
+
 \begin{figure*}
     \centering
     \includegraphics[width=\linewidth]{figures/model_cemg_mgh.pdf}
-    \caption{Stellar abundance distributions in three different radial bins predicted by the model with $y/Z_\odot=2$, KL16+K18, and $M_{\rm AGB}\times0.5$. The layout is similar to Figure \ref{fig:median-trends-grid}. Each point represents a model stellar population, color-coded by age. For visual clarity, only a random sample of 10,000 points is plotted in each panel. The dashed curve plots the gas abundance track at the mean radius in each bin. The solid contours show the 10th, 30th, 50th, 70th, and 90th percentiles of the MWM data in each region.}
+    \caption{Stellar abundance distributions in three different radial bins predicted by the model with $y/Z_\odot=2$, KL16+K18, and $M_{\rm AGB}\times0.5$. Stars in each panel are restricted to $z_{\rm max}<2\kpc$. Each point represents a model stellar population, color-coded by age. A Gaussian scatter has been applied to each model stellar population based on the median abundance and age errors in the MWM sample. For visual clarity, only a random sample of 10,000 points is plotted in each panel. The dashed curve plots the gas abundance track at the mean radius in each bin. The solid contours show the 10th, 30th, 50th, 70th, and 90th percentiles of the MWM data in each region.}
+    \label{fig:model-cemg-mgh}
 \end{figure*}
 
-% \begin{figure}
-%     \centering
-%     \includegraphics[width=\linewidth]{figures/onezone_sfh.pdf}
-%     \caption{The effect of GCE model parameters on the predicted age--[Ce/Mg] relation. In each panel, the gray filled (open) points are low-Ia (high-Ia) stars in the Solar neighborhood ($7\leq R_g<9\kpc$, $z_{\rm max}<0.5\kpc$) with $-0.1\leq\bracket{Mg}<+0.1$. The $\odot$ symbol marks the Solar age and [Ce/Mg], and the gray error bars represent the median uncertainties for the plotted sample. The colored curves plot the gas abundance evolution of various GCE models, with the blue curve representing the same model in each panel. {\bf (a)} The star formation efficiency timescale $\tau_\star$. {\bf (b)} The outflow mass-loading factor $\eta$. {\bf (c)} The form of the star formation history; the inset plot in the bottom right shows the normalized star formation rate of each SFH.}
-%     \label{fig:onezone-sfh}
-% \end{figure}
-
-% \begin{figure}
-%     \centering
-%     \includegraphics[width=\linewidth]{figures/onezone_agb.pdf}
-%     \caption{The effect of adjustments to AGB yield predictions on GCE model predictions. The data points are the same as in Figure \ref{fig:onezone-sfh}. The colored curves plot the gas abundance evolution of various GCE models, with the blue curve representing the same model in each panel. {\bf (a)} Global enhancement of the AGB yields; the dashed curve is a model without a prompt Ce enrichment channel. The ``$\otimes$'' symbol represents the Solar $s$-process fraction \citep{arlandini_neutron_1999}. {\bf (b)} Multiplicative scaling of the AGB progenitor masses. {\bf (c)} Multiplicative scaling of the AGB progenitor metallicities.}
-%     \label{fig:onezone-agb}
-% \end{figure}
-
-% \begin{figure}
-%     \centering
-%     \includegraphics[width=\linewidth]{figures/delayed_enrichment_models.pdf}
-%     \caption{\todo{Probably cut or significantly revamp this figure.}}
-%     \label{fig:delayed-enrichment-models}
-% \end{figure}
+\todo{Discuss Figure \ref{model-cemg-mgh}.}
 
 \section{Conclusions}
 \label{sec:conclusions}
