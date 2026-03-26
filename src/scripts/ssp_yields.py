@@ -76,11 +76,11 @@ def main(style='paper'):
     # Compare against Fe from SNe Ia
     mass, time = vice.single_stellar_population('fe', time=END_TIME, dt=1e-3, RIa=plateau(), delay=0.04)
     mass = [_ / mass[-1] for _ in mass]
-    axs[1].plot(time, mass, '-', c=paultol.bright.colors[2])
+    axs[1].plot(time, mass, ':', c='gray')
     # Plot median enrichment time
     idx = 0
     while mass[idx] < 0.5: idx += 1
-    axs[1].plot(time[idx], 1.0, '^', c=paultol.bright.colors[2], markersize=ms)
+    axs[1].plot(time[idx], 1.0, '^', c='gray', markersize=ms)
 
     axs[1].set_xscale('log')
     axs[1].set_xlim((4e-2, 20))
@@ -95,7 +95,6 @@ def main(style='paper'):
     )
     axs[1].text(
         0.6, 0.5, r'$R_{\rm Ia}$', 
-        color=paultol.bright.colors[2],
         transform=axs[1].transAxes, 
         ha='right', va='bottom'
     )
