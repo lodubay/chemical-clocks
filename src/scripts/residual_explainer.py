@@ -58,7 +58,9 @@ def main(style='paper'):
     pops = ['low_alpha', 'high_alpha']
     colors = [paultol.highcontrast.colors[0], paultol.highcontrast.colors[2]]
     labels = ['High-Ia', 'Low-Ia']
-    for pop, color, label in zip(pops, colors, labels):
+    formats = ['s-', 'o-']
+    ms = 3
+    for pop, color, label, fmt in zip(pops, colors, labels, formats):
         local_pop = mwm_rgb_local[mwm_rgb_local[pop]]
         sample_pop = sample[sample[pop]]
         # Plot [Mg/H] vs [Ce/H]
@@ -73,7 +75,7 @@ def main(style='paper'):
         )
         axs[0,0].plot(
             *local_pop_medians, 
-            '.-', color=color, label=label
+            fmt, color=color, label=label, ms=ms
         )
         # Plot [Ce/H] residuals vs [Mg/H]
         axs[1,0].scatter(
@@ -99,7 +101,7 @@ def main(style='paper'):
             local_pop_ages, 'ce_h_corr', 'age',
             q=0.5, bin_edges=age_bin_edges, min_count=10
         )
-        axs[0,1].plot(*pop_age_medians, '.-', color=color, zorder=6)
+        axs[0,1].plot(*pop_age_medians, fmt, color=color, zorder=6, ms=ms)
         # Plot [Ce/H] residuals vs age
         axs[1,1].scatter(
             sample_pop_ages['age'], sample_pop_ages['delta_ce_h'],
@@ -110,7 +112,7 @@ def main(style='paper'):
             local_pop_ages, 'delta_ce_h', 'age',
             q=0.5, bin_edges=age_bin_edges, min_count=10
         )
-        axs[1,1].plot(*pop_res_age_medians, '.-', color=color, zorder=6)
+        axs[1,1].plot(*pop_res_age_medians, fmt, color=color, zorder=6, ms=ms)
         
     # Horizontal lines for reference
     axs[1,0].plot([-0.7, 0.6], [0, 0], linestyle=':', color='gray', zorder=5)
