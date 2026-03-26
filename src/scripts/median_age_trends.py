@@ -8,52 +8,22 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from matplotlib.colors import BoundaryNorm, Normalize
 
+from residual_abundances import residual_abundances
 from utils import binned_quantiles
 from plotting import insert_colorbar_axes, colored_text_legend, ONE_COLUMN_WIDTH
-from colormaps import paultol
 import paths
 
 def main(style='paper', cmap='viridis_r'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    radius_bin_edges = np.arange(3, 15.1, 2)
-    age_bin_edges = np.arange(-0.5, 11.6, 1)
-    mg_bin_edges = np.arange(-0.75, 0.76, 0.1)
-
+    # Calculate residual abundances
+    mwm_rgb = residual_abundances(mwm_rgb)
     # Select only low-alpha, near-midplane stars
-    mwm_rgb['delta_ce_h'] = np.nan * np.ones(mwm_rgb.shape[0])
     all_lowz = mwm_rgb[(mwm_rgb['z_max'] < 0.5)].copy()
 
-    # Calculate residual [Ce/H] for high- and low-alpha stars
-    for i in range(len(radius_bin_edges)-1):
-        radius_bin = radius_bin_edges[i:i+2]
-        low_alpha_subset = all_lowz[
-            (all_lowz['Rg'] >= radius_bin[0]) &
-            (all_lowz['Rg'] < radius_bin[1]) &
-            (all_lowz['low_alpha'])
-        ]
-        low_alpha_medians = binned_quantiles(
-            low_alpha_subset, 'ce_h_corr', 'mg_h',
-            q=0.5, bin_edges=mg_bin_edges, min_count=10
-        )
-        all_lowz.loc[low_alpha_subset.index, 'delta_ce_h'] = \
-            low_alpha_subset['ce_h_corr'] - np.interp(
-                low_alpha_subset['mg_h'], *low_alpha_medians
-            )
-        high_alpha_subset = all_lowz[
-            (all_lowz['Rg'] >= radius_bin[0]) &
-            (all_lowz['Rg'] < radius_bin[1]) &
-            (all_lowz['high_alpha'])
-        ]
-        high_alpha_medians = binned_quantiles(
-            high_alpha_subset, 'ce_h_corr', 'mg_h',
-            q=0.5, bin_edges=mg_bin_edges, min_count=10
-        )
-        all_lowz.loc[high_alpha_subset.index, 'delta_ce_h'] = \
-            high_alpha_subset['ce_h_corr'] - np.interp(
-                high_alpha_subset['mg_h'], *high_alpha_medians
-            )
+    radius_bin_edges = np.arange(3, 15.1, 2)
+    age_bin_edges = np.arange(-0.5, 11.6, 1)
     
     # Set up figure
     fig, axs = plt.subplots(
@@ -98,7 +68,6 @@ def main(style='paper', cmap='viridis_r'):
                 low_alpha_subset, col, 'age',
                 q=0.5, bin_edges=age_bin_edges, min_count=10, est_errors=True
             )
-            # axs[i].plot(*low_alpha_age_medians, '-', color='w', linewidth=2)
             axs[i].plot(
                 *low_alpha_age_medians[:-1], '-', 
                 color=radial_cmap(norm(mean_radius)), zorder=4,
@@ -120,7 +89,6 @@ def main(style='paper', cmap='viridis_r'):
                 high_alpha_subset, col, 'age',
                 q=0.5, bin_edges=age_bin_edges, min_count=10, est_errors=True
             )
-            # axs[i].plot(*high_alpha_age_medians[:-1], '-', color='w', linewidth=2)
             axs[i].plot(
                 *high_alpha_age_medians[:-1], '--', 
                 color=radial_cmap(norm(mean_radius)), zorder=3

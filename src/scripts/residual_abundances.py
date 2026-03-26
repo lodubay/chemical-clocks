@@ -8,11 +8,11 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
 from utils import binned_quantiles, sample_rows
-from plotting import colored_text_legend, TWO_COLUMN_WIDTH
+from plotting import colored_text_legend, setup_hayden_plot, iterate_rz_bins
 from colormaps import paultol
 import paths
 
-RBINS = [(3, 5), (5, 7), (7, 9), (9, 11), (11, 13)] # left to right
+RBINS = [(3, 5), (5, 7), (7, 9), (9, 11), (11, 13), (13, 15)] # left to right
 ZBINS = [(1, 2), (0.5, 1), (0, 0.5)] # top to bottom
 ALPHA_BUFFER = 0.02 # dex, buffer around the [Mg/Fe] dividing line
 # SAMPLE_FRACTION = 0.25 # fraction of stars to plot in each panel
@@ -22,148 +22,101 @@ def main(style='paper'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
+    mwm_res = residual_abundances(mwm_rgb)
+    mwm_res_ages = mwm_res[mwm_res['good_age']].copy() # Good ages only
 
-    mg_bin_edges = np.arange(-0.75, 0.76, 0.1)
     age_bin_edges = np.arange(0.5, 11.6, 1)
 
     # Solar neighborhood sample
-    local_low_alpha = mwm_rgb[
-        (mwm_rgb['Rg'] >= 7) &
-        (mwm_rgb['Rg'] < 9) &
-        (mwm_rgb['z_max'] < 0.5) &
-        (mwm_rgb['low_alpha'])
+    local_low_alpha = mwm_res_ages[
+        (mwm_res_ages['Rg'] >= 7) &
+        (mwm_res_ages['Rg'] < 9) &
+        (mwm_res_ages['z_max'] < 0.5) &
+        (mwm_res_ages['low_alpha'])
     ].copy()
-    local_high_alpha = mwm_rgb[
-        (mwm_rgb['Rg'] >= 7) &
-        (mwm_rgb['Rg'] < 9) &
-        (mwm_rgb['z_max'] < 0.5) &
-        (mwm_rgb['high_alpha'])
+    local_high_alpha = mwm_res_ages[
+        (mwm_res_ages['Rg'] >= 7) &
+        (mwm_res_ages['Rg'] < 9) &
+        (mwm_res_ages['z_max'] < 0.5) &
+        (mwm_res_ages['high_alpha'])
     ].copy()
-    # Calculate median trend with [Mg/H]
-    local_low_alpha_medians = binned_quantiles(
-        local_low_alpha, 'ce_h_corr', 'mg_h', 
-        q=0.5, bin_edges=mg_bin_edges, min_count=10
-    )
-    local_high_alpha_medians = binned_quantiles(
-        local_high_alpha, 'ce_h_corr', 'mg_h', 
-        q=0.5, bin_edges=mg_bin_edges, min_count=10
-    )
-    # Calculate residual Ce abundance
-    local_low_alpha['delta_ce_h'] = local_low_alpha['ce_h_corr'] - np.interp(
-        local_low_alpha['mg_h'], *local_low_alpha_medians
-    )
-    local_high_alpha['delta_ce_h'] = local_high_alpha['ce_h_corr'] - np.interp(
-        local_high_alpha['mg_h'], *local_high_alpha_medians
-    )
     # Calculate median trend with age (only stars with good ages)
     local_low_alpha_age_medians = binned_quantiles(
-        local_low_alpha[local_low_alpha['good_age']], 'delta_ce_h', 'age',
+        local_low_alpha, 'delta_ce_h', 'age',
         q=0.5, bin_edges=age_bin_edges, min_count=10
     )
     local_high_alpha_age_medians = binned_quantiles(
-        local_high_alpha[local_high_alpha['good_age']], 'delta_ce_h', 'age',
+        local_high_alpha, 'delta_ce_h', 'age',
         q=0.5, bin_edges=age_bin_edges, min_count=10
     )
 
-    fig, axs = plt.subplots(
-        len(ZBINS), len(RBINS),
-        figsize=(TWO_COLUMN_WIDTH, 0.6*TWO_COLUMN_WIDTH), 
-        sharex=True, sharey=True,
-        gridspec_kw={'hspace': 0, 'wspace': 0},
-    )
+    fig, axs = setup_hayden_plot(rbins=RBINS, zbins=ZBINS)
     plt.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.95)
     # scatterplot style arguments
     kwargs = dict(s=1, marker='.', rasterized=True, edgecolor='none')
     high_alpha_color = paultol.highcontrast.colors[2]
     low_alpha_color = paultol.highcontrast.colors[0]
 
-    for i, row in enumerate(axs):
-        zlim = ZBINS[i]
-        for j, ax in enumerate(row):
-            rlim = RBINS[j]
-            subset = mwm_rgb[
-                (mwm_rgb['Rg'] >= rlim[0]) &
-                (mwm_rgb['Rg'] < rlim[1]) &
-                (mwm_rgb['z_max'] >= zlim[0]) &
-                (mwm_rgb['z_max'] < zlim[1])
-            ]
-            low_alpha = subset[subset['low_alpha']].copy()
-            high_alpha = subset[subset['high_alpha']].copy()
-            # Select random sample of stars for scatter plot (good ages only)
-            sample = sample_rows(
-                subset[subset['good_age']], 
-                # int(SAMPLE_FRACTION * subset.shape[0])
-                SAMPLE_SIZE
+    for i, j, zlim, rlim in iterate_rz_bins(rbins=RBINS, zbins=ZBINS):
+        subset = mwm_res_ages[
+            (mwm_res_ages['Rg'] >= rlim[0]) &
+            (mwm_res_ages['Rg'] < rlim[1]) &
+            (mwm_res_ages['z_max'] >= zlim[0]) &
+            (mwm_res_ages['z_max'] < zlim[1])
+        ]
+        low_alpha = subset[subset['low_alpha']].copy()
+        high_alpha = subset[subset['high_alpha']].copy()
+        # Select random sample of stars for scatter plot
+        sample = sample_rows(subset, SAMPLE_SIZE)
+        low_alpha_sample = sample[sample['low_alpha']]
+        high_alpha_sample = sample[sample['high_alpha']]
+        if low_alpha.shape[0] >= 100:
+            # Scatter plot random sample of points
+            axs[i,j].scatter(
+                low_alpha.loc[low_alpha_sample.index, 'age'], 
+                low_alpha.loc[low_alpha_sample.index, 'delta_ce_h'],
+                c=low_alpha_color, zorder=2, **kwargs
             )
-            low_alpha_sample = sample[sample['low_alpha']]
-            high_alpha_sample = sample[sample['high_alpha']]
-            if low_alpha.shape[0] >= 100:
-                # Calculate median trend with [Mg/H]
-                low_alpha_medians = binned_quantiles(
-                    low_alpha, 'ce_h_corr', 'mg_h', 
-                    q=0.5, bin_edges=mg_bin_edges, min_count=10
-                )
-                # Calculate residual Ce abundance
-                # (for all stars, including those with no/poor ages)
-                low_alpha['delta_ce_h'] = low_alpha['ce_h_corr'] - np.interp(
-                    low_alpha['mg_h'], *low_alpha_medians
-                )
-                # Scatter plot random sample of points
-                ax.scatter(
-                    low_alpha.loc[low_alpha_sample.index, 'age'], 
-                    low_alpha.loc[low_alpha_sample.index, 'delta_ce_h'],
-                    c=low_alpha_color, zorder=2, **kwargs
-                )
-                # Plot median trend with age
-                age_medians = binned_quantiles(
-                    low_alpha[low_alpha['good_age']], 'delta_ce_h', 'age',
-                    q=0.5, bin_edges=age_bin_edges, min_count=10
-                )
-                ax.plot(
-                    *age_medians, '.-', color=low_alpha_color, zorder=6,
-                    label='High-Ia'
-                )
-            if high_alpha.shape[0] >= 100:
-                # Calculate median trend with [Mg/H]
-                high_alpha_medians = binned_quantiles(
-                    high_alpha, 'ce_h_corr', 'mg_h', 
-                    q=0.5, bin_edges=mg_bin_edges, min_count=10
-                )
-                # Calculate residual Ce abundance
-                high_alpha['delta_ce_h'] = high_alpha['ce_h_corr'] - np.interp(
-                    high_alpha['mg_h'], *high_alpha_medians
-                )
-                # Scatter plot random sample of points
-                ax.scatter(
-                    high_alpha.loc[high_alpha_sample.index, 'age'], 
-                    high_alpha.loc[high_alpha_sample.index, 'delta_ce_h'],
-                    c=high_alpha_color, zorder=1, **kwargs
-                )
-                # Plot median trend with age
-                age_medians = binned_quantiles(
-                    high_alpha[high_alpha['good_age']], 'delta_ce_h', 'age',
-                    q=0.5, bin_edges=age_bin_edges, min_count=10
-                )
-                ax.plot(
-                    *age_medians, '.-', color=high_alpha_color, zorder=5,
-                    label='Low-Ia'
-                )
-            # Plot local low and high-alpha trends for comparison
-            ax.plot(
-                *local_low_alpha_age_medians, 
-                linestyle='--', color=low_alpha_color, zorder=4,
+            # Plot median trend with age
+            age_medians = binned_quantiles(
+                low_alpha, 'delta_ce_h', 'age',
+                q=0.5, bin_edges=age_bin_edges, min_count=10
             )
-            ax.plot(
-                *local_high_alpha_age_medians, 
-                linestyle='--', color=high_alpha_color, zorder=3,
+            axs[i,j].plot(
+                *age_medians, '.-', color=low_alpha_color, zorder=6,
+                label='High-Ia'
             )
-            # Horizontal line for reference
-            ax.plot([0, 12], [0, 0], linestyle=':', color='gray', zorder=0)
+        if high_alpha.shape[0] >= 100:
+            # Scatter plot random sample of points
+            axs[i,j].scatter(
+                high_alpha.loc[high_alpha_sample.index, 'age'], 
+                high_alpha.loc[high_alpha_sample.index, 'delta_ce_h'],
+                c=high_alpha_color, zorder=1, **kwargs
+            )
+            # Plot median trend with age
+            age_medians = binned_quantiles(
+                high_alpha, 'delta_ce_h', 'age',
+                q=0.5, bin_edges=age_bin_edges, min_count=10
+            )
+            axs[i,j].plot(
+                *age_medians, '.-', color=high_alpha_color, zorder=5,
+                label='Low-Ia'
+            )
+        # Plot local low and high-alpha trends for comparison
+        axs[i,j].plot(
+            *local_low_alpha_age_medians, 
+            linestyle='--', color=low_alpha_color, zorder=4,
+        )
+        axs[i,j].plot(
+            *local_high_alpha_age_medians, 
+            linestyle='--', color=high_alpha_color, zorder=3,
+        )
+        # Horizontal line for reference
+        axs[i,j].plot([0, 12], [0, 0], linestyle=':', color='gray', zorder=0)
     # Indicate median abundance errors
-    mwm_rgb_ages = mwm_rgb[mwm_rgb['good_age']]
-    age_err_low = np.median(mwm_rgb_ages['age'] - mwm_rgb_ages['e_n_age'])
-    age_err_high = np.median(mwm_rgb_ages['e_p_age'] - mwm_rgb_ages['age'])
-    med_abund_err = mwm_rgb_ages['e_ce_h'].median()
+    age_err_low = np.median(mwm_res_ages['age'] - mwm_res_ages['e_n_age'])
+    age_err_high = np.median(mwm_res_ages['e_p_age'] - mwm_res_ages['age'])
+    med_abund_err = mwm_res_ages['e_ce_h'].median()
     axs[0,0].errorbar(
         3, -0.4, 
         xerr=[[age_err_low], [age_err_high]], 
@@ -194,6 +147,66 @@ def main(style='paper'):
     leg = colored_text_legend(axs[0,0], loc='upper left')
 
     plt.savefig(paths.figures / 'residual_abundances')
+
+
+def residual_abundances(
+        catalog, 
+        col='ce_h_corr', 
+        newcol='delta_ce_h', 
+        rbins=RBINS,
+        zbins=ZBINS
+    ):
+    """
+    Calculate residual [Ce/H] abundances for high- and low-alpha populations
+    separately in each Galactic region (defined by bins in Rg and z_max).
+    
+    Parameters
+    ----------
+    catalog : pandas.DataFrame
+        Full MWM catalog.
+    col : str, optional [default: 'ce_h_corr']
+        Column with abundances to calculate the residuals for.
+    newcol : str, optional [default: 'delta_ce_h']
+        Name of new column with residual abundances
+    rbins : list of tuples, optional
+        List of bins in guiding radius (Rg) in which to calculate residuals.
+    zbins : list of tuples, optional
+        List of bins in z_max in which to calculate residuals.
+
+    Returns
+    -------
+    catalog : pandas.DataFrame
+        MWM catalog with residual abundance column appended.
+    """
+    mg_bin_edges = np.arange(-0.75, 0.76, 0.1)
+    res_abund = []
+    for i, j, zlim, rlim in iterate_rz_bins(rbins=rbins, zbins=zbins):
+        subset = catalog[
+            (catalog['Rg'] >= rlim[0]) &
+            (catalog['Rg'] < rlim[1]) &
+            (catalog['z_max'] >= zlim[0]) &
+            (catalog['z_max'] < zlim[1])
+        ]
+        low_alpha = subset[subset['low_alpha']].copy()
+        high_alpha = subset[subset['high_alpha']].copy()
+        # Calculate residual abundances separately for high- and low-alpha
+        for subset_pop in [low_alpha, high_alpha]:
+            if subset_pop.shape[0] >= 100:
+                # Calculate median trend with [Mg/H]
+                mgh_medians = binned_quantiles(
+                    subset_pop, col, 'mg_h', 
+                    q=0.5, bin_edges=mg_bin_edges, min_count=10
+                )
+                # Calculate residual Ce abundance
+                subset_pop[newcol] = subset_pop[col] - np.interp(
+                    subset_pop['mg_h'], *mgh_medians
+                )
+                res_abund.append(subset_pop[['sdss_id', newcol]].copy())
+    # Join residual abundances to catalog DataFrame
+    res_abund = pd.concat(res_abund)
+    res_abund.set_index('sdss_id', inplace=True)
+    catalog = catalog.join(res_abund, on='sdss_id')
+    return catalog
 
 
 if __name__ == '__main__':

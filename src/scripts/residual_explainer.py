@@ -7,6 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
+from residual_abundances import residual_abundances
 from utils import binned_quantiles, sample_rows
 from plotting import colored_text_legend, ONE_COLUMN_WIDTH
 from colormaps import paultol
@@ -17,34 +18,27 @@ SAMPLE_FRACTION = 0.25
 def main(style='paper'):
     # Import MWM sample
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-
-    mg_bin_edges = np.arange(-0.55, 0.56, 0.1)
-    age_bin_edges = np.arange(0.5, 11.6, 1)
-
     # Solar neighborhood sample
     mwm_rgb_local = mwm_rgb[
         (mwm_rgb['Rg'] >= 7) &
         (mwm_rgb['Rg'] < 9) &
         (mwm_rgb['z_max'] < 0.5)
     ].copy()
-    local_low_alpha = mwm_rgb_local[mwm_rgb_local['low_alpha']].copy()
-    local_high_alpha = mwm_rgb_local[mwm_rgb_local['high_alpha']].copy()
-    # Calculate median trend with [Mg/H]
-    local_low_alpha_medians = binned_quantiles(
-        local_low_alpha, 'ce_h_corr', 'mg_h', 
-        q=0.5, bin_edges=mg_bin_edges, min_count=10
+    # Calculate residual abundances (Solar neighborhood only)
+    mwm_rgb_local = residual_abundances(
+        mwm_rgb_local, 
+        col='ce_h_corr', 
+        newcol='delta_ce_h',
+        rbins=[(7, 9)],
+        zbins=[(0, 0.5)]
     )
-    local_high_alpha_medians = binned_quantiles(
-        local_high_alpha, 'ce_h_corr', 'mg_h', 
-        q=0.5, bin_edges=mg_bin_edges, min_count=10
+    # Scatter plot random sample of points
+    sample = sample_rows(
+        mwm_rgb_local, 
+        int(SAMPLE_FRACTION * mwm_rgb_local.shape[0])
     )
-    # Calculate residual Ce abundance
-    local_low_alpha['delta_ce_h'] = local_low_alpha['ce_h_corr'] - np.interp(
-        local_low_alpha['mg_h'], *local_low_alpha_medians
-    )
-    local_high_alpha['delta_ce_h'] = local_high_alpha['ce_h_corr'] - np.interp(
-        local_high_alpha['mg_h'], *local_high_alpha_medians
-    )
+    mg_bin_edges = np.arange(-0.75, 0.56, 0.1)
+    age_bin_edges = np.arange(0.5, 11.6, 1)
 
     # Set up figure
     plt.style.use(paths.styles / f'{style}.mplstyle')
@@ -55,139 +49,75 @@ def main(style='paper'):
     )
     # scatterplot style arguments
     kwargs = dict(s=1, marker='.', rasterized=True, edgecolor='none')
-    high_alpha_color = paultol.highcontrast.colors[2]
-    low_alpha_color = paultol.highcontrast.colors[0]
     # Label each panel
     labels = ['(a)', '(b)', '(c)', '(d)']
     for i, ax in enumerate(axs.flatten()):
         ax.set_title(labels[i], y=0.93, x=0.07, ha='left', va='top', pad=0)
 
-    # Scatter plot random sample of points
-    sample = sample_rows(
-        mwm_rgb_local[mwm_rgb_local['good_age']], 
-        int(SAMPLE_FRACTION * mwm_rgb_local.shape[0])
-    )
-    low_alpha_sample = local_low_alpha.loc[sample[sample['low_alpha']].index]
-    high_alpha_sample = local_high_alpha.loc[sample[sample['high_alpha']].index]
-    
-    # Plot [Mg/H] vs [Ce/H]
-    axs[0,0].scatter(
-        high_alpha_sample['mg_h'], high_alpha_sample['ce_h_corr'], 
-        c=high_alpha_color, **kwargs
-    )
-    axs[0,0].scatter(
-        low_alpha_sample['mg_h'], low_alpha_sample['ce_h_corr'], 
-        c=low_alpha_color, **kwargs
-    )
-    axs[0,0].plot(
-        *local_low_alpha_medians, 
-        '.-', color=low_alpha_color, label='High-Ia'
-    )
-    axs[0,0].plot(
-        *local_high_alpha_medians, 
-        '.-', color=high_alpha_color, label='Low-Ia'
-    )
-
-    # Plot [Ce/H] residuals vs [Mg/H]
-    axs[1,0].scatter(
-        low_alpha_sample['mg_h'], low_alpha_sample['delta_ce_h'],
-        c=low_alpha_color, **kwargs
-    )
-    axs[1,0].scatter(
-        high_alpha_sample['mg_h'], high_alpha_sample['delta_ce_h'],
-        c=high_alpha_color, **kwargs
-    )
-    # Plot 1-sigma bands
-    low_alpha_sigma_low = binned_quantiles(
-        local_low_alpha, 'delta_ce_h', 'mg_h',
-        q=0.16, bin_edges=mg_bin_edges, min_count=10
-    )
-    axs[1,0].plot(*low_alpha_sigma_low, '--', color=low_alpha_color, zorder=6)
-    low_alpha_sigma_med = binned_quantiles(
-        local_low_alpha, 'delta_ce_h', 'mg_h',
-        q=0.5, bin_edges=mg_bin_edges, min_count=10
-    )
-    axs[1,0].plot(*low_alpha_sigma_med, '-', color=low_alpha_color, zorder=6)
-    low_alpha_sigma_high = binned_quantiles(
-        local_low_alpha, 'delta_ce_h', 'mg_h',
-        q=0.84, bin_edges=mg_bin_edges, min_count=10
-    )
-    axs[1,0].plot(*low_alpha_sigma_high, '--', color=low_alpha_color, zorder=6)
-    high_alpha_sigma_low = binned_quantiles(
-        local_high_alpha, 'delta_ce_h', 'mg_h',
-        q=0.16, bin_edges=mg_bin_edges, min_count=10
-    )
-    axs[1,0].plot(*high_alpha_sigma_low, '--', color=high_alpha_color, zorder=6)
-    high_alpha_sigma_med = binned_quantiles(
-        local_high_alpha, 'delta_ce_h', 'mg_h',
-        q=0.5, bin_edges=mg_bin_edges, min_count=10
-    )
-    axs[1,0].plot(*high_alpha_sigma_med, '-', color=high_alpha_color, zorder=6)
-    high_alpha_sigma_high = binned_quantiles(
-        local_high_alpha, 'delta_ce_h', 'mg_h',
-        q=0.84, bin_edges=mg_bin_edges, min_count=10
-    )
-    axs[1,0].plot(*high_alpha_sigma_high, '--', color=high_alpha_color, zorder=6)
-
-    # Plot [Ce/H] vs age
-    axs[0,1].scatter(
-        low_alpha_sample['age'], low_alpha_sample['ce_h_corr'],
-        c=low_alpha_color, **kwargs
-    )
-    axs[0,1].scatter(
-        high_alpha_sample['age'], high_alpha_sample['ce_h_corr'],
-        c=high_alpha_color, **kwargs
-    )
-    # Plot median trends with age
-    low_alpha_age_medians = binned_quantiles(
-        local_low_alpha[local_low_alpha['good_age']], 'ce_h_corr', 'age',
-        q=0.5, bin_edges=age_bin_edges, min_count=10
-    )
-    axs[0,1].plot(
-        *low_alpha_age_medians, '.-', color=low_alpha_color, zorder=6,
-        label='High-Ia'
-    )
-    high_alpha_age_medians = binned_quantiles(
-        local_high_alpha[local_high_alpha['good_age']], 'ce_h_corr', 'age',
-        q=0.5, bin_edges=age_bin_edges, min_count=10
-    )
-    axs[0,1].plot(
-        *high_alpha_age_medians, '.-', color=high_alpha_color, zorder=6,
-        label='Low-Ia'
-    )
-
-    # Plot [Ce/H] residuals vs age
-    axs[1,1].scatter(
-        low_alpha_sample['age'], low_alpha_sample['delta_ce_h'],
-        c=low_alpha_color, **kwargs
-    )
-    axs[1,1].scatter(
-        high_alpha_sample['age'], high_alpha_sample['delta_ce_h'],
-        c=high_alpha_color, **kwargs
-    )
-    # Plot median trends with age
-    low_alpha_age_medians = binned_quantiles(
-        local_low_alpha[local_low_alpha['good_age']], 'delta_ce_h', 'age',
-        q=0.5, bin_edges=age_bin_edges, min_count=10
-    )
-    axs[1,1].plot(
-        *low_alpha_age_medians, '.-', color=low_alpha_color, zorder=6,
-        label='High-Ia'
-    )
-    high_alpha_age_medians = binned_quantiles(
-        local_high_alpha[local_high_alpha['good_age']], 'delta_ce_h', 'age',
-        q=0.5, bin_edges=age_bin_edges, min_count=10
-    )
-    axs[1,1].plot(
-        *high_alpha_age_medians, '.-', color=high_alpha_color, zorder=6,
-        label='Low-Ia'
-    )
-    # Horizontal line for reference
+    # Loop through low- and high-alpha populations
+    pops = ['low_alpha', 'high_alpha']
+    colors = [paultol.highcontrast.colors[0], paultol.highcontrast.colors[2]]
+    labels = ['High-Ia', 'Low-Ia']
+    for pop, color, label in zip(pops, colors, labels):
+        local_pop = mwm_rgb_local[mwm_rgb_local[pop]]
+        sample_pop = sample[sample[pop]]
+        # Plot [Mg/H] vs [Ce/H]
+        axs[0,0].scatter(
+            sample_pop['mg_h'], sample_pop['ce_h_corr'], 
+            c=color, **kwargs
+        )
+        # Plot median trend with [Mg/H]
+        local_pop_medians = binned_quantiles(
+            local_pop, 'ce_h_corr', 'mg_h', 
+            q=0.5, bin_edges=mg_bin_edges, min_count=10
+        )
+        axs[0,0].plot(
+            *local_pop_medians, 
+            '.-', color=color, label=label
+        )
+        # Plot [Ce/H] residuals vs [Mg/H]
+        axs[1,0].scatter(
+            sample_pop['mg_h'], sample_pop['delta_ce_h'],
+            c=color, **kwargs
+        )
+        # Plot median and 1-sigma bands
+        for q, ls in zip([0.16, 0.5, 0.84], ['--', '-', '--']):
+            local_pop_quantile = binned_quantiles(
+                local_pop, 'delta_ce_h', 'mg_h',
+                q=q, bin_edges=mg_bin_edges, min_count=10
+            )
+            axs[1,0].plot(*local_pop_quantile, ls, color=color, zorder=6)
+        # Plot [Ce/H] vs age
+        sample_pop_ages = sample_pop[sample_pop['good_age']]
+        axs[0,1].scatter(
+            sample_pop_ages['age'], sample_pop_ages['ce_h_corr'],
+            c=color, **kwargs
+        )
+        # Plot median trends with age
+        local_pop_ages = local_pop[local_pop['good_age']]
+        pop_age_medians = binned_quantiles(
+            local_pop_ages, 'ce_h_corr', 'age',
+            q=0.5, bin_edges=age_bin_edges, min_count=10
+        )
+        axs[0,1].plot(*pop_age_medians, '.-', color=color, zorder=6)
+        # Plot [Ce/H] residuals vs age
+        axs[1,1].scatter(
+            sample_pop_ages['age'], sample_pop_ages['delta_ce_h'],
+            c=color, **kwargs
+        )
+        # Plot median trends with age
+        pop_res_age_medians = binned_quantiles(
+            local_pop_ages, 'delta_ce_h', 'age',
+            q=0.5, bin_edges=age_bin_edges, min_count=10
+        )
+        axs[1,1].plot(*pop_res_age_medians, '.-', color=color, zorder=6)
+        
+    # Horizontal lines for reference
     axs[1,0].plot([-0.7, 0.6], [0, 0], linestyle=':', color='gray', zorder=5)
     axs[1,1].plot([-1, 12], [0, 0], linestyle=':', color='gray', zorder=5)
 
     # Axes labels
-    axs[0,0].set_ylabel(r'[Ce/H]$_{\rm corr}$')
+    axs[0,0].set_ylabel('[Ce/H]')
     axs[1,0].set_ylabel(r'$\Delta$[Ce/H]')
     axs[1,0].set_xlabel('[Mg/H]')
     axs[1,1].set_xlabel('Age [Gyr]')
