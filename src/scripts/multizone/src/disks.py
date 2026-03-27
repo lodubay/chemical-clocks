@@ -18,7 +18,7 @@ import importlib
 from .._globals import END_TIME, MAX_SF_RADIUS, ETA_SCALE_RADIUS, SOLAR_CE_S_FRAC
 from .migration import diskmigration, gaussian_migration, no_migration
 from . import models, dtds, outflows
-from .yields.utils import adjusted_agb
+from .yields.utils import adjusted_agb, decompose_agb_grid
 from .models.utils import get_bin_number, interpolate, modified_exponential
 from .models.diskmodel import two_component_disk, BHG16
 import math as m
@@ -129,6 +129,7 @@ class diskmodel(vice.milkyway):
             agb_amp = 1,
             agb_mscale = 1,
             agb_Zscale = 1,
+            agb_mscale_frac = 1,
             r_channel = "ccsne",
             delay = 0.04, 
             RIa = "plateau", 
@@ -149,13 +150,26 @@ class diskmodel(vice.milkyway):
         # Set the yields for Mg, Fe
         importlib.import_module(f'.yields.{yields}', 'multizone.src')
         # Set the AGB yield of Ce
-        vice.yields.agb.settings["ce"] = adjusted_agb(
-            "ce", 
-            study=agb_yields,
-            amp=agb_amp,
-            mscale=agb_mscale,
-            Zscale=agb_Zscale,
-        )
+        if agb_mscale_frac == 1:
+            vice.yields.agb.settings["ce"] = adjusted_agb(
+                "ce", 
+                study=agb_yields,
+                amp=agb_amp,
+                mscale=agb_mscale,
+                Zscale=agb_Zscale,
+            )
+        # Option to modify some fraction of AGB yields independently
+        # (e.g., to accommodate blue stragglers)
+        elif agb_mscale_frac < 1 and agb_mscale_frac > 0:
+            vice.yields.agb.settings["ce"] = decompose_agb_grid(
+                "ce",
+                study = agb_yields,
+                amplitudes = [agb_amp * (1 - agb_mscale_frac), agb_amp * agb_mscale_frac],
+                mscales = [1, agb_mscale],
+                Zscales = [agb_Zscale, agb_Zscale],
+            )
+        else:
+            raise ValueError("Mass-scaled AGB fraction must be between 0 and 1.")
         # Set the r-process yield of Ce
         rproc_yield = (1 - SOLAR_CE_S_FRAC) * (
             vice.yields.ccsne.settings["mg"] * vice.solar_z["ce"] / vice.solar_z["mg"]

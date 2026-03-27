@@ -165,6 +165,11 @@ underscores. (Default: \"fe_o\")""",
         type = float,
         default = 1
     )
+    parser.add_argument("--agb-mscale-frac",
+        help = "Fraction of total AGB yield modified by the mass scaling.",
+        type = float,
+        default = 1
+    )
     parser.add_argument("--r-channel",
         help = "Channel to assign r-process contribution (default: 'ccsne').",
         type = str,
@@ -258,6 +263,7 @@ def model(args):
         agb_amp = args.agb_amp,
         agb_mscale = args.agb_mscale,
         agb_Zscale = args.agb_Zscale,
+        agb_mscale_frac = args.agb_mscale_frac,
         r_channel = args.r_channel,
         seed = args.seed,
         radial_gas_velocity = args.radial_gas_velocity,
