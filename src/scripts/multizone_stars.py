@@ -299,7 +299,7 @@ class MultizoneStars:
         if mwm_data is None:
             mwm_data = pd.read_csv(paths.data/'MWM/sample.csv')
         rng = np.random.default_rng(seed)
-        mwm_ages = mwm_data[mwm_data['use_age']]
+        mwm_ages = mwm_data[mwm_data['good_age']]
         age_err_low = np.median(mwm_ages['age'] - mwm_ages['e_n_age'])
         age_err_high = np.median(mwm_ages['e_p_age'] - mwm_ages['age'])
         age_med_err = 0.5 * (age_err_low + age_err_high)
