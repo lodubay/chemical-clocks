@@ -47,7 +47,7 @@ def main(style='paper'):
             yields[j] = 10**logprefactor * interp(masses[j], SOLAR_Z) * masses[j]**-1.3
         axs[0].plot(masses, yields, marker='.', label=labels[i])
 
-    axs[0].set_xlim((0.5, 7.5))
+    axs[0].set_xlim((0.5, 6.5))
     axs[0].set_ylim((0, None))
     axs[0].set_xlabel(r'$M_{\rm ZAMS}\,[M_\odot]$')
     axs[0].set_ylabel(r'IMF-weighted Ce Yield [$\times10^{-%s}$]' % logprefactor)
@@ -89,19 +89,22 @@ def main(style='paper'):
     axs[1].yaxis.set_minor_locator(MultipleLocator(0.05))
     axs[1].xaxis.set_major_formatter(FuncFormatter(lambda y, _: '{:g}'.format(y)))
     axs[1].text(
-        0.5, 0.85, r'$M_{\rm AGB}\times1$', 
+        0.47, 0.5, r'$M_{\rm AGB}\times1$', 
         transform=axs[1].transAxes, 
-        ha='right', va='bottom'
+        ha='right', va='bottom',
+        rotation=75,
     )
     axs[1].text(
-        0.6, 0.5, r'$R_{\rm Ia}$', 
+        0.62, 0.45, r'$R_{\rm Ia}$', 
         transform=axs[1].transAxes, 
-        ha='right', va='bottom'
+        ha='right', va='bottom',
+        rotation=55,
     )
     axs[1].text(
-        0.95, 0.05, r'$M_{\rm AGB}\times0.5$', 
+        0.85, 0.2, r'$M_{\rm AGB}\times0.5$', 
         transform=axs[1].transAxes, 
-        ha='right', va='bottom'
+        ha='right', va='bottom',
+        rotation=75
     )
 
     # Third panel: total enrichment from an SSP as a function of metallicity
