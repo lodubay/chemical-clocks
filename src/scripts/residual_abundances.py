@@ -12,7 +12,7 @@ from plotting import colored_text_legend, setup_hayden_plot, iterate_rz_bins
 from colormaps import paultol
 import paths
 
-RBINS = [(3, 5), (5, 7), (7, 9), (9, 11), (11, 13), (13, 15)] # left to right
+RBINS = [(3, 5), (5, 7), (7, 9), (9, 11), (11, 13)] # left to right
 ZBINS = [(1, 2), (0.5, 1), (0, 0.5)] # top to bottom
 ALPHA_BUFFER = 0.02 # dex, buffer around the [Mg/Fe] dividing line
 # SAMPLE_FRACTION = 0.25 # fraction of stars to plot in each panel
@@ -133,16 +133,8 @@ def main(style='paper'):
     axs[0,0].yaxis.set_minor_locator(MultipleLocator(0.1))
     for ax in axs[-1,:]:
         ax.set_xlabel('Age [Gyr]')
-    for i, ax in enumerate(axs[0,:]):
-        ax.set_title(r'$%s\leq R_{\rm guide}<%s$ kpc' % RBINS[i], fontsize=8)
     for ax in axs[:,0]:
         ax.set_ylabel(r'$\Delta$[Ce/H]')
-    for i, ax in enumerate(axs[:,-1]):
-        ax.yaxis.set_label_position('right')
-        ax.set_ylabel(
-            r'$%s\leq z_{\rm max}<%s$ kpc' % ZBINS[i], 
-            fontsize=8, labelpad=6
-        )
     # Text-only lengend
     leg = colored_text_legend(axs[0,0], loc='upper left')
 
@@ -179,29 +171,37 @@ def residual_abundances(
         MWM catalog with residual abundance column appended.
     """
     mg_bin_edges = np.arange(-0.75, 0.76, 0.1)
+    # Calculate residuals separately in each region for low-alpha
     res_abund = []
     for i, j, zlim, rlim in iterate_rz_bins(rbins=rbins, zbins=zbins):
         subset = catalog[
             (catalog['Rg'] >= rlim[0]) &
             (catalog['Rg'] < rlim[1]) &
             (catalog['z_max'] >= zlim[0]) &
-            (catalog['z_max'] < zlim[1])
-        ]
-        low_alpha = subset[subset['low_alpha']].copy()
-        high_alpha = subset[subset['high_alpha']].copy()
-        # Calculate residual abundances separately for high- and low-alpha
-        for subset_pop in [low_alpha, high_alpha]:
-            if subset_pop.shape[0] >= 100:
-                # Calculate median trend with [Mg/H]
-                mgh_medians = binned_quantiles(
-                    subset_pop, col, 'mg_h', 
-                    q=0.5, bin_edges=mg_bin_edges, min_count=10
-                )
-                # Calculate residual Ce abundance
-                subset_pop[newcol] = subset_pop[col] - np.interp(
-                    subset_pop['mg_h'], *mgh_medians
-                )
-                res_abund.append(subset_pop[['sdss_id', newcol]].copy())
+            (catalog['z_max'] < zlim[1]) &
+            (catalog['low_alpha'])
+        ].copy()
+        if subset.shape[0] >= 100:
+            # Calculate median trend with [Mg/H]
+            mgh_medians = binned_quantiles(
+                subset, col, 'mg_h', 
+                q=0.5, bin_edges=mg_bin_edges, min_count=10
+            )
+            # Calculate residual Ce abundance
+            subset[newcol] = subset[col] - np.interp(
+                subset['mg_h'], *mgh_medians
+            )
+            res_abund.append(subset[['sdss_id', newcol]].copy())
+    # Calculate high-alpha residuals all together
+    all_high_alpha = catalog[catalog['high_alpha']].copy()
+    high_alpha_medians = binned_quantiles(
+        all_high_alpha, col, 'mg_h', 
+        q=0.5, bin_edges=mg_bin_edges, min_count=10
+    )
+    all_high_alpha[newcol] = all_high_alpha[col] - np.interp(
+        all_high_alpha['mg_h'], *high_alpha_medians
+    )
+    res_abund.append(all_high_alpha[['sdss_id', newcol]].copy())
     # Join residual abundances to catalog DataFrame
     res_abund = pd.concat(res_abund)
     res_abund.set_index('sdss_id', inplace=True)

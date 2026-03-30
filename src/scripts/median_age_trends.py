@@ -13,16 +13,20 @@ from utils import binned_quantiles
 from plotting import insert_colorbar_axes, colored_text_legend, ONE_COLUMN_WIDTH
 import paths
 
+RBINS = [(3, 5), (5, 7), (7, 9), (9, 11), (11, 13), (13, 15)]
+ZLIM = (0, 0.5)
+
 def main(style='paper', cmap='viridis_r'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     # Calculate residual abundances
-    mwm_rgb = residual_abundances(mwm_rgb)
+    mwm_rgb = residual_abundances(mwm_rgb, rbins=RBINS, zbins=[ZLIM])
     # Select only low-alpha, near-midplane stars
-    all_lowz = mwm_rgb[(mwm_rgb['z_max'] < 0.5)].copy()
+    all_lowz = mwm_rgb[(mwm_rgb['z_max'] >= ZLIM[0]) & (mwm_rgb['z_max'] < ZLIM[1])].copy()
 
-    radius_bin_edges = np.arange(3, 15.1, 2)
+    dr = RBINS[0][1] - RBINS[0][0]
+    radius_bin_edges = np.arange(RBINS[0][0], RBINS[-1][1]+dr, dr)
     age_bin_edges = np.arange(-0.5, 11.6, 1)
     
     # Set up figure
