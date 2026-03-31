@@ -79,6 +79,8 @@ def main():
     # Calculate upper limits and flag abundances below these limits
     print('Computing abundance limits...')
     sample = compute_upper_limits(sample)
+    # Drop Ce abundances flagged below limits
+    sample = sample[sample['lim_ce_h_flag'] == 0]
     # Calculate abundance ratios and errors in quadrature
     print('Calculating abundance ratios and coordinates...')
     sample['mg_fe'], sample['e_mg_fe'] = abundance_ratio(sample, 'mg', 'fe')
