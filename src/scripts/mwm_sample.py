@@ -79,7 +79,7 @@ def main():
     # Calculate upper limits and flag abundances below these limits
     print('Computing abundance limits...')
     sample = compute_upper_limits(sample)
-    # Drop Ce abundances flagged below limits
+    # Drop stars with Ce abundances flagged below limits
     sample = sample[sample['lim_ce_h_flag'] == 0]
     # Calculate abundance ratios and errors in quadrature
     print('Calculating abundance ratios and coordinates...')
@@ -105,7 +105,7 @@ def main():
     sample = apply_alpha_cut(sample)
 
     # Export catalogs
-    print('Exporting high-quality RGB sample (sample.csv)...')
+    print('Exporting sample of %s stars (sample.csv)...' % sample.shape[0])
     sample.to_csv(paths.data / 'MWM' / 'sample.csv', index=False)
     print('Done!')
 
