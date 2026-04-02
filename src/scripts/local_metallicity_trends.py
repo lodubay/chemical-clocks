@@ -73,6 +73,17 @@ def main(style='paper'):
     )
     cbar = fig.colorbar(pc, ax=axs[0], fraction=0.05, label=MET_LABEL)
 
+    # Indicate median abundance errors
+    age_err_low = np.median(mwm_rgb['age'] - mwm_rgb['e_n_age'])
+    age_err_high = np.median(mwm_rgb['e_p_age'] - mwm_rgb['age'])
+    med_abund_err = mwm_rgb['e_ce_h'].median()
+    axs[0].errorbar(
+        8, 0.6, 
+        xerr=[[age_err_low], [age_err_high]], 
+        yerr=med_abund_err, 
+        c='gray', capsize=0, #elinewidth=0.5,
+    )
+
     # Bin by metallicity and fit linear trend to stars within good age range
     fits = []
     age_arr = np.arange(0, 12.1, 0.1)
