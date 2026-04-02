@@ -12,6 +12,7 @@ from scipy import stats
 from scipy.optimize import minimize
 import emcee
 import corner
+from odrpack import odr_fit
 
 from plotting import ONE_COLUMN_WIDTH
 from utils import sample_rows
@@ -155,14 +156,18 @@ def main(style='paper'):
         )
         # Plot MCMC
         print(met_lim[0], met_lim[1])
-        flat_samples = mcmc_fit(subset_fit, plot=True, verbose=True) / ABUND_SCALE
-        inds = np.random.randint(len(flat_samples), size=100)
-        for ind in inds:
-            sample = flat_samples[ind]
-            ax.plot(age_arr, sample[0] * age_arr + sample[1], color=color, alpha=0.1)
-        med_fit = np.median(flat_samples, axis=0)
-        print(med_fit)
-        ax.plot(age_arr, med_fit[0] * age_arr + med_fit[1], 'k-')
+        # flat_samples = mcmc_fit(subset_fit, plot=True, verbose=True) / ABUND_SCALE
+        # inds = np.random.randint(len(flat_samples), size=100)
+        # for ind in inds:
+        #     sample = flat_samples[ind]
+        #     ax.plot(age_arr, sample[0] * age_arr + sample[1], color=color, alpha=0.1)
+        # med_fit = np.median(flat_samples, axis=0)
+        # print(med_fit)
+        # ax.plot(age_arr, med_fit[0] * age_arr + med_fit[1], 'k-')
+        # ODR
+        fit_params, fit_sd = get_odr_fit(subset_low_alpha, verbose=True)
+        ax.plot(age_arr, fit_params[0] * age_arr + fit_params[1], 'k-')
+
 
     axs[0].set_xlim(xlim)
     axs[0].set_ylim(ylim)
@@ -175,6 +180,11 @@ def main(style='paper'):
         ax.set_ylabel(r'[Ce/Mg]$_{\rm corr}$')
 
     plt.savefig(paths.figures / 'metallicity_fits')
+
+
+def model(x, beta):
+    m, b = beta
+    return m * x + b
 
 
 def log_prior(theta):
@@ -201,6 +211,28 @@ def log_probability(theta, xobs, yobs, xerr, yerr):
     if not np.isfinite(lp):
         return -np.inf
     return lp + log_likelihood(theta, xobs, yobs, xerr, yerr)
+
+
+def get_odr_fit(data, verbose=False):
+    # Parse data
+    xobs = data['age'].to_numpy()
+    yobs = data['ce_mg_corr'].to_numpy()
+    xerr = 0.5 * ((data['e_p_age'] - data['age']) + 
+                  (data['age'] - data['e_n_age'])).to_numpy()
+    yerr = data['e_ce_mg'].to_numpy()
+    beta0 = [0, 0] # initial guess
+    lower, upper = [-5, -5], [5, 5] # bounds
+    if verbose:
+        report = 'short'
+    else:
+        report = 'none'
+    sol = odr_fit(
+        model, xobs, yobs, beta0, 
+        bounds = (lower, upper),
+        weight_x = 1 / xerr, weight_y = 1 / yerr,
+        report = report
+    )
+    return sol.beta, sol.sd_beta
 
 
 def mcmc_fit(data, nwalkers=32, max_steps=5000, burnin=100, thin=20, verbose=False, seed=None, plot=False):
