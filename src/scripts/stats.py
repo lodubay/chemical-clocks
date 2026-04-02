@@ -5,6 +5,98 @@ Generic statistical routines for this project.
 import numpy as np
 from multizone._globals import RANDOM_SEED
 
+def deming_regression(x_obs, y_obs, x_err, y_err):
+    """
+    Calculate the Deming regression, a variant of least-squares regression
+    that accounts for errors in both x and y.
+    
+    Parameters
+    ----------
+    x_obs : numpy.ndarray
+        Array of length N with x-values of observed data.
+    y_obs : numpy.ndarray
+        Array of length N with y-values of observed data.
+    x_err : numpy.ndarray
+        Array of length N with uncertainties on the x-values. Note that this is
+        assumed to be the standard deviation of the errors, which are normally
+        distributed and centered on 0.
+    y_err : numpy.ndarray
+        Array of length N with uncertainties on the y-values.
+    
+    Returns
+    -------
+    beta : np.ndarray of length 2
+        Parameters of best-fit line, with beta[0] the slope and beta[1] the
+        intercept.
+
+    Notes
+    -----
+    The Deming regression assumes that the ratio of the error variances is
+    constant.
+    """
+    # Center the data
+    mean_x = np.mean(x_obs)
+    x_obs = x_obs - mean_x
+    mean_y = np.mean(y_obs)
+    y_obs = y_obs - mean_y
+
+    # Ratio of variances of the errors
+    # sigma_x = np.std(x_err)
+    # sigma_y = np.std(y_err)
+    sigma_x = np.mean(x_err)
+    sigma_y = np.mean(y_err)
+    lam = (sigma_y**2) / (sigma_x**2)
+
+    # For centered data, compute the sums of squares:
+    Sxx = np.sum(x_obs**2)
+    Syy = np.sum(y_obs**2)
+    Sxy = np.sum(x_obs * y_obs)
+
+    # Least-squares estimate of model parameters
+    beta_deming = (
+        Syy - lam * Sxx + np.sqrt((Syy - lam * Sxx)**2 + 4 * lam * Sxy**2)
+    ) / (2 * Sxy)
+    emp_m_dem = beta_deming
+    emp_b_dem = mean_y - beta_deming * mean_x
+    
+    return np.array([emp_m_dem, emp_b_dem])
+
+
+def bootstrap_standard_error(func, *args, B=1000, seed=RANDOM_SEED, **kwargs):
+    """
+    Use bootstrapping to calculate the standard error of the given function.
+    
+    Parameters
+    ----------
+    func : <function>
+        Function accepting one or several arrays of the same length.
+    args : array-like
+        Data array(s) to pass to func. If multiple, must all have same length.
+    B : int [default: 1000]
+        Number of bootstrap samples.
+    seed : int [default: RANDOM_SEED]
+        Seed for random number generator.
+    **kwargs passed to func().
+
+    Returns
+    -------
+    float or array-like
+        Standard error of the given function return values.
+    """
+    assert len(args) > 0, 'Missing at least one positional argument for data.'
+    nobs = len(args[0])
+    assert all([nobs == len(x) for x in args]), \
+        'Positional arguments must have equal length.'
+    rng = np.random.default_rng(seed)
+    vals = [] # return values from function
+    for i in range(B):
+        # Randomly sample input array(s) *with* replacement
+        sample_indices = rng.integers(0, nobs, size=nobs)
+        data_samples = [x[sample_indices] for x in args]
+        vals.append(func(*data_samples, **kwargs))
+    # The standard error is the standard deviation of the values
+    return np.std(np.array(vals), axis=0)
+
 
 def median_standard_error(x, B=1000, seed=RANDOM_SEED):
     """

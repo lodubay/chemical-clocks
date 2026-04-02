@@ -14,6 +14,7 @@ import emcee
 import corner
 from odrpack import odr_fit
 
+from stats import deming_regression, bootstrap_standard_error
 from plotting import ONE_COLUMN_WIDTH
 from utils import sample_rows
 import paths
@@ -38,6 +39,10 @@ def main(style='paper'):
         (mwm_rgb['z_max'] < ZLIM[1]) &
         (mwm_rgb['good_age'])
     ].copy()
+    local_sample['e_age'] = 0.5 * (
+        (local_sample['e_p_age'] - local_sample['age']) + 
+        (local_sample['age'] - local_sample['e_n_age'])
+    )
     # Restrict age trends to low-alpha stars only
     local_low_alpha = local_sample[local_sample['low_alpha']]
     local_high_alpha = local_sample[~local_sample['low_alpha']] # include border stars
@@ -165,9 +170,20 @@ def main(style='paper'):
         # print(med_fit)
         # ax.plot(age_arr, med_fit[0] * age_arr + med_fit[1], 'k-')
         # ODR
-        fit_params, fit_sd = get_odr_fit(subset_low_alpha, verbose=True)
-        ax.plot(age_arr, fit_params[0] * age_arr + fit_params[1], 'k-')
-
+        # fit_params, fit_sd = get_odr_fit(subset_low_alpha, verbose=True)
+        # ax.plot(age_arr, model(age_arr, fit_params), 'k-')
+        # Deming regression
+        data = (
+            subset_low_alpha['age'].to_numpy(), 
+            subset_low_alpha['ce_mg_corr'].to_numpy(),
+            subset_low_alpha['e_age'].to_numpy(),
+            subset_low_alpha['e_ce_mg'].to_numpy()
+        )
+        fit_params = deming_regression(*data)
+        fit_sd = bootstrap_standard_error(deming_regression, *data)
+        print(fit_params)
+        print(fit_sd)
+        ax.plot(age_arr, model(age_arr, fit_params), 'k-')
 
     axs[0].set_xlim(xlim)
     axs[0].set_ylim(ylim)
@@ -184,7 +200,7 @@ def main(style='paper'):
 
 def model(x, beta):
     m, b = beta
-    return m * x + b
+    return m * (x - 5) + b
 
 
 def log_prior(theta):
@@ -229,7 +245,7 @@ def get_odr_fit(data, verbose=False):
     sol = odr_fit(
         model, xobs, yobs, beta0, 
         bounds = (lower, upper),
-        weight_x = 1 / xerr, weight_y = 1 / yerr,
+        weight_x = 1 / xerr**2, weight_y = 1 / yerr**2,
         report = report
     )
     return sol.beta, sol.sd_beta
