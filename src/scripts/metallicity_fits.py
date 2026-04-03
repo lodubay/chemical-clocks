@@ -4,6 +4,7 @@ of metallicity.
 """
 
 import numpy as np
+from numpy.polynomial import Polynomial
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
@@ -87,6 +88,7 @@ def main(style='paper'):
         # )
         # Bin by metallicity and fit linear trend to stars within good age range
         met_lim = (np.round(met_bins[-(i+2)], 2), np.round(met_bins[-(i+1)], 2))
+        print(met_lim)
         met_center = np.mean(met_lim) # mean metallicity of bin
         color = cmap(norm(met_center))
         # Scatter plot of stars in metallicity range
@@ -125,6 +127,7 @@ def main(style='paper'):
             (local_sample['low_alpha'])
         ]
         regress = stats.linregress(subset_fit['age'], subset_fit['ce_mg_corr'])
+        print(regress.slope, regress.intercept)
         fits.append(regress)
         # Plot linear regression
         yfit = age_arr * regress.slope + regress.intercept
@@ -160,7 +163,6 @@ def main(style='paper'):
             }
         )
         # Plot MCMC
-        print(met_lim[0], met_lim[1])
         # flat_samples = mcmc_fit(subset_fit, plot=True, verbose=True) / ABUND_SCALE
         # inds = np.random.randint(len(flat_samples), size=100)
         # for ind in inds:
@@ -173,11 +175,12 @@ def main(style='paper'):
         # fit_params, fit_sd = get_odr_fit(subset_low_alpha, verbose=True)
         # ax.plot(age_arr, model(age_arr, fit_params), 'k-')
         # Deming regression
+        abund_error_scale = 3
         data = (
             subset_low_alpha['age'].to_numpy(), 
             subset_low_alpha['ce_mg_corr'].to_numpy(),
             subset_low_alpha['e_age'].to_numpy(),
-            subset_low_alpha['e_ce_mg'].to_numpy()
+            subset_low_alpha['e_ce_mg'].to_numpy() * abund_error_scale
         )
         fit_params = deming_regression(*data)
         fit_sd = bootstrap_standard_error(deming_regression, *data)
@@ -200,7 +203,7 @@ def main(style='paper'):
 
 def model(x, beta):
     m, b = beta
-    return m * (x - 5) + b
+    return m * x + b
 
 
 def log_prior(theta):
