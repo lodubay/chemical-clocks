@@ -22,6 +22,7 @@ AGE_FIT_RANGE = (1, 8) # Range of ages to fit linear trend
 SAMPLE_FRACTION = 1 # fraction of stars to plot in each panel
 RLIM = (7, 9)
 ZLIM = (0, 0.5)
+AGE_DELTA = 5 # Gyr, linear age shift for regression
 
 
 def main(style='paper'):
@@ -51,6 +52,7 @@ def main(style='paper'):
 
     fig, axs = plt.subplots(2, 1,
         figsize=(ONE_COLUMN_WIDTH, 1.5*ONE_COLUMN_WIDTH),
+        gridspec_kw={'hspace': 0.25}
     )
     plt.subplots_adjust(right=0.75)
     # cax = insert_colorbar_axes(fig)
@@ -98,10 +100,10 @@ def main(style='paper'):
             (local_low_alpha['age'] < AGE_FIT_RANGE[1])
         ]
         # Fit linear age trend
-        regress = stats.linregress(subset['age'], subset['ce_mg_corr'])
+        regress = stats.linregress(subset['age'] - AGE_DELTA, subset['ce_mg_corr'])
         fits.append(regress)
         # Plot linear regression
-        yfit = age_arr * regress.slope + regress.intercept
+        yfit = (age_arr - AGE_DELTA) * regress.slope + regress.intercept
         # White outline for plot legibility
         axs[0].plot(age_arr, yfit, linestyle='-', linewidth=2, color='w')
         axs[0].plot( # extends beyond fit region
@@ -174,11 +176,11 @@ def main(style='paper'):
     axs[1].xaxis.set_minor_locator(MultipleLocator(0.1))
     axs[1].yaxis.set_major_locator(MultipleLocator(0.05))
     axs[1].yaxis.set_minor_locator(MultipleLocator(0.01))
-    intax.set_ylabel('Intercept [dex]', color=intercept_color)
-    intax.set_ylim((-0.7, 0.7))
+    intax.set_ylabel('[Ce/Mg] at %s Gyr' % AGE_DELTA, color=intercept_color)
+    intax.set_ylim((-0.25, 0.25))
     intax.tick_params(axis='y', labelcolor=intercept_color)
-    intax.yaxis.set_major_locator(MultipleLocator(0.5))
-    intax.yaxis.set_minor_locator(MultipleLocator(0.1))
+    intax.yaxis.set_major_locator(MultipleLocator(0.1))
+    intax.yaxis.set_minor_locator(MultipleLocator(0.02))
 
     leg = axs[1].legend()
     leg.legend_handles[0].set_color('k')
