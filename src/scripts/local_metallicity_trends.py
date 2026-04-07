@@ -134,7 +134,7 @@ def main(style='paper'):
     cbar.ax.yaxis.set_major_locator(MultipleLocator(0.1))
     cbar.ax.tick_params(axis='y', which='major', right=False)
     axs[0].set_xlabel('Age [Gyr]')
-    axs[0].set_ylabel(r'[Ce/Mg]$_{\rm corr}$')
+    axs[0].set_ylabel('[Ce/Mg]')
     
     # Bottom panel: plot slopes, intercepts as a function of metallicity
     # Plot intercept on same axes
