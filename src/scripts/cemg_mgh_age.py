@@ -31,7 +31,6 @@ def main(style='paper'):
         gridsize=30, extent=[XLIM[0], XLIM[1], YLIM[0], YLIM[1]],
         cmap=cmap, norm=norm, mincnt=10, contours=4,
     )
-    print(contours)
     fig.colorbar(pc, ax=ax, label='StarFlow Age [Gyr]')
     # Indicate median abundance errors
     ax.errorbar(
@@ -41,7 +40,7 @@ def main(style='paper'):
         c='gray', capsize=0, elinewidth=1,
     )
     ax.set_xlabel('[Mg/H]')
-    ax.set_ylabel(r'[Ce/Mg]$_{\rm corr}$')
+    ax.set_ylabel('[Ce/Mg]')
     ax.set_xlim(XLIM)
     ax.set_ylim(YLIM)
     ax.xaxis.set_major_locator(MultipleLocator(0.5))
