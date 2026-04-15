@@ -37,7 +37,7 @@ def main():
     # ensure SDSS IDs are the same between DR19 and StarFlow in every row
     assert np.all(np.where(mwm_full['sdss_id'] == starflow['sdss_id'], 1, 0))
     mwm_full = mwm_full.join(
-        starflow[['age', 'e_p_age', 'e_n_age', 'good_age']]
+        starflow[['age', 'e_p_age', 'e_n_age', 'training_density', 'good_age']]
     )
     # Drop contamination & confusion flag
     mwm_full.drop(labels='cc_flg', axis=1, inplace=True)
