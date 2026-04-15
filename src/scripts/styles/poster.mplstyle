@@ -30,6 +30,9 @@ ytick.labelsize: 8
 legend.fontsize: 8
 legend.handlelength: 1.2
 legend.frameon: False
+legend.framealpha: 1.0
+legend.facecolor: 'w'
+legend.edgecolor: 'w'
 # Axes
 axes.labelpad: 2.0
 axes.linewidth: 0.5
