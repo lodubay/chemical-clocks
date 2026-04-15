@@ -1,6 +1,8 @@
 """
 Compare [Ce/Mg]-age trends at different radii predicted by the model to the data
 """
+import argparse
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -121,4 +123,17 @@ def main(style='paper', cmap='viridis_r'):
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Plot [Ce/Mg]-age trends at many radii predicted by models.'
+    )
+    parser.add_argument('--style',
+        choices=('paper', 'poster'),
+        default='paper',
+        help='Plot style to use (default: paper).'
+    )
+    parser.add_argument('--cmap',
+        default='viridis_r',
+        help='Colormap to use for radial dimension.'
+    )
+    args = parser.parse_args()
+    main(**vars(args))

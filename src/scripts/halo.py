@@ -1,6 +1,7 @@
 """
 This script plots Ce abundances in the Milky Way halo.
 """
+import argparse
 
 import numpy as np
 import pandas as pd
@@ -12,6 +13,7 @@ from matplotlib.ticker import MultipleLocator
 import paths
 from plotting import TWO_COLUMN_WIDTH, colored_text_legend
 from colormaps import paultol
+from utils import binned_quantiles
 
 DENSITY_COLORMAP = 'binary_r'
 
@@ -188,6 +190,27 @@ def main(style='paper'):
         **scatter_kwargs
     )
     # Rolling median, 16th and 84th percentiles of low-Ia stars
+    # mgh_bin_edges = np.arange(-1.55, 0.56, 0.1)
+    # for q, ls in zip([0.16, 0.5, 0.84], ['--', '-', '--']):
+    #     low_ia_trend = binned_quantiles(
+    #         low_ia, 'ce_mg', 'mg_h',
+    #         q=q, bin_edges=mgh_bin_edges, min_count=10
+    #     )
+    #     label = 'Low-Ia' if q == 0.5 else None
+    #     ax2.plot(*low_ia_trend, 'w-', linewidth=2)
+    #     ax2.plot(*low_ia_trend, ls, color=low_ia_color, label=label)
+    #     insitu_trend = binned_quantiles(
+    #         insitu, 'ce_mg', 'mg_h',
+    #         q=q, bin_edges=mgh_bin_edges, min_count=10
+    #     )
+    #     ax2.plot(*insitu_trend, 'w-', linewidth=2)
+    #     ax2.plot(*insitu_trend, ls, color=insitu_color)
+    #     accreted_trend = binned_quantiles(
+    #         accreted, 'ce_mg', 'mg_h',
+    #         q=q, bin_edges=mgh_bin_edges, min_count=10
+    #     )
+    #     ax2.plot(*accreted_trend, 'w-', linewidth=2)
+    #     ax2.plot(*accreted_trend, ls, color=accreted_color)
     sorted_low_ia = low_ia.sort_values('mg_h')[['mg_h', 'ce_mg']]
     rolling_low_ia = sorted_low_ia.rolling(
         1000, min_periods=1000, step=100, on='mg_h', center=True
@@ -311,4 +334,13 @@ def halo_chem_cut(alfe):
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Plot [Ce/Mg] vs [Mg/H] for halo stars.'
+    )
+    parser.add_argument('--style',
+        choices=('paper', 'poster'),
+        default='paper',
+        help='Plot style to use (default: paper).'
+    )
+    args = parser.parse_args()
+    main(**vars(args))

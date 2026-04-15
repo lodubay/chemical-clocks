@@ -1,6 +1,7 @@
 """
 Plot [Ce/Mg] evolution predicted by various GCE models.
 """
+import argparse
 
 import numpy as np
 import pandas as pd
@@ -148,4 +149,13 @@ def main(style='paper'):
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Compare ISM evolution of multi-zone models.'
+    )
+    parser.add_argument('--style',
+        choices=('paper', 'poster'),
+        default='paper',
+        help='Plot style to use (default: paper).'
+    )
+    args = parser.parse_args()
+    main(**vars(args))

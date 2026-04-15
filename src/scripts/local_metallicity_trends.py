@@ -2,6 +2,7 @@
 This script fits a linear trend to the age-[Ce/Mg] relation in metallicity bins
 for stars in the Solar neighborhood.
 """
+import argparse
 
 import numpy as np
 import pandas as pd
@@ -25,7 +26,7 @@ ZLIM = (0, 0.5)
 AGE_DELTA = 5 # Gyr, linear age shift for regression
 
 
-def main(style='paper'):
+def main(style='paper', cmap='viridis'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
 
     # Data
@@ -56,7 +57,7 @@ def main(style='paper'):
     )
     plt.subplots_adjust(right=0.75)
     # cax = insert_colorbar_axes(fig)
-    cmap = plt.get_cmap('viridis')
+    cmap = plt.get_cmap(cmap)
     norm = BoundaryNorm(met_bins, cmap.N, extend='both')
 
     # Top panel: fit age trends binned by metallicity
@@ -203,4 +204,17 @@ def casali_local_fit(age, feh):
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Fit local [Ce/Mg]-age relation in metallicity bins.'
+    )
+    parser.add_argument('--style',
+        choices=('paper', 'poster'),
+        default='paper',
+        help='Plot style to use (default: paper).'
+    )
+    parser.add_argument('--cmap',
+        default='viridis',
+        help='Colormap to use for metallicity dimension.'
+    )
+    args = parser.parse_args()
+    main(**vars(args))

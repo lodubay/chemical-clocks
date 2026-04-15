@@ -2,6 +2,8 @@
 Compare median trends in [Ce/Mg] and residual [Ce/H] as a function of age
 and guiding-center radius.
 """
+import argparse
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -140,4 +142,18 @@ def main(style='paper', cmap='viridis_r'):
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Plot median Ce abundances as a function of age in \
+multiple radial bins.'
+    )
+    parser.add_argument('--style',
+        choices=('paper', 'poster'),
+        default='paper',
+        help='Plot style to use (default: paper).'
+    )
+    parser.add_argument('--cmap',
+        default='viridis_r',
+        help='Colormap to use for radial dimension.'
+    )
+    args = parser.parse_args()
+    main(**vars(args))
