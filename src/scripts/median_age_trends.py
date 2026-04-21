@@ -18,7 +18,7 @@ import paths
 RBINS = [(3, 5), (5, 7), (7, 9), (9, 11), (11, 13), (13, 15)]
 ZLIM = (0, 0.5)
 
-def main(style='paper', cmap='viridis_r'):
+def main(style='paper', cmap='viridis_r', min_count=10):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
@@ -72,7 +72,7 @@ def main(style='paper', cmap='viridis_r'):
             ]
             low_alpha_age_medians = binned_quantiles(
                 low_alpha_subset, col, 'age',
-                q=0.5, bin_edges=age_bin_edges, min_count=10, est_errors=True
+                q=0.5, bin_edges=age_bin_edges, min_count=min_count, est_errors=True
             )
             axs[i].plot(
                 *low_alpha_age_medians[:-1], '-', 
@@ -93,7 +93,7 @@ def main(style='paper', cmap='viridis_r'):
             ]
             high_alpha_age_medians = binned_quantiles(
                 high_alpha_subset, col, 'age',
-                q=0.5, bin_edges=age_bin_edges, min_count=10, est_errors=True
+                q=0.5, bin_edges=age_bin_edges, min_count=min_count, est_errors=True
             )
             axs[i].plot(
                 *high_alpha_age_medians[:-1], '--', 
@@ -154,6 +154,11 @@ multiple radial bins.'
     parser.add_argument('--cmap',
         default='viridis_r',
         help='Colormap to use for radial dimension.'
+    )
+    parser.add_argument('--min-count', 
+        type=int,
+        default=10,
+        help='Minimum counts per age bin (default: 10).'
     )
     args = parser.parse_args()
     main(**vars(args))

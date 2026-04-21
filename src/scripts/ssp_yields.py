@@ -1,7 +1,8 @@
 """
-This script plots the age and metallicity dependence of AGB yields predicted
+This script plots the mass and metallicity dependence of AGB yields predicted
 from a simple stellar population (SSP) model.
 """
+import argparse
 
 import numpy as np
 import pandas as pd
@@ -162,4 +163,13 @@ def main(style='paper'):
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Plot the mass and metallicity dependence of AGB yields.'
+    )
+    parser.add_argument('--style',
+        choices=('paper', 'poster'),
+        default='paper',
+        help='Plot style to use (default: paper).'
+    )
+    args = parser.parse_args()
+    main(**vars(args))

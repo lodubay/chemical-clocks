@@ -1,6 +1,7 @@
 """
 Plot explaining the calculation of the residual abundance Delta [Ce/H].
 """
+import argparse
 
 import numpy as np
 import pandas as pd
@@ -152,4 +153,13 @@ def main(style='paper'):
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Explainer plot for the residual abundance calculation.'
+    )
+    parser.add_argument('--style',
+        choices=('paper', 'poster'),
+        default='paper',
+        help='Plot style to use (default: paper).'
+    )
+    args = parser.parse_args()
+    main(**vars(args))
