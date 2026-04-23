@@ -26,10 +26,10 @@ def main(style='poster'):
     fig, axs = plt.subplots(
         1, 3, figsize=(8, 2.5), sharex=True, constrained_layout=True
     )
-    cols = ['mg_h', 'fe_mg', 'ce_mg']
-    labels = ['[Mg/H]', '[Fe/Mg]', '[Ce/Mg]']
+    cols = ['mg_h', 'mg_fe', 'ce_mg']
+    labels = ['[Mg/H]', '[Mg/Fe]', '[Ce/Mg]']
     xlim = (0, 11)
-    ylims = [(-1.1, 0.6), (-0.4, 0.2), (-0.8, 0.8)]
+    ylims = [(-1.1, 0.6), (-0.2, 0.4), (-0.8, 0.8)]
     for ax, col, label, ylim in zip(axs, cols, labels, ylims):
         # ax.scatter(
         #     local_sample['age'], local_sample[col], 
