@@ -33,13 +33,21 @@ def main(style='paper', verbose=True, overwrite=False):
     mwm_sample = pd.read_csv(paths.data / 'MWM' / 'sample.csv', index_col='sdss_id')
     plt.rcParams['axes.prop_cycle'] = plt.cycler('color', paultol.bright.colors)
     colors = paultol.bright.colors
-    markers = ['o', '^', 'd', 's', '*', 'h']
+    markers = ['o', '^', 'd', 's', '*', 'p', 'P']
 
     # Get spectra
-    sdss_id_list_1 = [56306785, 72644900, 91786587]
-    sdss_id_list_2 = [75933928, 115549731, 102251258]
-    sdss_id_list = sdss_id_list_1 + sdss_id_list_2
-    rows = [0, 0, 0, 1, 1, 1] # panel rows in which to plot the spectra
+    sdss_id_list = [
+        76020143, # logg~3
+        77434984, # logg~2.5
+        72928961, # logg~2
+        57957167, # [Ce/Fe]~0, [Fe/H]~-1, logg~3
+        61020837, # [Ce/Fe]~-0.3, [Fe/H]~-0.5, logg~3
+        89108691, # [Ce/Fe]~0, [Fe/H]~+0.3, logg~3
+        # 61604644, # [Ce/Fe]~0, [Fe/H]~-1, logg~2
+        # 75933928, # [Ce/Fe]~-0.3, [Fe/H]~-0.5, logg~2
+        # 82369483, # [Ce/Fe]~0, [Fe/H]~+0.3, logg~2
+    ]
+    # rows = [0, 0, 0, 1, 1, 1] # panel rows in which to plot the spectra
     access = Access(release='dr19')
     access.remote()
     # Check for spectrum files
@@ -69,20 +77,24 @@ def main(style='paper', verbose=True, overwrite=False):
 
     plt.style.use(paths.styles / f'{style}.mplstyle')
     fig = plt.figure(figsize=(TWO_COLUMN_WIDTH, 0.6*TWO_COLUMN_WIDTH))
-    gs1 = GridSpec(2, 2, figure=fig, right=0.72)
+    gs1 = GridSpec(2, 2, figure=fig, right=0.72, wspace=0.15)
 
     # Plot spectral windows
-    ax1 = fig.add_subplot(gs1[0,0])
-    ax2 = fig.add_subplot(gs1[0,1])
-    ax3 = fig.add_subplot(gs1[1,0], sharex=ax1)
-    ax4 = fig.add_subplot(gs1[1,1], sharex=ax2)
-    axs = np.array([[ax1, ax2], [ax3, ax4]])
-    ax3.xaxis.set_minor_locator(MultipleLocator(0.2))
-    ax4.xaxis.set_minor_locator(MultipleLocator(0.2))
-    ax3.set_xlabel('Wavelength [Å]')
-    ax4.set_xlabel('Wavelength [Å]')
+    ax1 = fig.add_subplot(gs1[:,0])
+    ax2 = fig.add_subplot(gs1[:,1])
+    # ax3 = fig.add_subplot(gs1[1,0], sharex=ax1)
+    # ax4 = fig.add_subplot(gs1[1,1], sharex=ax2)
+    # axs = np.array([[ax1, ax2], [ax3, ax4]])
+    ax1.xaxis.set_minor_locator(MultipleLocator(0.2))
+    ax2.xaxis.set_minor_locator(MultipleLocator(0.2))
+    ax1.set_xlabel('Wavelength [Å]')
+    ax2.set_xlabel('Wavelength [Å]')
     ax1.set_ylabel('Relative Flux + Offset')
-    ax3.set_ylabel('Relative Flux + Offset')
+    # ax3.set_ylabel('Relative Flux + Offset')
+
+    # Flux offsets per spectrum for each panel
+    left_offsets = [0.05, 0.025, 0, -0.10, -0.15, -0.2]
+    right_offsets = [0.1, 0.05, 0, -0.05, -0.1, -0.2]
 
     # Cycle through SDSS IDs
     for i, sdss_id in enumerate(sdss_id_list):
@@ -105,19 +117,19 @@ def main(style='paper', verbose=True, overwrite=False):
         obs_flux_err = mwmStar['ivar'][0]**-0.5 / astraStar['continuum'][0] # flux error calculation
         model_ce = astraStar['model_flux_ce_h'][0] # model fit to Ce abundance
         model_global = astraStar['model_flux'][0] # global model fit
-        offset = i*0.05 # flux offset for plotting
 
         # Plot mutliple spectral windows
-        row = axs[rows[i]] # select row to plot in
-        for ax, line in zip(row, [CE_II_LINES[1], CE_II_LINES[6]]):
-            ax.axvline(line, color='gray', linestyle='--')
+        # row = axs[rows[i]] # select row to plot in
+        for ax, line, offset_list in zip([ax1, ax2], [CE_II_LINES[1], CE_II_LINES[6]], [left_offsets, right_offsets]):
+            offset = offset_list[i]
+            ax.axvline(line, color=paultol.bright.colors[-1], linestyle='--')
             wl_range = (line-1.5, line+1.5)
             mask = (wl_arr >= wl_range[0]) & (wl_arr < wl_range[1])
             ax.errorbar(
                 wl_arr[mask], obs_flux[mask]+offset, 
                 yerr=obs_flux_err[mask], 
                 color=colors[i],
-                marker=markers[i], ms=3, mfc='w', capsize=0, linestyle='none',
+                marker=markers[i], ms=4, mfc='w', capsize=0, linestyle='none',
                 # label=round(logg, 2)
             )
             ax.plot(
@@ -132,7 +144,7 @@ def main(style='paper', verbose=True, overwrite=False):
             ax.ticklabel_format(style='plain', axis='x', useOffset=False)
 
     # Plot Kiel diagram
-    gs2 = GridSpec(2, 1, left=0.8, right=0.98, hspace=0.25)
+    gs2 = GridSpec(2, 1, left=0.78, right=0.98, hspace=0.25)
     kiel_ax = fig.add_subplot(gs2[0])
     hexbin_kwargs = dict(
         gridsize=50,
