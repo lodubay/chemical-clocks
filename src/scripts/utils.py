@@ -38,6 +38,48 @@ def alpha_cut(feh):
     )
 
 
+def vac2air(wl):
+    """
+    Convert vacuum wavelengths to wavelengths in air at STP.
+
+    Parameters
+    ----------
+    wl : array-like
+        Vacuum wavelengths in Angstroms.
+
+    Returns
+    -------
+    array-like
+        Air wavelengths in Angstroms.
+    """
+    # Wave number
+    s = 10**4 / wl
+    # Refraction index
+    n = 1 + 0.0000834254 + 0.02406147 / (130 - s**2) + 0.00015998 / (38.9 - s**2)
+    return wl / n
+
+
+def air2vac(wl):
+    """
+    Convert wavelengths in air at STP to vacuum wavelengths.
+    
+    Parameters
+    ----------
+    wl : array-like
+        Wavelengths in air in Angstroms.
+    
+    Returns
+    -------
+    array-like
+        Vacuum wavelengths in Angstroms.
+    """
+    # Wave number
+    s = 10**4 / wl
+    # Index of refraction
+    n = 1 + 0.00008336624212083 + 0.02408926869968 / (130.1065924522 - s**2) + 0.0001599740894897 / (38.92568793293 - s**2)
+    return wl * n
+
+
 # =============================================================================
 # DATA UTILITY FUNCTIONS
 # =============================================================================
