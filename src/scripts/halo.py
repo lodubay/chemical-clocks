@@ -13,7 +13,8 @@ from matplotlib.ticker import MultipleLocator
 import paths
 from plotting import TWO_COLUMN_WIDTH, colored_text_legend
 from colormaps import paultol
-from utils import binned_quantiles
+from utils import binned_quantiles, get_bin_centers
+from contours import plot_kde2D_contours
 
 DENSITY_COLORMAP = 'binary_r'
 
@@ -28,6 +29,7 @@ def main(style='paper'):
     disk = data[data['E']/1e5 < halo_ELz_cut(data['Lz']/1e3)].copy()
     # disk = data[(data['z_max'] < 3) & (data['vphi'] < -120)]
     low_ia = disk[disk['high_alpha']]
+    high_ia = disk[disk['low_alpha']]
     # Chemically-selected accreted stars
     accreted = halo[halo['mn_mg'] < halo_chem_cut(halo['al_fe'])]
     # Chemically-selected in-situ halo stars
@@ -36,10 +38,9 @@ def main(style='paper'):
     # Set up figure
     plt.style.use(paths.styles / f'{style}.mplstyle')
     fig = plt.figure(figsize=(0.8*TWO_COLUMN_WIDTH, 0.8*TWO_COLUMN_WIDTH))
-    gs = GridSpec(2, 2, figure=fig, height_ratios=[2, 3], wspace=0.35)
-    ax0 = fig.add_subplot(gs[0,0])
-    ax1 = fig.add_subplot(gs[0,1])
-    ax2 = fig.add_subplot(gs[1,:])
+    gs0 = GridSpec(1, 2, figure=fig, top=0.98, bottom=0.64, wspace=0.35)
+    ax0 = fig.add_subplot(gs0[0])
+    ax1 = fig.add_subplot(gs0[1])
     hexbin_kwargs = dict(
         cmap=DENSITY_COLORMAP, 
         linewidths=0.2,
@@ -54,6 +55,7 @@ def main(style='paper'):
     accreted_color = paultol.bright.colors[5]
     insitu_color = paultol.bright.colors[2]
     low_ia_color = paultol.bright.colors[1]
+    high_ia_color = paultol.bright.colors[0]
     # Italicize "in situ" if LaTeX is installed
     if plt.rcParams['text.usetex']:
         insitu_label = r'\textit{In situ}'
@@ -150,6 +152,11 @@ def main(style='paper'):
         bbox={'color': 'w', 'pad': 1}
     )
 
+    # Set up second row
+    gs1 = GridSpec(1, 2, figure=fig, width_ratios=[4, 1], bottom=0.08, top=0.56, right=0.88, wspace=0.)
+    ax2 = fig.add_subplot(gs1[0])
+    ax3 = fig.add_subplot(gs1[1], sharey=ax2)
+
     # [Ce/Mg] - [Mg/H] plane
     ax2.set_xlabel('[Mg/H]')
     ax2.set_ylabel('[Ce/Mg]')
@@ -157,36 +164,36 @@ def main(style='paper'):
     ax2.xaxis.set_minor_locator(MultipleLocator(0.1))
     ax2.yaxis.set_major_locator(MultipleLocator(0.5))
     ax2.yaxis.set_minor_locator(MultipleLocator(0.1))
-    xlim = (-1.8, 0.6)
+    xlim = (-1.8, 0.499)
     ylim = (-1.1, 1.1)
     ax2.set_xlim(xlim)
     ax2.set_ylim(ylim)
     scatter_kwargs['s'] = 8
-    pc = ax2.hexbin(
-        disk['mg_h'], disk['ce_mg'],
-        C=np.ones(disk.shape[0]),
-        gridsize=(50, 18),
-        zorder=1,
-        extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
-        **hexbin_kwargs
-    )
-    fig.colorbar(
-        pc, ax=ax2, label=r'$\log N$ (disk)', 
-        pad=0., fraction=0.07, aspect=30, 
-        use_gridspec=True
-    )
+    # pc = ax2.hexbin(
+    #     disk['mg_h'], disk['ce_mg'],
+    #     C=np.ones(disk.shape[0]),
+    #     gridsize=(50, 18),
+    #     zorder=1,
+    #     extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
+    #     **hexbin_kwargs
+    # )
+    # fig.colorbar(
+    #     pc, ax=ax2, label=r'$\log N$ (disk)', 
+    #     pad=0., fraction=0.07, aspect=30, 
+    #     use_gridspec=True
+    # )
     # Plot chemically-selected accreted stars
     ax2.scatter(
         accreted['mg_h'], accreted['ce_mg'],
-        c=accreted_color, marker='D', zorder=2,
-        label='Accreted',
+        c=accreted_color, marker='D', zorder=1,
+        label='Accreted Halo',
         **scatter_kwargs
     )
     # Plot in-situ halo stars
     ax2.scatter(
         insitu['mg_h'], insitu['ce_mg'], 
-        c=insitu_color, marker='o', zorder=1,
-        label=insitu_label,
+        c=insitu_color, marker='o', zorder=2,
+        label=insitu_label + ' Halo',
         **scatter_kwargs
     )
     # Rolling median, 16th and 84th percentiles of low-Ia stars
@@ -221,7 +228,29 @@ def main(style='paper'):
     )
     ax2.plot(
         rolling_low_ia['mg_h'].median(), rolling_low_ia['ce_mg'].median(), 
-        '--', color=low_ia_color, label='Low-Ia'
+        '-', color=low_ia_color, label='Low-Ia Disk'
+    )
+    # Plot rolling median of high-Ia stars
+    sorted_high_ia = high_ia.sort_values('mg_h')[['mg_h', 'ce_mg']]
+    rolling_high_ia = sorted_high_ia.rolling(
+        1000, min_periods=1000, step=100, on='mg_h', center=True
+    )
+    ax2.plot(
+        rolling_high_ia['mg_h'].median(), rolling_high_ia['ce_mg'].median(), 
+        'w-', linewidth=2
+    )
+    ax2.plot(
+        rolling_high_ia['mg_h'].median(), rolling_high_ia['ce_mg'].median(), 
+        '-', color=high_ia_color, label='High-Ia Disk'
+    )
+    # Plot contours for low- and high-Ia stars
+    plot_kde2D_contours(
+        ax2, low_ia, 'mg_h', 'ce_mg', c=low_ia_color, 
+        path=paths.data / 'MWM' / 'kde' / 'mgh_cemg' / 'all_low_ia.dat'
+    )
+    plot_kde2D_contours(
+        ax2, high_ia, 'mg_h', 'ce_mg', c=high_ia_color, 
+        path=paths.data / 'MWM' / 'kde' / 'mgh_cemg' / 'all_high_ia.dat'
     )
     # Indicate dispersion
     # for q in [0.16, 0.84]:
@@ -302,7 +331,31 @@ def main(style='paper'):
         c='k', capsize=0
     )
     # ax2.legend(loc='upper left')
-    colored_text_legend(ax2, show_handles=True, loc='upper left', fontsize=plt.rcParams['axes.titlesize'], frameon=True)
+    # colored_text_legend(
+    #     ax2, 
+    #     loc='upper left', 
+    #     bbox_to_anchor=(1, 1),
+    #     fontsize=plt.rcParams['axes.titlesize']
+    # )
+
+    # Marginal panel with histograms
+    cemg_bins = np.arange(-1.1, 1.12, 0.05)
+    colors = [high_ia_color, low_ia_color, insitu_color, accreted_color]
+    labels = ['High-Ia Disk', 'Low-Ia Disk', insitu_label + ' Halo', 'Accreted Halo']
+    for i, df in enumerate([high_ia, low_ia, insitu, accreted]):
+        hist, bin_edges = np.histogram(df['ce_mg'], cemg_bins, density=True)
+        if i < 2:
+            lw = 0.5
+        else:
+            lw = 1
+        ax3.plot(
+            hist/hist.max(), get_bin_centers(bin_edges),
+            c=colors[i], lw=lw, label=labels[i]
+        )
+    ax3.set_xlabel('Density')
+    ax3.set_xlim((0, 1.2))
+    ax3.tick_params(axis='y', labelleft=False, labelright=True)
+    colored_text_legend(ax3, loc='upper left')
 
     plt.subplots_adjust(bottom=0.08, top=0.96, left=0.08, right=0.92)
     plt.savefig(paths.figures / 'halo')

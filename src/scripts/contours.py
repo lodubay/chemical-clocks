@@ -69,7 +69,7 @@ def contour_levels_2D(arr2d, enclosed=[0.8, 0.3]):
     return levels
 
 
-def get_kde2D(data, xcol, ycol, bandwidth=0.03, overwrite=False, **kwargs):
+def get_kde2D(data, xcol, ycol, bandwidth=0.03, overwrite=False, path=None, **kwargs):
     """
     Generate 2-dimensional kernel density estimate (KDE) of MWM data, 
     or import previously saved KDE if it already exists.
@@ -87,6 +87,9 @@ def get_kde2D(data, xcol, ycol, bandwidth=0.03, overwrite=False, **kwargs):
         smoother contour lines. The default is 0.03.
     overwrite : bool
         If True, force re-generate the 2D KDE and save the output.
+    path : str or pathlib.Path, optional
+        Path to save the KDE. If None, assumes the default naming convention.
+        Default is None.
     **kwargs passed to stats.kde2D()
     
     Returns
@@ -97,7 +100,8 @@ def get_kde2D(data, xcol, ycol, bandwidth=0.03, overwrite=False, **kwargs):
     # Path to save 2D KDE for faster plot times
     rlim = (round(data['Rg'].min(), 1), round(data['Rg'].max(), 1))
     zlim = (round(data['z_max'].min(), 1), round(data['z_max'].max(), 1))
-    path = kde2D_path(xcol, ycol, rlim, zlim)
+    if path is None:
+        path = kde2D_path(xcol, ycol, rlim, zlim)
     if path.exists() and not overwrite:
         xx, yy, logz = read_kde(path)
     else:
