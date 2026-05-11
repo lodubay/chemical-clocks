@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 from matplotlib.ticker import MultipleLocator
 from matplotlib.lines import Line2D
+from matplotlib.colors import Normalize
 from astropy.table import Table
 from sdss_access import Access
 
@@ -106,10 +107,11 @@ def main(style='paper', verbose=True, overwrite=False):
 
     # Flux offsets per spectrum for each panel
     offsets = [
-        [0.15, 0.1, 0.05, -0.10, -0.15, -0.25],
+        [0.175, 0.1, 0.05, -0.10, -0.15, -0.25],
         [0.2, 0.15, 0.1, -0.05, -0.1, -0.125],
         [0.2, 0.15, 0.1, 0.025, -0.025, -0.125]
     ]
+    speclabels = ['(i)', '(ii)', '(iii)', '(iv)', '(v)', '(vi)']
 
     # Cycle through SDSS IDs
     for i, sdss_id in enumerate(sdss_id_list):
@@ -155,9 +157,18 @@ def main(style='paper', verbose=True, overwrite=False):
                 linestyle='--', linewidth=0.5, c=colors[i]
             )
             ax.ticklabel_format(style='plain', axis='x', useOffset=False)
+            # Individual spectrum labels in right-hand panel
+            if j==0:
+                ax.text(
+                    wl_arr[mask][2]+0.05, 
+                    max(obs_flux[mask][2], model_ce[mask][2])+offset+0.015,
+                    speclabels[i],
+                    color=colors[i],
+                    ha='center', va='bottom'
+                )
     
     # Custom legend
-    ax0.set_ylim((None, 1.35))
+    ax0.set_ylim((None, 1.38))
     handles = [
         Line2D([0], [0], ls='none', marker='o', ms=4, mec='k', mfc='w'),
         Line2D([0], [0], c='k'),
@@ -167,16 +178,18 @@ def main(style='paper', verbose=True, overwrite=False):
     ax0.legend(handles, labels, loc='upper right', frameon=True)
 
     # Plot Kiel diagram
-    gs2 = GridSpec(2, 1, left=0.78, right=0.98, hspace=0.25)
+    gs2 = GridSpec(2, 1, left=0.78, right=0.98, top=1., hspace=0.25)
     kiel_ax = fig.add_subplot(gs2[0])
+    norm = Normalize(vmin=1, vmax=600)
     hexbin_kwargs = dict(
         gridsize=50,
         cmap='binary_r', 
+        norm=norm,
         linewidths=0.01,
         # reduce_C_function=logsum,
         mincnt=1
     )
-    kiel_ax.hexbin(
+    hb0 = kiel_ax.hexbin(
         mwm_sample['teff'], mwm_sample['logg'], 
         extent=[4000, 5400, LOGG_CUT[0], LOGG_CUT[1]],
         **hexbin_kwargs
@@ -200,12 +213,13 @@ def main(style='paper', verbose=True, overwrite=False):
     kiel_ax.yaxis.set_minor_locator(MultipleLocator(0.1))
     kiel_ax.set_xlabel(r'$T_{\rm eff}$')
     kiel_ax.set_ylabel(r'$\log(g)$')
+    # plt.colorbar(hb0, ax=kiel_ax, label='Number of stars', pad=0)
 
     # Plot abundance diagram
     cefe_ax = fig.add_subplot(gs2[1])
     xlim = (-1.5, 0.5)
     ylim = (-1.2, 1.2)
-    cefe_ax.hexbin(
+    hb1 = cefe_ax.hexbin(
         mwm_sample['fe_h'], mwm_sample['ce_fe'], 
         extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
         **hexbin_kwargs
@@ -222,10 +236,13 @@ def main(style='paper', verbose=True, overwrite=False):
         )
     cefe_ax.set_xlim(xlim)
     cefe_ax.set_ylim(ylim)
-    cefe_ax.xaxis.set_minor_locator(MultipleLocator(0.2))
+    cefe_ax.xaxis.set_major_locator(MultipleLocator(0.5))
+    cefe_ax.xaxis.set_minor_locator(MultipleLocator(0.1))
+    cefe_ax.yaxis.set_major_locator(MultipleLocator(0.5))
     cefe_ax.yaxis.set_minor_locator(MultipleLocator(0.1))
     cefe_ax.set_xlabel('[Fe/H]')
     cefe_ax.set_ylabel('[Ce/Fe]', labelpad=-4)
+    plt.colorbar(hb1, ax=[kiel_ax, cefe_ax], label='Number of stars', pad=0.02, location='top', extend='max')
 
     if verbose:
         print(mwm_sample.loc[sdss_id_list][['obj', 'snr', 'logg', 'm_h_atm', 'alpha_m_atm', 'fe_h', 'ce_fe']])
