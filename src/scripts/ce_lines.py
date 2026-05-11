@@ -19,15 +19,22 @@ from utils import vac2air
 # List of Ce II lines used to calculate abundance in ASPCAP
 # from Cunha et al. (2017)
 CE_II_LINES = [
-    15277.65, 
+    # 15277.65, 
     15784.75, 
-    15958.40, 
-    15977.12, 
-    16327.32, 
+    # 15958.40, 
+    # 15977.12, 
+    # 16327.32, 
     16376.48, 
     16595.18, 
-    16722.51
+    # 16722.51
 ] # Angstroms
+# Approximate bounds of Ce window masks
+# https://data.sdss5.org/sas/sdsswork/mwm/spectro/astra/component_data/aspcap/masks_ipl3/Ce.mask
+CE_WINDOWS = [
+    (15783.6, 15786.3),
+    (16375.35, 16377.45),
+    (16594.0, 16596.35)
+]
 
 def main(style='paper', verbose=True, overwrite=False):
     mwm_sample = pd.read_csv(paths.data / 'MWM' / 'sample.csv', index_col='sdss_id')
@@ -77,24 +84,31 @@ def main(style='paper', verbose=True, overwrite=False):
 
     plt.style.use(paths.styles / f'{style}.mplstyle')
     fig = plt.figure(figsize=(TWO_COLUMN_WIDTH, 0.6*TWO_COLUMN_WIDTH))
-    gs1 = GridSpec(2, 2, figure=fig, right=0.72, wspace=0.15)
+    gs1 = GridSpec(1, 3, figure=fig, left=0.08, right=0.72, wspace=0.2)
 
     # Plot spectral windows
-    ax1 = fig.add_subplot(gs1[:,0])
-    ax2 = fig.add_subplot(gs1[:,1])
-    # ax3 = fig.add_subplot(gs1[1,0], sharex=ax1)
-    # ax4 = fig.add_subplot(gs1[1,1], sharex=ax2)
-    # axs = np.array([[ax1, ax2], [ax3, ax4]])
-    ax1.xaxis.set_minor_locator(MultipleLocator(0.2))
-    ax2.xaxis.set_minor_locator(MultipleLocator(0.2))
-    ax1.set_xlabel('Wavelength [Å]')
-    ax2.set_xlabel('Wavelength [Å]')
-    ax1.set_ylabel('Relative Flux + Offset')
+    ax0 = fig.add_subplot(gs1[0])
+    ax1 = fig.add_subplot(gs1[1])
+    ax2 = fig.add_subplot(gs1[2])
+    spec_axs = np.array([ax0, ax1, ax2])
+    # ax3 = fig.add_subplot(gs1[1,0], sharex=ax0)
+    # ax4 = fig.add_subplot(gs1[1,1], sharex=ax1)
+    # axs = np.array([[ax0, ax1], [ax3, ax4]])
+    for ax in spec_axs:
+        ax.set_xlabel('Wavelength [Å]')
+        ax.xaxis.set_major_locator(MultipleLocator(1))
+        ax.xaxis.set_minor_locator(MultipleLocator(0.2))
+        ax.yaxis.set_major_locator(MultipleLocator(0.1))
+        ax.yaxis.set_minor_locator(MultipleLocator(0.02))
+    ax0.set_ylabel('Relative Flux + Offset')
     # ax3.set_ylabel('Relative Flux + Offset')
 
     # Flux offsets per spectrum for each panel
-    left_offsets = [0.05, 0.025, 0, -0.10, -0.15, -0.2]
-    right_offsets = [0.1, 0.05, 0, -0.05, -0.1, -0.2]
+    offsets = [
+        [0.15, 0.1, 0.05, -0.10, -0.15, -0.2],
+        [0.2, 0.15, 0.1, -0.025, -0.075, -0.1],
+        [0.2, 0.15, 0.1, 0.025, -0.025, -0.1]
+    ]
 
     # Cycle through SDSS IDs
     for i, sdss_id in enumerate(sdss_id_list):
@@ -120,10 +134,12 @@ def main(style='paper', verbose=True, overwrite=False):
 
         # Plot mutliple spectral windows
         # row = axs[rows[i]] # select row to plot in
-        for ax, line, offset_list in zip([ax1, ax2], [CE_II_LINES[1], CE_II_LINES[6]], [left_offsets, right_offsets]):
-            offset = offset_list[i]
+        # for ax, line, offset_list in zip([ax0, ax1], [CE_II_LINES[1], CE_II_LINES[6]], [left_offsets, right_offsets]):
+        for j, ax in enumerate(spec_axs):
+            offset = offsets[j][i]
+            line = CE_II_LINES[j]
             ax.axvline(line, color=paultol.bright.colors[-1], linestyle='--')
-            wl_range = (line-1.5, line+1.5)
+            wl_range = CE_WINDOWS[j]
             mask = (wl_arr >= wl_range[0]) & (wl_arr < wl_range[1])
             ax.errorbar(
                 wl_arr[mask], obs_flux[mask]+offset, 
@@ -142,6 +158,7 @@ def main(style='paper', verbose=True, overwrite=False):
                 linestyle='--', linewidth=0.5, c=colors[i]
             )
             ax.ticklabel_format(style='plain', axis='x', useOffset=False)
+            ax.set_xlim((wl_range[0]+0.1, wl_range[1]-0.1))
 
     # Plot Kiel diagram
     gs2 = GridSpec(2, 1, left=0.78, right=0.98, hspace=0.25)
