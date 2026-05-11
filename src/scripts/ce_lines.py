@@ -94,12 +94,13 @@ def main(style='paper', verbose=True, overwrite=False):
     # ax3 = fig.add_subplot(gs1[1,0], sharex=ax0)
     # ax4 = fig.add_subplot(gs1[1,1], sharex=ax1)
     # axs = np.array([[ax0, ax1], [ax3, ax4]])
-    for ax in spec_axs:
+    for i, ax in enumerate(spec_axs):
         ax.set_xlabel('Wavelength [Å]')
         ax.xaxis.set_major_locator(MultipleLocator(1))
         ax.xaxis.set_minor_locator(MultipleLocator(0.2))
         ax.yaxis.set_major_locator(MultipleLocator(0.1))
         ax.yaxis.set_minor_locator(MultipleLocator(0.02))
+        ax.set_title('%s Å' % CE_II_LINES[i])
     ax0.set_ylabel('Relative Flux + Offset')
     # ax3.set_ylabel('Relative Flux + Offset')
 
