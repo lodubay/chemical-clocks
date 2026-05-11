@@ -11,6 +11,7 @@ from matplotlib.lines import Line2D
 from matplotlib.colors import Normalize
 from astropy.table import Table
 from sdss_access import Access
+access = Access(release='dr19')
 
 import paths
 from colormaps import paultol
@@ -54,32 +55,7 @@ def main(style='paper', verbose=True, overwrite=False):
         62793899, # [Ce/Fe]~-0.3, [Fe/H]~-0.5, logg~2
         96579887, # [Ce/Fe]~0, [Fe/H]~+0.3, logg~2
     ]
-    access = Access(release='dr19')
-    access.remote()
-    # Check for spectrum files
-    download = False
-    for sdss_id in sdss_id_list:
-        if verbose: print(f'{sdss_id}: checking for downloaded spectra...')
-        access_kwargs = dict(v_astra='0.6.0', component='', sdss_id=sdss_id)
-        mwmStar_filename = access.full('mwmStar', **access_kwargs)
-        if not access.exists('', full=mwmStar_filename) or overwrite:
-            access.add('mwmStar', **access_kwargs)
-            download = True
-            if verbose: print('\tAdding data file to download list...')
-        else:
-            if verbose: print('\tFound data file!')
-        astraStar_filename = access.full('astraStarASPCAP', **access_kwargs)
-        if not access.exists('', full=astraStar_filename) or overwrite:
-            access.add('astraStarASPCAP', **access_kwargs)
-            download = True
-            if verbose: print('\tAdding model file to download list...')
-        else:
-            if verbose: print('\tFound model file!')
-    # Download spectra if needed
-    if download:
-        if verbose: print('Downloading spectra...')
-        access.set_stream()
-        access.commit()
+    download_sdss_spectra(sdss_id_list, verbose=verbose, overwrite=overwrite)
 
     plt.style.use(paths.styles / f'{style}.mplstyle')
     fig = plt.figure(figsize=(TWO_COLUMN_WIDTH, 0.6*TWO_COLUMN_WIDTH))
@@ -248,6 +224,50 @@ def main(style='paper', verbose=True, overwrite=False):
         print(mwm_sample.loc[sdss_id_list][['obj', 'snr', 'logg', 'm_h_atm', 'alpha_m_atm', 'fe_h', 'ce_fe']])
     
     plt.savefig(paths.figures / 'ce_lines')
+
+
+def download_sdss_spectra(sdss_id_list, verbose=True, overwrite=False):
+    """
+    Download co-added APOGEE spectra and ASPCAP model spectra.
+    
+    Parameters
+    ----------
+    sdss_id_list : list of ints
+        List of SDSS-V IDs to download. Must have been observed post-DR17.
+    verbose : bool, optional
+        If True, print verbose output. Default is True.
+    overwrite: bool, optional
+        If True, overwrite existing downloaded spectra. Default is False.
+
+    Returns
+    -------
+    None
+    """
+    access.remote()
+    # Check for spectrum files that already exist
+    download = False
+    for sdss_id in sdss_id_list:
+        if verbose: print(f'{sdss_id}: checking for downloaded spectra...')
+        access_kwargs = dict(v_astra='0.6.0', component='', sdss_id=sdss_id)
+        mwmStar_filename = access.full('mwmStar', **access_kwargs)
+        if not access.exists('', full=mwmStar_filename) or overwrite:
+            access.add('mwmStar', **access_kwargs)
+            download = True
+            if verbose: print('\tAdding data file to download list...')
+        else:
+            if verbose: print('\tFound data file!')
+        astraStar_filename = access.full('astraStarASPCAP', **access_kwargs)
+        if not access.exists('', full=astraStar_filename) or overwrite:
+            access.add('astraStarASPCAP', **access_kwargs)
+            download = True
+            if verbose: print('\tAdding model file to download list...')
+        else:
+            if verbose: print('\tFound model file!')
+    # Download spectra if needed
+    if download:
+        if verbose: print('Downloading spectra...')
+        access.set_stream()
+        access.commit()
 
 if __name__ == '__main__':
     main()
