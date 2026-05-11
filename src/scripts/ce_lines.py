@@ -7,6 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 from matplotlib.ticker import MultipleLocator
+from matplotlib.lines import Line2D
 from astropy.table import Table
 from sdss_access import Access
 
@@ -28,13 +29,14 @@ CE_II_LINES = [
     16595.18, 
     # 16722.51
 ] # Angstroms
+
 # Approximate bounds of Ce window masks
 # https://data.sdss5.org/sas/sdsswork/mwm/spectro/astra/component_data/aspcap/masks_ipl3/Ce.mask
 CE_WINDOWS = [
-    (15783.6, 15786.3),
-    (16375.35, 16377.45),
-    (16594.0, 16596.35)
-]
+    (15783.55, 15786.35),
+    (16375.25, 16377.50),
+    (16593.9, 16596.4)
+] # Angstroms
 
 def main(style='paper', verbose=True, overwrite=False):
     mwm_sample = pd.read_csv(paths.data / 'MWM' / 'sample.csv', index_col='sdss_id')
@@ -42,19 +44,15 @@ def main(style='paper', verbose=True, overwrite=False):
     colors = paultol.bright.colors
     markers = ['o', '^', 'd', 's', '*', 'p', 'P']
 
-    # Get spectra
+    # Get spectra (all have S/N ~ 200)
     sdss_id_list = [
-        76020143, # logg~3
-        77434984, # logg~2.5
-        72928961, # logg~2
-        # 57957167, # [Ce/Fe]~0, [Fe/H]~-1, logg~3
-        # 61020837, # [Ce/Fe]~-0.3, [Fe/H]~-0.5, logg~3
-        # 89108691, # [Ce/Fe]~0, [Fe/H]~+0.3, logg~3
-        61604644, # [Ce/Fe]~0, [Fe/H]~-1, logg~2
-        75933928, # [Ce/Fe]~-0.3, [Fe/H]~-0.5, logg~2
-        82369483, # [Ce/Fe]~0, [Fe/H]~+0.3, logg~2
+        58834996, # logg~3
+        116336280, # logg~2.5
+        55254073, # logg~2
+        70979365, # [Ce/Fe]~0, [Fe/H]~-1, logg~2
+        62793899, # [Ce/Fe]~-0.3, [Fe/H]~-0.5, logg~2
+        96579887, # [Ce/Fe]~0, [Fe/H]~+0.3, logg~2
     ]
-    # rows = [0, 0, 0, 1, 1, 1] # panel rows in which to plot the spectra
     access = Access(release='dr19')
     access.remote()
     # Check for spectrum files
@@ -91,24 +89,26 @@ def main(style='paper', verbose=True, overwrite=False):
     ax1 = fig.add_subplot(gs1[1])
     ax2 = fig.add_subplot(gs1[2])
     spec_axs = np.array([ax0, ax1, ax2])
-    # ax3 = fig.add_subplot(gs1[1,0], sharex=ax0)
-    # ax4 = fig.add_subplot(gs1[1,1], sharex=ax1)
-    # axs = np.array([[ax0, ax1], [ax3, ax4]])
     for i, ax in enumerate(spec_axs):
+        ax.set_title('%s Å' % CE_II_LINES[i])
+        ax.axvline(
+            CE_II_LINES[i],
+            color=paultol.bright.colors[-1], 
+            linestyle='--'
+        )
+        ax.set_xlim(CE_WINDOWS[i])
         ax.set_xlabel('Wavelength [Å]')
         ax.xaxis.set_major_locator(MultipleLocator(1))
         ax.xaxis.set_minor_locator(MultipleLocator(0.2))
         ax.yaxis.set_major_locator(MultipleLocator(0.1))
         ax.yaxis.set_minor_locator(MultipleLocator(0.02))
-        ax.set_title('%s Å' % CE_II_LINES[i])
     ax0.set_ylabel('Relative Flux + Offset')
-    # ax3.set_ylabel('Relative Flux + Offset')
 
     # Flux offsets per spectrum for each panel
     offsets = [
-        [0.15, 0.1, 0.05, -0.10, -0.15, -0.2],
-        [0.2, 0.15, 0.1, -0.025, -0.075, -0.1],
-        [0.2, 0.15, 0.1, 0.025, -0.025, -0.1]
+        [0.15, 0.1, 0.05, -0.10, -0.15, -0.25],
+        [0.2, 0.15, 0.1, -0.05, -0.1, -0.125],
+        [0.2, 0.15, 0.1, 0.025, -0.025, -0.125]
     ]
 
     # Cycle through SDSS IDs
@@ -134,20 +134,16 @@ def main(style='paper', verbose=True, overwrite=False):
         model_global = astraStar['model_flux'][0] # global model fit
 
         # Plot mutliple spectral windows
-        # row = axs[rows[i]] # select row to plot in
-        # for ax, line, offset_list in zip([ax0, ax1], [CE_II_LINES[1], CE_II_LINES[6]], [left_offsets, right_offsets]):
         for j, ax in enumerate(spec_axs):
             offset = offsets[j][i]
             line = CE_II_LINES[j]
-            ax.axvline(line, color=paultol.bright.colors[-1], linestyle='--')
             wl_range = CE_WINDOWS[j]
-            mask = (wl_arr >= wl_range[0]) & (wl_arr < wl_range[1])
+            mask = (wl_arr >= wl_range[0]-0.2) & (wl_arr < wl_range[1]+0.2)
             ax.errorbar(
                 wl_arr[mask], obs_flux[mask]+offset, 
                 yerr=obs_flux_err[mask], 
                 color=colors[i],
                 marker=markers[i], ms=4, mfc='w', capsize=0, linestyle='none',
-                # label=round(logg, 2)
             )
             ax.plot(
                 wl_arr[mask], model_ce[mask]+offset, 
@@ -159,7 +155,16 @@ def main(style='paper', verbose=True, overwrite=False):
                 linestyle='--', linewidth=0.5, c=colors[i]
             )
             ax.ticklabel_format(style='plain', axis='x', useOffset=False)
-            ax.set_xlim((wl_range[0]+0.1, wl_range[1]-0.1))
+    
+    # Custom legend
+    ax0.set_ylim((None, 1.35))
+    handles = [
+        Line2D([0], [0], ls='none', marker='o', ms=4, mec='k', mfc='w'),
+        Line2D([0], [0], c='k'),
+        Line2D([0], [0], c='k', ls='--', lw=0.5),
+    ]
+    labels = ['Observed', '[Ce/H] fit', 'Global fit']
+    ax0.legend(handles, labels, loc='upper right', frameon=True)
 
     # Plot Kiel diagram
     gs2 = GridSpec(2, 1, left=0.78, right=0.98, hspace=0.25)
@@ -221,6 +226,9 @@ def main(style='paper', verbose=True, overwrite=False):
     cefe_ax.yaxis.set_minor_locator(MultipleLocator(0.1))
     cefe_ax.set_xlabel('[Fe/H]')
     cefe_ax.set_ylabel('[Ce/Fe]', labelpad=-4)
+
+    if verbose:
+        print(mwm_sample.loc[sdss_id_list][['obj', 'snr', 'logg', 'm_h_atm', 'alpha_m_atm', 'fe_h', 'ce_fe']])
     
     plt.savefig(paths.figures / 'ce_lines')
 
