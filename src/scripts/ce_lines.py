@@ -40,12 +40,12 @@ def main(style='paper', verbose=True, overwrite=False):
         76020143, # logg~3
         77434984, # logg~2.5
         72928961, # logg~2
-        57957167, # [Ce/Fe]~0, [Fe/H]~-1, logg~3
-        61020837, # [Ce/Fe]~-0.3, [Fe/H]~-0.5, logg~3
-        89108691, # [Ce/Fe]~0, [Fe/H]~+0.3, logg~3
-        # 61604644, # [Ce/Fe]~0, [Fe/H]~-1, logg~2
-        # 75933928, # [Ce/Fe]~-0.3, [Fe/H]~-0.5, logg~2
-        # 82369483, # [Ce/Fe]~0, [Fe/H]~+0.3, logg~2
+        # 57957167, # [Ce/Fe]~0, [Fe/H]~-1, logg~3
+        # 61020837, # [Ce/Fe]~-0.3, [Fe/H]~-0.5, logg~3
+        # 89108691, # [Ce/Fe]~0, [Fe/H]~+0.3, logg~3
+        61604644, # [Ce/Fe]~0, [Fe/H]~-1, logg~2
+        75933928, # [Ce/Fe]~-0.3, [Fe/H]~-0.5, logg~2
+        82369483, # [Ce/Fe]~0, [Fe/H]~+0.3, logg~2
     ]
     # rows = [0, 0, 0, 1, 1, 1] # panel rows in which to plot the spectra
     access = Access(release='dr19')
