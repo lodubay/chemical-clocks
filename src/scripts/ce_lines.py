@@ -55,6 +55,15 @@ def main(style='paper', verbose=True, overwrite=False):
         62793899, # [Ce/Fe]~-0.3, [Fe/H]~-0.5, logg~2
         96579887, # [Ce/Fe]~0, [Fe/H]~+0.3, logg~2
     ]
+    # "Sibling" stars with similar [Fe/H], Teff, and logg but different [Ce/Fe]
+    # sdss_id_list = [
+    #     75810381,
+    #     59558349,
+    #     86517081,
+    #     54750610,
+    #     58830163,
+    #     54880428
+    # ]
     download_sdss_spectra(sdss_id_list, verbose=verbose, overwrite=overwrite)
 
     plt.style.use(paths.styles / f'{style}.mplstyle')
@@ -84,7 +93,9 @@ def main(style='paper', verbose=True, overwrite=False):
     # Flux offsets per spectrum for each panel
     offsets = [
         [0.175, 0.1, 0.05, -0.10, -0.15, -0.25],
+        # [0.175, 0.1, 0.025, -0.05, -0.1, -0.2],
         [0.2, 0.15, 0.1, -0.05, -0.1, -0.125],
+        # [0.2, 0.15, 0.1, 0.0, -0.05, -0.1],
         [0.2, 0.15, 0.1, 0.025, -0.025, -0.125]
     ]
     speclabels = ['(i)', '(ii)', '(iii)', '(iv)', '(v)', '(vi)']
