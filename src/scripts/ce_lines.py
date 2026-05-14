@@ -44,8 +44,10 @@ CE_WINDOWS = [
 
 def main(style='paper', verbose=False, overwrite=False):
     plt.style.use(paths.styles / f'{style}.mplstyle')
+    if verbose: print('Importing MWM sample file...')
     mwm_sample = pd.read_csv(paths.data / 'MWM' / 'sample.csv', index_col='sdss_id')
     # First figure: stars with similar log(g) and metallicity but different Ce
+    if verbose: print('\nFigure 1: stellar siblings')
     sdss_id_list = [ # all have S/N~200
         75810381,
         59558349,
@@ -69,6 +71,7 @@ def main(style='paper', verbose=False, overwrite=False):
         overwrite=overwrite
     )
     # Second figure: exploring different log(g) and metallicity values
+    if verbose: print('\nFigure 2: parameter space coverage')
     sdss_id_list = [ # All have S/N~200
         58834996, # logg~3
         116336280, # logg~2.5
