@@ -11,42 +11,82 @@ from matplotlib.ticker import MultipleLocator
 from plotting import ONE_COLUMN_WIDTH
 import paths
 
-XLIM = (-0.7, 0.5)
-YLIM = (-0.8, 0.8)
-
 def main(style='paper'):
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     mwm_rgb = mwm_rgb[mwm_rgb['good_age']].copy()
     plt.style.use(paths.styles / f'{style}.mplstyle')
-    fig, ax = plt.subplots(figsize=(ONE_COLUMN_WIDTH, 0.7*ONE_COLUMN_WIDTH))
+    fig, axs = plt.subplots(
+        2, 
+        figsize=(ONE_COLUMN_WIDTH, 1.5*ONE_COLUMN_WIDTH), 
+        sharey=True,
+        gridspec_kw={'hspace': 0.25, 'top': 0.95}
+    )
+
+    # First panel: [Ce/Mg] vs [Mg/H], color-coded by median age
     cmap = plt.get_cmap('Spectral_r')
     norm = BoundaryNorm(np.arange(0, 11, 1), cmap.N, extend='max')
-    ax.scatter(
+    xlim = (-0.7, 0.5)
+    ylim = (-0.9, 0.9)
+    axs[0].scatter(
         mwm_rgb['mg_h'], mwm_rgb['ce_mg_corr'], 
         c=mwm_rgb['age'], cmap=cmap, norm=norm,
         s=1, rasterized=True, edgecolors='none', marker='o', zorder=0
     )
     pc, contours = hexbin_contours(
-        ax, mwm_rgb['mg_h'], mwm_rgb['ce_mg_corr'], mwm_rgb['age'],
-        gridsize=30, extent=[XLIM[0], XLIM[1], YLIM[0], YLIM[1]],
+        axs[0], mwm_rgb['mg_h'], mwm_rgb['ce_mg_corr'], mwm_rgb['age'],
+        gridsize=30, extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
         cmap=cmap, norm=norm, mincnt=10, contours=4,
     )
-    fig.colorbar(pc, ax=ax, label='StarFlow Age [Gyr]')
+    fig.colorbar(pc, ax=axs[0], label='Age [Gyr]')
     # Indicate median abundance errors
-    ax.errorbar(
-        0.4, 0.6, 
+    axs[0].errorbar(
+        0.3, 0.7, 
         xerr=mwm_rgb['e_mg_h'].median(), 
         yerr=mwm_rgb['e_ce_mg'].median(), 
-        c='gray', capsize=0, elinewidth=1,
+        c='k', capsize=0, elinewidth=1,
     )
-    ax.set_xlabel('[Mg/H]')
-    ax.set_ylabel('[Ce/Mg]')
-    ax.set_xlim(XLIM)
-    ax.set_ylim(YLIM)
-    ax.xaxis.set_major_locator(MultipleLocator(0.5))
-    ax.xaxis.set_minor_locator(MultipleLocator(0.1))
-    ax.yaxis.set_major_locator(MultipleLocator(0.5))
-    ax.yaxis.set_minor_locator(MultipleLocator(0.1))
+    axs[0].set_xlabel('[Mg/H]')
+    axs[0].set_ylabel('[Ce/Mg]')
+    axs[0].set_xlim(xlim)
+    axs[0].set_ylim(ylim)
+    axs[0].xaxis.set_major_locator(MultipleLocator(0.5))
+    axs[0].xaxis.set_minor_locator(MultipleLocator(0.1))
+    axs[0].yaxis.set_major_locator(MultipleLocator(0.5))
+    axs[0].yaxis.set_minor_locator(MultipleLocator(0.1))
+
+    # Second panel: [Ce/Mg] vs age, color-coded by [Fe/H]
+    cmap = plt.get_cmap('viridis')
+    norm = BoundaryNorm(np.arange(-0.8, 0.41, 0.1), cmap.N, extend='both')
+    xlim = (0, 12)
+    axs[1].scatter(
+        mwm_rgb['age'], mwm_rgb['ce_mg_corr'], 
+        c=mwm_rgb['fe_h_corr'], cmap=cmap, norm=norm,
+        s=1, rasterized=True, edgecolors='none', marker='o', zorder=0
+    )
+    pc, contours = hexbin_contours(
+        axs[1], mwm_rgb['age'], mwm_rgb['ce_mg_corr'], mwm_rgb['fe_h_corr'],
+        gridsize=30, extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
+        cmap=cmap, norm=norm, mincnt=10, contours=4,
+    )
+    fig.colorbar(pc, ax=axs[1], label='[Fe/H]')
+    # Indicate median abundance errors
+    age_err_low = np.median(mwm_rgb['age'] - mwm_rgb['e_n_age'])
+    age_err_high = np.median(mwm_rgb['e_p_age'] - mwm_rgb['age'])
+    med_abund_err = mwm_rgb['e_ce_h'].median()
+    axs[1].errorbar(
+        10, 0.7, 
+        xerr=[[age_err_low], [age_err_high]], 
+        yerr=med_abund_err, 
+        c='k', capsize=0, elinewidth=1,
+    )
+    axs[1].set_xlabel('Age [Gyr]')
+    axs[1].set_ylabel('[Ce/Mg]')
+    axs[1].set_xlim(xlim)
+    axs[1].xaxis.set_major_locator(MultipleLocator(5))
+    axs[1].xaxis.set_minor_locator(MultipleLocator(1))
+    axs[1].yaxis.set_major_locator(MultipleLocator(0.5))
+    axs[1].yaxis.set_minor_locator(MultipleLocator(0.1))
+
     plt.savefig(paths.figures / 'cemg_mgh_age')
     plt.close()
 
