@@ -1,6 +1,7 @@
 """
 This script plots spectral windows around Ce II lines for a handful stars.
 """
+import argparse
 
 import numpy as np
 import pandas as pd
@@ -21,6 +22,7 @@ from utils import vac2air
 
 # List of Ce II lines used to calculate abundance in ASPCAP
 # from Cunha et al. (2017)
+# Eight are within the APOGEE windows, but only three are used for abundance determination
 CE_II_LINES = [
     # 15277.65, 
     15784.75, 
@@ -40,14 +42,34 @@ CE_WINDOWS = [
     (16593.9, 16596.4)
 ] # Angstroms
 
-def main(style='paper', verbose=True, overwrite=False):
+def main(style='paper', verbose=False, overwrite=False):
+    plt.style.use(paths.styles / f'{style}.mplstyle')
     mwm_sample = pd.read_csv(paths.data / 'MWM' / 'sample.csv', index_col='sdss_id')
-    plt.rcParams['axes.prop_cycle'] = plt.cycler('color', paultol.bright.colors)
-    colors = paultol.bright.colors
-    markers = ['o', '^', 'd', 's', '*', 'p', 'P']
-
-    # Get spectra (all have S/N ~ 200)
-    sdss_id_list = [
+    # First figure: stars with similar log(g) and metallicity but different Ce
+    sdss_id_list = [ # all have S/N~200
+        75810381,
+        59558349,
+        86517081,
+        54750610,
+        58830163,
+        54880428
+    ]
+    # Flux offsets per spectrum for each panel
+    offsets = [
+        [0.175, 0.1, 0.025, -0.05, -0.125, -0.25],
+        [0.15, 0.1, 0.05, 0.0, -0.05, -0.125],
+        [0.2, 0.15, 0.1, 0.025, -0.025, -0.1]
+    ]
+    plot_spectrum_comparison(
+        sdss_id_list, 
+        offsets,
+        mwm_sample=mwm_sample,
+        fname='ce_lines_1', 
+        verbose=verbose, 
+        overwrite=overwrite
+    )
+    # Second figure: exploring different log(g) and metallicity values
+    sdss_id_list = [ # All have S/N~200
         58834996, # logg~3
         116336280, # logg~2.5
         55254073, # logg~2
@@ -55,18 +77,35 @@ def main(style='paper', verbose=True, overwrite=False):
         62793899, # [Ce/Fe]~-0.3, [Fe/H]~-0.5, logg~2
         96579887, # [Ce/Fe]~0, [Fe/H]~+0.3, logg~2
     ]
-    # "Sibling" stars with similar [Fe/H], Teff, and logg but different [Ce/Fe]
-    # sdss_id_list = [
-    #     75810381,
-    #     59558349,
-    #     86517081,
-    #     54750610,
-    #     58830163,
-    #     54880428
-    # ]
+    # Flux offsets per spectrum for each panel
+    offsets = [
+        [0.175, 0.1, 0.05, -0.10, -0.15, -0.25],
+        [0.2, 0.15, 0.1, -0.05, -0.1, -0.125],
+        [0.2, 0.15, 0.1, 0.025, -0.025, -0.125]
+    ]
+    plot_spectrum_comparison(
+        sdss_id_list, 
+        offsets,
+        mwm_sample=mwm_sample,
+        fname='ce_lines_2',
+        verbose=verbose,
+        overwrite=overwrite
+    )
+
+
+def plot_spectrum_comparison(
+        sdss_id_list, 
+        offsets,
+        mwm_sample=None, 
+        fname='ce_lines', 
+        verbose=False, 
+        overwrite=False
+    ):
+    """
+    Plot a figure comparing Ce windows for multiple SDSS spectra.
+    """
     download_sdss_spectra(sdss_id_list, verbose=verbose, overwrite=overwrite)
 
-    plt.style.use(paths.styles / f'{style}.mplstyle')
     fig = plt.figure(figsize=(TWO_COLUMN_WIDTH, 0.6*TWO_COLUMN_WIDTH))
     gs1 = GridSpec(1, 3, figure=fig, left=0.08, right=0.72, wspace=0.2)
 
@@ -90,17 +129,10 @@ def main(style='paper', verbose=True, overwrite=False):
         ax.yaxis.set_minor_locator(MultipleLocator(0.02))
     ax0.set_ylabel('Relative Flux + Offset')
 
-    # Flux offsets per spectrum for each panel
-    offsets = [
-        [0.175, 0.1, 0.05, -0.10, -0.15, -0.25],
-        # [0.175, 0.1, 0.025, -0.05, -0.1, -0.2],
-        [0.2, 0.15, 0.1, -0.05, -0.1, -0.125],
-        # [0.2, 0.15, 0.1, 0.0, -0.05, -0.1],
-        [0.2, 0.15, 0.1, 0.025, -0.025, -0.125]
-    ]
-    speclabels = ['(i)', '(ii)', '(iii)', '(iv)', '(v)', '(vi)']
-
     # Cycle through SDSS IDs
+    colors = paultol.bright.colors
+    markers = ['o', '^', 'd', 's', '*', 'p', 'P']
+    speclabels = ['(i)', '(ii)', '(iii)', '(iv)', '(v)', '(vi)']
     for i, sdss_id in enumerate(sdss_id_list):
         # Determine telescope - APO or LCO
         hdu = {
@@ -155,7 +187,7 @@ def main(style='paper', verbose=True, overwrite=False):
                 )
     
     # Custom legend
-    ax0.set_ylim((None, 1.38))
+    ax0.set_ylim((None, 1.4))
     handles = [
         Line2D([0], [0], ls='none', marker='o', ms=4, mec='k', mfc='w'),
         Line2D([0], [0], c='k'),
@@ -200,7 +232,6 @@ def main(style='paper', verbose=True, overwrite=False):
     kiel_ax.yaxis.set_minor_locator(MultipleLocator(0.1))
     kiel_ax.set_xlabel(r'$T_{\rm eff}$')
     kiel_ax.set_ylabel(r'$\log(g)$')
-    # plt.colorbar(hb0, ax=kiel_ax, label='Number of stars', pad=0)
 
     # Plot abundance diagram
     cefe_ax = fig.add_subplot(gs2[1])
@@ -234,7 +265,7 @@ def main(style='paper', verbose=True, overwrite=False):
     if verbose:
         print(mwm_sample.loc[sdss_id_list][['obj', 'snr', 'logg', 'm_h_atm', 'alpha_m_atm', 'fe_h', 'ce_fe']])
     
-    plt.savefig(paths.figures / 'ce_lines')
+    plt.savefig(paths.figures / fname)
 
 
 def download_sdss_spectra(sdss_id_list, verbose=True, overwrite=False):
@@ -281,4 +312,21 @@ def download_sdss_spectra(sdss_id_list, verbose=True, overwrite=False):
         access.commit()
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Plot [Ce/Mg] vs [Mg/H] for halo stars.'
+    )
+    parser.add_argument('--style',
+        choices=('paper', 'poster'),
+        default='paper',
+        help='Plot style to use (default: paper).'
+    )
+    parser.add_argument('-v', '--verbose',
+        action='store_true',
+        help='Print verbose output to terminal.'
+    )
+    parser.add_argument('-o', '--overwrite',
+        action='store_true',
+        help='Re-download all spectrum files (takes longer).'
+    )
+    args = parser.parse_args()
+    main(**vars(args))
