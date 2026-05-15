@@ -41,17 +41,17 @@ def main(style='paper'):
     )
     fig.colorbar(pcm0, ax=axs[0], shrink=0.9, label='Number of stars')
     # Rolling median
-    sorted_ages = mwm_ages.sort_values('age')[['age', 'ce_mg']]
-    rolling_medians = sorted_ages.rolling(
-        1000, min_periods=1000, step=250, on='age', center=True
+    mwm_sorted_ages = mwm_ages.sort_values('age')[['age', 'ce_mg']]
+    mwm_rolling_medians = mwm_sorted_ages.rolling(
+        3000, min_periods=1000, step=1000, on='age', center=True
     ).median()
     axs[0].plot(
-        rolling_medians['age'], rolling_medians['ce_mg'], 
+        mwm_rolling_medians['age'], mwm_rolling_medians['ce_mg'], 
         'w-', 
         linewidth=2
     )
     axs[0].plot(
-        rolling_medians['age'], rolling_medians['ce_mg'], 
+        mwm_rolling_medians['age'], mwm_rolling_medians['ce_mg'], 
         'k-', 
         label='Rolling median'
     )
@@ -76,28 +76,44 @@ def main(style='paper'):
     else:
         apokasc3 = join_apokasc_mwm()
         apokasc3.to_csv(apokasc_csv_path, index=True)
-    scatter_kwargs = dict(s=1, edgecolors='none', marker='o')
-    cmap = truncate_colormap('autumn', minval=0.1, maxval=0.7)
-    norm = BoundaryNorm([0, 0.5, 1], cmap.N)
-    pc = axs[1].scatter(
-        apokasc3['AgeBest'], 
-        apokasc3['MWM_CE_MG'],
-        c=apokasc3['EvolState']=='RC', 
-        cmap=cmap,
-        norm=norm,
-        # label='RC',
-        **scatter_kwargs
+    pcm1 = axs[1].hexbin(
+        apokasc3['AgeBest'], apokasc3['MWM_CE_MG'],
+        C=np.ones(apokasc3.shape[0]),
+        reduce_C_function=np.sum,
+        cmap='gist_heat_r',
+        gridsize=30,
+        linewidths=0.2,
+        extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
+        vmin=0
     )
-    cbar = fig.colorbar(pc, ax=axs[1], shrink=0.9)
-    cbar.ax.set_yticks([0.25, 0.75], labels=['RGB', 'RC'])
+    fig.colorbar(pcm1, ax=axs[1], shrink=0.9, label='Number of stars')
     # DR19 median trend for comparison
     axs[1].plot(
-        rolling_medians['age'], rolling_medians['ce_mg'], 
+        mwm_rolling_medians['age'], mwm_rolling_medians['ce_mg'], 
         'w-', 
         linewidth=2
     )
     axs[1].plot(
-        rolling_medians['age'], rolling_medians['ce_mg'], 
+        mwm_rolling_medians['age'], mwm_rolling_medians['ce_mg'], 
+        'k--', 
+        label='Rolling median'
+    )
+    # APOKASC Rolling median
+    apokasc3_sorted_ages = apokasc3.sort_values(
+        'AgeBest'
+    ).dropna(subset=['AgeBest', 'MWM_CE_MG'])[['AgeBest', 'MWM_CE_MG']]
+    apokasc3_rolling_medians = apokasc3_sorted_ages.rolling(
+        300, min_periods=100, step=100, on='AgeBest', center=True
+    ).median()
+    axs[1].plot(
+        apokasc3_rolling_medians['AgeBest'], 
+        apokasc3_rolling_medians['MWM_CE_MG'], 
+        'w-', 
+        linewidth=2
+    )
+    axs[1].plot(
+        apokasc3_rolling_medians['AgeBest'], 
+        apokasc3_rolling_medians['MWM_CE_MG'], 
         'k-', 
         label='Rolling median'
     )
@@ -134,13 +150,13 @@ def main(style='paper'):
     fig.colorbar(im, ax=axs[2], shrink=0.9, label='log number of stars')
     # DR19 median trend for comparison
     axs[2].plot(
-        rolling_medians['age'], rolling_medians['ce_mg'], 
+        mwm_rolling_medians['age'], mwm_rolling_medians['ce_mg'], 
         'w-', 
         linewidth=2
     )
     axs[2].plot(
-        rolling_medians['age'], rolling_medians['ce_mg'], 
-        'k-', 
+        mwm_rolling_medians['age'], mwm_rolling_medians['ce_mg'], 
+        'k--', 
         label='Rolling median'
     )
     axs[2].set_title('(c) OCCAM', y=0.82)
@@ -150,7 +166,7 @@ def main(style='paper'):
     # for feh in [-0.6, -0.3, 0, 0.3]:
     #     axs[3].plot(xarr, casali_relation(xarr, feh), label='[Fe/H]=%s' % feh)
     # axs[3].plot(
-    #     rolling_medians['age'], rolling_medians['ce_mg'], 
+    #     mwm_rolling_medians['age'], mwm_rolling_medians['ce_mg'], 
     #     'k-', 
     #     label='Rolling median'
     # )
