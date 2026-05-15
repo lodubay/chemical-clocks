@@ -188,12 +188,12 @@ We remove median trends with $\log(g)$ in Fe and Ce following the procedure outl
 $-0.75 < \bracket{Mg} < 0.45$, $3<R_{\rm gal}<13\kpc$, and $|z| < 2\kpc$.
 In brief, corrective offsets are applied to each individual [Fe/H] and [Ce/H] such that the median [X/Mg] trend with [Mg/H] is the same over all $\log(g)$ in the Galactic disk. [X/Mg] medians are calculated in 0.1 dex bins of [Mg/H] and 0.25 dex bins of $\log(g)$. Differences in the median values of each bin from a fiducial value (selected to be $\bracket{Mg} = 0$ and $\log(g) = 1.75$) are calculated separately for the low-Ia and high-Ia sequences. Then a number-weighted average of median differences over the two alpha sequences is calculated at each ([Mg/H], $\log(g)$) bin pair. The final offset value for a given star is calculated by interpolating the binned median differences to that star's [Mg/H] and $\log(g)$. Unlike \citet{sit_chemical_2024}, we did not include an additional zeropoint offset. For DR19, the Fe offsets are on average $\sim0.003\dex$ and the Ce offsets are on average $\sim0.07\dex$.
 
-Figure \ref{fig:logg-calibrations} shows the effect of the corrective offsets on [Ce/Mg] and [Fe/Mg]. Across different $\log(g)$ bins, the uncorrected [Ce/Mg] trends with [Mg/H] vary by up to $\sim0.3\dex$ for high-Ia stars, and $\sim0.1\dex$ for low-Ia stars. The corrective offsets ensure that abundances are consistent across the full range of $\log(g)$ in the sample. Throughout the remainder of this paper, we will use these corrected abundances unless otherwise noted. \todo{Compare/constrast with $T_{\rm eff}$ calibration approach in \citet{meszaros_sdss-v_2025}.}
+Figure \ref{fig:logg-calibrations} shows the effect of the corrective offsets on [Ce/Mg] and [Fe/Mg]. Across different $\log(g)$ bins, the uncorrected [Ce/Mg] trends with [Mg/H] vary by up to $\sim0.3\dex$ for high-Ia stars, and $\sim0.1\dex$ for low-Ia stars. The corrective offsets ensure that abundances are consistent across the full range of $\log(g)$ in the sample. Throughout the remainder of this paper, we will use these corrected abundances unless otherwise noted. \todo{Compare/contrast with $T_{\rm eff}$ calibration approach in \citet{meszaros_sdss-v_2025}.}
 
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/logg_calibrations.pdf}
-    \caption{Demonstration of corrective $\log(g)$ offsets applied to DR19 Ce and Fe abundances.}
+    \caption{Demonstration of corrective $\log(g)$ offsets applied to Ce and Fe abundances in our full sample. Each panel plots the median trend in [X/Mg] as a function of [Mg/H] in multiple $\log(g)$ bins. Separate trends are shown for low-Ia (circles, dashed lines) and high-Ia (squares, solid lines) populations. The right-hand panels use the base DR19 abundances, while the left-hand panels incorporate the corrective offsets.}
     \label{fig:logg-calibrations}
 \end{figure}
 
@@ -205,7 +205,7 @@ Figure \ref{fig:logg-calibrations} shows the effect of the corrective offsets on
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/dataset_comparison.pdf}
-    \caption{Comparison of the age--[Ce/Mg] trend between MWM+StarFlow, APOKASC-3, and OCCAM. Each survey uses different age estimation techniques, but the abundances on the y-axis all come from DR19. For the sake of comparison, we do not apply $\log(g)$ corrections to the abundances in this plot.}
+    \caption{Comparison of the age--[Ce/Mg] trend between MWM+StarFlow \citep{stone-martinez_starflow_2025}, APOKASC-3 \citep{pinsonneault_apokasc-3_2025}, and OCCAM \citep{otto_open_2026}. Each survey uses different age estimation techniques, but the abundances on the y-axis all come from MWM DR19. For the sake of comparison, we do not apply $\log(g)$ corrections to the abundances in this plot. The solid curves plot the running median [Ce/Mg] as a function of age for each data set, and the dashed curves plot the StarFlow running median for comparison. The APOKASC-3 sample is restricted to ``gold sample'' (highest quality) RGB and red clump stars. The OCCAM sample includes only stars with $\log(g)<3.5$.}
     \label{fig:dataset-comparison}
 \end{figure}
 
