@@ -217,6 +217,7 @@ def main(style='paper'):
         'k--', zorder=1, label='Casali et al. (2025)'
     )
     ax0.legend()
+    ax0.set_title('Best-Fit Parameters')
     ax1.set_xlabel('[Fe/H]')
     ax0.set_ylabel(r'Slope [dex Gyr$^{-1}$]')
     ax1.set_ylabel(r'[Ce/Mg] at $\tau=%s$ Gyr' % AGE_DELTA)
