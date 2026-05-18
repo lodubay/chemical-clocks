@@ -107,25 +107,20 @@ def main(style='paper'):
         fits.append(regress)
         # Plot linear regression
         yfit = (age_arr - AGE_DELTA) * regress.slope + regress.intercept
-        # White outline for plot legibility
-        ax.plot(age_arr, yfit, linestyle='-', linewidth=2, color='w')
         ax.plot( # extends beyond fit region
             age_arr[age_arr < AGE_FIT_RANGE[0]], 
             yfit[age_arr < AGE_FIT_RANGE[0]], 
-            linestyle='--', 
-            color=color
+            'k--'
         )
         ax.plot( # segment within fit region
             age_arr[(AGE_FIT_RANGE[0] <= age_arr) & (age_arr < AGE_FIT_RANGE[1])], 
             yfit[(AGE_FIT_RANGE[0] <= age_arr) & (age_arr < AGE_FIT_RANGE[1])], 
-            linestyle='-', 
-            color=color
+            'k-'
         )
         ax.plot( # extends beyond fit region
             age_arr[age_arr >= AGE_FIT_RANGE[1]], 
             yfit[age_arr >= AGE_FIT_RANGE[1]], 
-            linestyle='--', 
-            color=color
+            'k--'
         )
         # indicate Solar value
         if met_lim[0] <= 0 < met_lim[1]:
