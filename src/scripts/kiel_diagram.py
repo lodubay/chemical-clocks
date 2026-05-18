@@ -59,7 +59,7 @@ def main(style='paper'):
     axs[0].yaxis.set_minor_locator(MultipleLocator(0.1))
     axs[0].set_xlabel(r'$T_{\rm eff}$ [K]')
     axs[1].set_xlabel(r'$T_{\rm eff}$ [K]')
-    axs[0].set_ylabel(r'$\log g$')
+    axs[0].set_ylabel(r'$\log(g)$')
     colored_text_legend(axs[0])
     plt.savefig(paths.figures / 'kiel_diagram')
     plt.close()
