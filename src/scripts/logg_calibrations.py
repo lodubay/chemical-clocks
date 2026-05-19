@@ -85,6 +85,9 @@ def main(style='paper', cmap_name='autumn'):
                 color=cmap(norm(logg_center)),
                 zorder=10-j
             )
+    # Label populations
+    axs[1,0].text(-0.7, 0.1, 'High-Ia')
+    axs[1,0].text(0.05, -0.325, 'Low-Ia')
     # Add colorbar
     cax = insert_colorbar_axes(
         fig, 
