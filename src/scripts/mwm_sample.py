@@ -80,6 +80,9 @@ def main():
     print('Computing abundance limits...')
     sample = compute_upper_limits(sample)
     # Drop stars with Ce abundances flagged below limits
+    print('Cutting %s abundances below upper limits.' % (
+        sample[sample['lim_ce_h_flag'] > 0].shape[0]
+    ))
     sample = sample[sample['lim_ce_h_flag'] == 0]
     # Calculate abundance ratios and errors in quadrature
     print('Calculating abundance ratios and coordinates...')
