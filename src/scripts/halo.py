@@ -50,10 +50,12 @@ def main(style='paper'):
     scatter_kwargs = dict(
         s=2, rasterized=True, edgecolors='none',
     )
-    halo_color = 'k'
-    disk_color = 'k'
-    accreted_color = paultol.bright.colors[5]
-    insitu_color = paultol.bright.colors[2]
+    # accreted_color = paultol.bright.colors[5]
+    # insitu_color = paultol.bright.colors[2]
+    # low_ia_color = paultol.bright.colors[1]
+    # high_ia_color = paultol.bright.colors[0]
+    accreted_color = paultol.vibrant.colors[1]
+    insitu_color = paultol.vibrant.colors[2]
     low_ia_color = paultol.bright.colors[1]
     high_ia_color = paultol.bright.colors[0]
     # Italicize "in situ" if LaTeX is installed
@@ -98,8 +100,7 @@ def main(style='paper'):
     ax0.plot(Lz_arr, halo_ELz_cut(Lz_arr), '-', color='k')
     ax0.text(
         1.5, -0.5, 'Halo', 
-        fontsize=plt.rcParams['axes.titlesize'], 
-        color=halo_color
+        fontsize=plt.rcParams['axes.titlesize']
     )
     ax0.text(
         -4, -2, 'Disk', 
@@ -113,7 +114,7 @@ def main(style='paper'):
     ax1.xaxis.set_minor_locator(MultipleLocator(0.1))
     ax1.yaxis.set_major_locator(MultipleLocator(0.5))
     ax1.yaxis.set_minor_locator(MultipleLocator(0.1))
-    xlim = (-0.8, 0.7)
+    xlim = (-0.9, 0.6)
     ylim = (-1.1, 0.6)
     ax1.set_xlim(xlim)
     ax1.set_ylim(ylim)
@@ -137,19 +138,21 @@ def main(style='paper'):
         **scatter_kwargs
     )
     # Indicate boundary
-    alfe_arr = np.arange(-0.8, 0.5, 0.1)
+    alfe_arr = np.arange(-0.9, 0.5, 0.1)
     ax1.plot(alfe_arr, halo_chem_cut(alfe_arr), '-', color='k')
     ax1.text(
-        0.25, 0.3, insitu_label, 
-        color=insitu_color,
+        0.15, 0.4, 
+        insitu_label, 
+        color='k',
         fontsize=plt.rcParams['axes.titlesize'], 
         # style='italic'
     )
     ax1.text(
-        -0.7, -0.9, 'Accreted', 
+        -0.8, -1, 
+        'Accreted', 
         fontsize=plt.rcParams['axes.titlesize'], 
-        color=accreted_color,
-        bbox={'color': 'w', 'pad': 1}
+        color='k',
+        bbox={'color': 'w', 'pad': 1, 'alpha': 0.8}
     )
 
     # Set up second row
@@ -164,24 +167,14 @@ def main(style='paper'):
     ax2.xaxis.set_minor_locator(MultipleLocator(0.1))
     ax2.yaxis.set_major_locator(MultipleLocator(0.5))
     ax2.yaxis.set_minor_locator(MultipleLocator(0.1))
-    xlim = (-1.8, 0.499)
-    ylim = (-1.1, 1.1)
+    xlim = (-1.6, 0.499)
+    ylim = (-1., 1.)
     ax2.set_xlim(xlim)
     ax2.set_ylim(ylim)
-    scatter_kwargs['s'] = 8
-    # pc = ax2.hexbin(
-    #     disk['mg_h'], disk['ce_mg'],
-    #     C=np.ones(disk.shape[0]),
-    #     gridsize=(50, 18),
-    #     zorder=1,
-    #     extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
-    #     **hexbin_kwargs
-    # )
-    # fig.colorbar(
-    #     pc, ax=ax2, label=r'$\log N$ (disk)', 
-    #     pad=0., fraction=0.07, aspect=30, 
-    #     use_gridspec=True
-    # )
+    scatter_kwargs['s'] = 5
+    median_linewidth = 2
+    contour_linewidth = 0.5
+    border_linewidth = 3
     # Plot chemically-selected accreted stars
     ax2.scatter(
         accreted['mg_h'], accreted['ce_mg'],
@@ -196,128 +189,73 @@ def main(style='paper'):
         label=insitu_label + ' Halo',
         **scatter_kwargs
     )
-    # Rolling median, 16th and 84th percentiles of low-Ia stars
-    # mgh_bin_edges = np.arange(-1.55, 0.56, 0.1)
-    # for q, ls in zip([0.16, 0.5, 0.84], ['--', '-', '--']):
-    #     low_ia_trend = binned_quantiles(
-    #         low_ia, 'ce_mg', 'mg_h',
-    #         q=q, bin_edges=mgh_bin_edges, min_count=10
-    #     )
-    #     label = 'Low-Ia' if q == 0.5 else None
-    #     ax2.plot(*low_ia_trend, 'w-', linewidth=2)
-    #     ax2.plot(*low_ia_trend, ls, color=low_ia_color, label=label)
-    #     insitu_trend = binned_quantiles(
-    #         insitu, 'ce_mg', 'mg_h',
-    #         q=q, bin_edges=mgh_bin_edges, min_count=10
-    #     )
-    #     ax2.plot(*insitu_trend, 'w-', linewidth=2)
-    #     ax2.plot(*insitu_trend, ls, color=insitu_color)
-    #     accreted_trend = binned_quantiles(
-    #         accreted, 'ce_mg', 'mg_h',
-    #         q=q, bin_edges=mgh_bin_edges, min_count=10
-    #     )
-    #     ax2.plot(*accreted_trend, 'w-', linewidth=2)
-    #     ax2.plot(*accreted_trend, ls, color=accreted_color)
-    sorted_low_ia = low_ia.sort_values('mg_h')[['mg_h', 'ce_mg']]
-    rolling_low_ia = sorted_low_ia.rolling(
-        1000, min_periods=1000, step=100, on='mg_h', center=True
-    )
-    ax2.plot(
-        rolling_low_ia['mg_h'].median(), rolling_low_ia['ce_mg'].median(), 
-        'w-', linewidth=2
-    )
-    ax2.plot(
-        rolling_low_ia['mg_h'].median(), rolling_low_ia['ce_mg'].median(), 
-        '-', color=low_ia_color, label='Low-Ia Disk'
-    )
     # Plot rolling median of high-Ia stars
     sorted_high_ia = high_ia.sort_values('mg_h')[['mg_h', 'ce_mg']]
     rolling_high_ia = sorted_high_ia.rolling(
-        1000, min_periods=1000, step=100, on='mg_h', center=True
+        2000, min_periods=1000, step=1000, on='mg_h', center=True
     )
     ax2.plot(
         rolling_high_ia['mg_h'].median(), rolling_high_ia['ce_mg'].median(), 
-        'w-', linewidth=2
+        'w-', linewidth=border_linewidth, zorder=3,
     )
     ax2.plot(
         rolling_high_ia['mg_h'].median(), rolling_high_ia['ce_mg'].median(), 
-        '-', color=high_ia_color, label='High-Ia Disk'
+        '-', color=high_ia_color, linewidth=median_linewidth, zorder=4, 
+        label='High-Ia Disk'
+    )
+    # Rolling median of low-Ia stars
+    sorted_low_ia = low_ia.sort_values('mg_h')[['mg_h', 'ce_mg']]
+    rolling_low_ia = sorted_low_ia.rolling(
+        1000, min_periods=1000, step=300, on='mg_h', center=True
+    )
+    ax2.plot(
+        rolling_low_ia['mg_h'].median(), rolling_low_ia['ce_mg'].median(), 
+        'w-', linewidth=border_linewidth, zorder=3,
+    )
+    ax2.plot(
+        rolling_low_ia['mg_h'].median(), rolling_low_ia['ce_mg'].median(), 
+        '-', linewidth=median_linewidth, color=low_ia_color, zorder=4, 
+        label='Low-Ia Disk'
     )
     # Plot contours for low- and high-Ia stars
     plot_kde2D_contours(
-        ax2, low_ia, 'mg_h', 'ce_mg', c=low_ia_color, 
-        path=paths.data / 'MWM' / 'kde' / 'mgh_cemg' / 'all_low_ia.dat'
-    )
-    plot_kde2D_contours(
-        ax2, high_ia, 'mg_h', 'ce_mg', c=high_ia_color, 
+        ax2, high_ia, 'mg_h', 'ce_mg', c=high_ia_color, lw=contour_linewidth,
         path=paths.data / 'MWM' / 'kde' / 'mgh_cemg' / 'all_high_ia.dat'
     )
-    # Indicate dispersion
-    # for q in [0.16, 0.84]:
-    #     ax2.plot(
-    #         rolling_low_ia['mg_h'].quantile(q), 
-    #         rolling_low_ia['ce_mg'].quantile(q), 
-    #         'w-', linewidth=2
-    #     )
-    #     ax2.plot(
-    #         rolling_low_ia['mg_h'].quantile(q), 
-    #         rolling_low_ia['ce_mg'].quantile(q), 
-    #         ':', color=low_ia_color
-    #     )
+    plot_kde2D_contours(
+        ax2, low_ia, 'mg_h', 'ce_mg', c=low_ia_color, lw=contour_linewidth,
+        path=paths.data / 'MWM' / 'kde' / 'mgh_cemg' / 'all_low_ia.dat'
+    )
     # Rolling median of in-situ stars
     sorted_insitu = insitu.sort_values('mg_h')[['mg_h', 'ce_mg']]
     rolling_insitu = sorted_insitu.rolling(
-        100, min_periods=100, step=10, on='mg_h', center=True
+        200, min_periods=100, step=30, on='mg_h', center=True
     )
     ax2.plot(
         rolling_insitu['mg_h'].median(), 
         rolling_insitu['ce_mg'].median(), 
-        'w-', linewidth=2
+        'w-', linewidth=border_linewidth, zorder=3,
     )
     ax2.plot(
         rolling_insitu['mg_h'].median(), 
         rolling_insitu['ce_mg'].median(), 
-        '-', color=insitu_color
+        '-', color=insitu_color, linewidth=median_linewidth, zorder=4
     )
-    # Indicate dispersion
-    # for q in [0.16, 0.84]:
-    #     ax2.plot(
-    #         rolling_insitu['mg_h'].quantile(q), 
-    #         rolling_insitu['ce_mg'].quantile(q), 
-    #         'w-', linewidth=2
-    #     )
-    #     ax2.plot(
-    #         rolling_insitu['mg_h'].quantile(q), 
-    #         rolling_insitu['ce_mg'].quantile(q), 
-    #         ':', color=insitu_color
-    #     )
     # Rolling median of accreted stars
     sorted_accreted = accreted.sort_values('mg_h')[['mg_h', 'ce_mg']]
     rolling_accreted = sorted_accreted.rolling(
-        100, min_periods=100, step=10, on='mg_h', center=True
+        200, min_periods=100, step=30, on='mg_h', center=True
     )
     ax2.plot(
         rolling_accreted['mg_h'].median(), 
         rolling_accreted['ce_mg'].median(), 
-        'w-', linewidth=2
+        'w-', linewidth=border_linewidth, zorder=3
     )
     ax2.plot(
         rolling_accreted['mg_h'].median(), 
         rolling_accreted['ce_mg'].median(), 
-        '-', color=accreted_color
+        '-', color=accreted_color, linewidth=median_linewidth, zorder=4,
     )
-    # Indicate dispersion
-    # for q in [0.16, 0.84]:
-    #     ax2.plot(
-    #         rolling_accreted['mg_h'].quantile(q), 
-    #         rolling_accreted['ce_mg'].quantile(q), 
-    #         'w-', linewidth=2
-    #     )
-    #     ax2.plot(
-    #         rolling_accreted['mg_h'].quantile(q), 
-    #         rolling_accreted['ce_mg'].quantile(q), 
-    #         ':', color=accreted_color
-    #     )
     # Indicate grid edges
     mgh_arr = np.arange(-2.5, 1.25, 0.25)
     ax2.plot(mgh_arr, -2.1 - mgh_arr, 'k:') # edge of stars flagged bad
@@ -325,18 +263,21 @@ def main(style='paper'):
     ax2.plot(mgh_arr, 0.9 - mgh_arr, 'k:') # edge of stars flagged bad
     # Indicate median abundance error
     ax2.errorbar(
-        -1.7, -0.9, 
+        0.3, -0.8, 
         xerr=data['e_mg_h'].median(), 
         yerr=data['e_ce_mg'].median(),
         c='k', capsize=0
     )
-    # ax2.legend(loc='upper left')
-    # colored_text_legend(
-    #     ax2, 
-    #     loc='upper left', 
-    #     bbox_to_anchor=(1, 1),
-    #     fontsize=plt.rcParams['axes.titlesize']
-    # )
+    colored_text_legend(
+        ax2, 
+        loc='upper right', 
+        ncols=2,
+        columnspacing=1,
+        fontsize=plt.rcParams['axes.titlesize'],
+        frameon=True,
+        framealpha=0.8,
+    )
+
 
     # Marginal panel with histograms
     cemg_bins = np.arange(-1.1, 1.12, 0.05)
@@ -345,9 +286,9 @@ def main(style='paper'):
     for i, df in enumerate([high_ia, low_ia, insitu, accreted]):
         hist, bin_edges = np.histogram(df['ce_mg'], cemg_bins, density=True)
         if i < 2:
-            lw = 0.5
-        else:
             lw = 1
+        else:
+            lw = 2
         ax3.plot(
             hist/hist.max(), get_bin_centers(bin_edges),
             c=colors[i], lw=lw, label=labels[i]
@@ -355,7 +296,7 @@ def main(style='paper'):
     ax3.set_xlabel('Density')
     ax3.set_xlim((0, 1.2))
     ax3.tick_params(axis='y', labelleft=False, labelright=True)
-    colored_text_legend(ax3, loc='upper left')
+    # colored_text_legend(ax3, loc='upper left')
 
     plt.subplots_adjust(bottom=0.08, top=0.96, left=0.08, right=0.92)
     plt.savefig(paths.figures / 'halo')
