@@ -61,15 +61,20 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Stellar ages are a vital component of galactic archaeology studies. Recent years have seen an explosion of large stellar age catalogs that encompass a substantial portion of the Milky Way. However, most age estimation techniques are observationally expensive or apply to a limited range of stellar parameters. ``Chemical clocks,'' or empirically-calibrated relations between stellar age and atmospheric abundance ratios, promise reliable spectroscopic age estimates over a wider parameter space. The best-studied chemical clock is [C/N], which has a strong foundation in stellar physics but can only be used for stars on the red giant branch (RGB).
+Stellar ages are a vital component of Galactic archaeology studies. Stellar age data provide direct measurements of the Galaxy's evolution over time and allow for better comparisons with chemical evolution models. Recent years have seen an explosion of large stellar catalogs with age measurements for $10^5-10^6$ stars \citep[e.g.,][]{nataf_accurate_2024,stone-martinez_starflow_2025,wang_spectroscopic_2025,roberts_cn_2026}. However, most age estimation techniques are observationally expensive or apply to a limited range of stellar parameters. ``Chemical clocks,'' or empirically-calibrated relations between stellar age and atmospheric abundance ratios, promise reliable spectroscopic age estimates over a wider parameter space. 
+% The best-studied chemical clock is [C/N], which has a strong foundation in stellar physics but can only be used for stars on the red giant branch (RGB).
 
 A number of studies have proposed the use of $[s/\alpha]$\textemdash the ratio of elements produced by the slow neutron-capture process to the $\alpha$-elements produced in core-collapse supernovae (CCSNe)\textemdash as a chemical clock. \citet{nissen_high-precision_2015} reported a tight correlation between [Y/Mg] and isochronal age for solar twins and proposed its use as a sensitive chronometer. \citet{slumstrup_ymg_2017} also found this correlation in solar-metallicity red clump stars. \citet{casali_tracing_2025} found a tight correlation between [$s/\alpha$] and asteroseismic age for several $s$-process and $\alpha$-elements (in particular, [Ce/Mg] and [Zr/Ti]). \citet{casali_tracing_2025} calibrated these chemical clocks on age and metallicity and applied them to the full APOGEE survey, yielding several hundred thousand age estimates.
 
-However, there is some evidence that $[s/\alpha]$ may not be a universal chemical clock. \citet{feltzing_metallicity_2017} found that the [Y/Mg]--age relation depends strongly on metallicity in the Solar neighborhood. \citet{ratcliffe_chemical_2024} found that the age--$[s/\alpha]$ relation varies with the guiding-center radius and birth radius of the star.
+\todo{Discuss the theory behind the $[s/\alpha]$ chemical clock, focusing on $s$-process element production in AGB stars.} The mechanism behind the $[s/\alpha]$ chemical clock is the difference in the enrichment timescales of the two elements. The progenitors of CCSNe are short-lived, so the $\alpha$-element abundances closely trace the star formation history. The $s$-process elements are primarily produced in the asymptotic giant branch (AGB) phase of low- to intermediate-mass stars \citep[$\sim1-10\Msun$; see review by][]{karakas_dawes_2014} whose main-sequence lifetimes range from $\sim30\Myr-10\Gyr$. Therefore, $[s/\alpha]$ should increase over time in response to continuous star formation.
 
-From a theoretical perspective, the $[s/\alpha]$ chemical clock's mechanism is not understood. Galactic chemical evolution (GCE) models  with standard AGB yields predict qualitatively different evolution than observed \citep[e.g.,][]{grisoni_modelling_2020,ratcliffe_chemical_2024}.
+However, there is some evidence that the $[s/\alpha]$--age relation may not be universal. \citet{feltzing_metallicity_2017} found that the [Y/Mg]--age relation depends strongly on metallicity in the Solar neighborhood. \citet{ratcliffe_chemical_2024} found that the age--$[s/\alpha]$ relation varies with the guiding-center radius and birth radius of the star. \todo{More discussion of environmental dependence and implications for the chemical clock. Also mention how abundance uncertainties propagate into age estimates.}
+
+From a theoretical perspective, the $[s/\alpha]$ chemical clock's mechanism is not understood in detail. Galactic chemical evolution (GCE) models  with standard AGB yields predict qualitatively different evolution than observed \citep[e.g.,][]{grisoni_modelling_2020,ratcliffe_chemical_2024}. \todo{Discuss GCE model predictions and how they differ from observations.}
 
 We quantify the [Ce/Mg]--age relation as a function of metallicity, $\alpha$-enhancement, and Galactic position using data from the Milky Way Mapper program of the Sloan Digital Sky Survey (SDSS-V). We then explore possible mechanisms for the relation, such as modifications to the star formation history and yield prescription, in multizone GCE models. In Section \ref{sec:data}, we describe our observational dataset. In Section \ref{sec:results}, we present the chemical abundance trends in our sample. In Section \ref{sec:gce}, we compare our results with chemical evolution model predictions. In Section \ref{sec:conclusions}, we summarize our conclusions.
+
+\todo{Somewhere discuss why cerium is chosen and differences between Ce and other $s$-process elements like Y.}
 
 % Paper goals
 % \begin{itemize}
@@ -115,7 +120,7 @@ We limit our study to red giant branch (RGB) stars because the Ce abundances in 
     \item $\SI{4000}{\kelvin}<T_{\rm eff}<\SI{5500}{\kelvin}$ \citep[recommended by][]{meszaros_sdss-v_2025};
     \item $\bracket{M}>-1.5$ \citep[recommended by][]{meszaros_sdss-v_2025};
     \item $S/N>100$ \todo{(cite)};
-    \item No bad flags or spectrum flags;
+    \item No bad flag or spectrum flags;
     \item No Mg, Fe, or Ce abundance flags (avoiding stars close to grid edges);
     \item No SDSS-IV EXTRATARG flag.
 \end{itemize}
@@ -197,7 +202,7 @@ ASPCAP does not include a treatment for upper limits, so the reported abundances
 % Fe: ---
 % Why are these different??
 
-The reported ASPCAP abundances include a zero-point offset $\Delta_{\rm X}$ to force the solar neighborhood, solar metallicity sample to have a mean of $\bracket{X}=0$ for each element \citep{meszaros_sdss-v_2025}. While $\Delta_{\rm X}$ is small for many elements (e.g, $\Delta_{\rm Mg}=+0.004\dex$ and $\Delta_{\rm Fe}=+0.014\dex$), the zero-point offset for Ce is fairly large, $\Delta_{\rm Ce}=+0.149\dex$. This is an important consideration when comparing DR19 abundance trends to other catalogs or previous data releases of SDSS.
+The DR19 abundances include a zero-point offset $\Delta_{\rm X}$ to force the solar neighborhood, solar metallicity sample to have a mean of $\bracket{X}=0$ for each element \citep{meszaros_sdss-v_2025}. While $\Delta_{\rm X}$ is small for many elements (e.g, $\Delta_{\rm Mg}=+0.004\dex$ and $\Delta_{\rm Fe}=+0.014\dex$), the zero-point offset for Ce is fairly large, $\Delta_{\rm Ce}=+0.149\dex$. This is an important consideration when comparing DR19 abundance trends to other catalogs or previous data releases of SDSS.
 
 \begin{figure}
     \centering
