@@ -12,6 +12,7 @@ from scipy import stats
 
 from plotting import TWO_COLUMN_WIDTH
 from utils import get_bin_centers
+from global_metallicity_fits import fit_metallicity_bins
 import paths
 
 MET_COL = 'fe_h_corr' # Column with metallicity values
@@ -37,6 +38,7 @@ def main(style='paper'):
         (local_sample['e_p_age'] - local_sample['age']) + 
         (local_sample['age'] - local_sample['e_n_age'])
     )
+    local_low_alpha = local_sample[local_sample['low_alpha']]
 
     # Set up figure
     plt.style.use(paths.styles / f'{style}.mplstyle')
@@ -53,20 +55,26 @@ def main(style='paper'):
     cmap = plt.get_cmap('viridis')
     norm = BoundaryNorm(met_bins, cmap.N, extend='both')
 
+    # Get best-fit regressions
+    fits, met_bin_centers = fit_metallicity_bins(
+        local_low_alpha, 
+        met_bins, 
+        met_col=MET_COL, 
+        age_fit_range=AGE_FIT_RANGE, 
+        age_delta=AGE_DELTA
+    )
+
     # Left panels: individual fits in metallicity bins
-    fits = []
-    # gs0 = GridSpec(3, 3, figure=fig, right=0.7, hspace=0, wspace=0)
     for i, ax in enumerate(axs.flatten()):
         # Underlying scatter plot of all low-alpha stars
         ax.scatter(
             local_sample['age'], local_sample['ce_mg_corr'],
             color='gray', s=1, marker='o', rasterized=True, edgecolor='none'
         )
-        # Bin by metallicity and fit linear trend to stars within good age range
+        # Scatter plot of stars in metallicity range
         met_lim = tuple(np.round(met_bins[i:i+2], 2))
         met_center = np.mean(met_lim) # mean metallicity of bin
         color = cmap(norm(met_center))
-        # Scatter plot of stars in metallicity range
         subset_low_alpha = local_sample[
             (local_sample[MET_COL] >= met_lim[0]) &
             (local_sample[MET_COL] < met_lim[1]) &
@@ -93,19 +101,8 @@ def main(style='paper'):
         #     age_arr, casali_relation(age_arr, met_center), 'k:', 
         #     label='Casali et al. (2025)'
         # )
-        # Fit linear age trend
-        subset_fit = local_sample[
-            (local_sample[MET_COL] >= met_lim[0]) & 
-            (local_sample[MET_COL] < met_lim[1]) &
-            (local_sample['age'] >= AGE_FIT_RANGE[0]) &
-            (local_sample['age'] < AGE_FIT_RANGE[1]) &
-            (local_sample['low_alpha'])
-        ]
-        regress = stats.linregress(
-            subset_fit['age'] - AGE_DELTA, subset_fit['ce_mg_corr']
-        )
-        fits.append(regress)
         # Plot linear regression
+        regress = fits[i]
         yfit = (age_arr - AGE_DELTA) * regress.slope + regress.intercept
         ax.plot( # extends beyond fit region
             age_arr[age_arr < AGE_FIT_RANGE[0]], 
@@ -147,15 +144,15 @@ def main(style='paper'):
         # 
 
     # Indicate median abundance and age errors
-    # age_err_low = np.median(local_sample['age'] - local_sample['e_n_age'])
-    # age_err_high = np.median(local_sample['e_p_age'] - local_sample['age'])
-    # med_abund_err = local_sample['e_ce_h'].median()
-    # axs[0,0].errorbar(
-    #     9, 0.5, 
-    #     xerr=[[age_err_low], [age_err_high]], 
-    #     yerr=med_abund_err, 
-    #     c='gray', capsize=0, #elinewidth=0.5,
-    # )
+    age_err_low = np.median(local_sample['age'] - local_sample['e_n_age'])
+    age_err_high = np.median(local_sample['e_p_age'] - local_sample['age'])
+    med_abund_err = local_sample['e_ce_h'].median()
+    axs[0,0].errorbar(
+        2, -0.5, 
+        xerr=[[age_err_low], [age_err_high]], 
+        yerr=med_abund_err, 
+        c='k', capsize=0, #elinewidth=0.5,
+    )
 
     axs[0,0].set_xlim((0, 11))
     axs[0,0].set_ylim((-0.7, 0.9))
@@ -166,10 +163,6 @@ def main(style='paper'):
     axs[-1,1].set_xlabel('Age [Gyr]')
     axs[1,0].set_ylabel('[Ce/Mg]')
     axs[0,1].set_title('Bins in [Fe/H]')
-    # for ax in axs[-1]:
-    #     ax.set_xlabel('Age [Gyr]')
-    # for ax in axs[:,0]:
-    #     ax.set_ylabel('[Ce/Mg]')
 
     # Right panels: plot slope and intercept vs metallicity
     gs = GridSpec(2, 1, figure=fig, left=0.75, right=0.98, hspace=0)
@@ -211,7 +204,7 @@ def main(style='paper'):
         xarr, casali_fit(AGE_DELTA, xarr),
         'k--', zorder=1, label='Casali et al. (2025)'
     )
-    ax0.legend()
+    ax0.legend(loc='upper left')
     ax0.set_title('Best-Fit Parameters')
     ax1.set_xlabel('[Fe/H]')
     ax0.set_ylabel(r'Slope [dex Gyr$^{-1}$]')
