@@ -91,7 +91,7 @@ def main(style='paper', cmap='viridis_r'):
 
     # Format axes
     axs[0].set_xlim((-0.7, 0.6))
-    axs[0].set_ylim((-0.1, 0.1))
+    axs[0].set_ylim((-0.08, 0.08))
     axs[0].xaxis.set_major_locator(MultipleLocator(0.5))
     axs[0].xaxis.set_minor_locator(MultipleLocator(0.1))
     axs[0].yaxis.set_major_locator(MultipleLocator(0.05))
