@@ -17,7 +17,7 @@ access = Access(release='dr19')
 import paths
 from colormaps import paultol
 from plotting import TWO_COLUMN_WIDTH
-from mwm_sample import LOGG_CUT
+from sample import LOGG_CUT
 from utils import vac2air
 
 # List of Ce II lines used to calculate abundance in ASPCAP
@@ -45,7 +45,7 @@ CE_WINDOWS = [
 def main(style='paper', verbose=False, overwrite=False):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     if verbose: print('Importing MWM sample file...')
-    mwm_sample = pd.read_csv(paths.data / 'MWM' / 'sample.csv', index_col='sdss_id')
+    mwm_sample = pd.read_csv(paths.data / 'sample.csv', index_col='sdss_id')
     # First figure: stars with similar log(g) and metallicity but different Ce
     if verbose: print('\nFigure 1: stellar siblings')
     sdss_id_list = [ # all have S/N~200

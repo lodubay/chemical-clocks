@@ -31,7 +31,7 @@ def main(style='paper', cmap=RADIUS_COLORMAP):
     radius_bin_edges = np.arange(RBINS[0][0], RBINS[-1][1]+dr, dr)
 
     # Import MWM sample
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'sample.csv')
     mwm_rgb = mwm_rgb[mwm_rgb['good_age']].copy()
     local_sample = mwm_rgb[
         (mwm_rgb['Rg'] >= 7) &

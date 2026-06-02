@@ -12,8 +12,8 @@ from plotting import ONE_COLUMN_WIDTH, ABUNDANCE_COLORMAP, AGE_COLORMAP
 import paths
 
 def main(style='paper'):
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    mwm_rgb = mwm_rgb[mwm_rgb['good_age']].copy()
+    mwm_sample = pd.read_csv(paths.data / 'sample.csv')
+    mwm_sample = mwm_sample[mwm_sample['good_age']].copy()
     plt.style.use(paths.styles / f'{style}.mplstyle')
     fig, axs = plt.subplots(
         2, 
@@ -28,12 +28,12 @@ def main(style='paper'):
     xlim = (-0.7, 0.5)
     ylim = (-0.9, 0.9)
     axs[0].scatter(
-        mwm_rgb['mg_h'], mwm_rgb['ce_mg_corr'], 
-        c=mwm_rgb['age'], cmap=cmap, norm=norm,
+        mwm_sample['mg_h'], mwm_sample['ce_mg_corr'], 
+        c=mwm_sample['age'], cmap=cmap, norm=norm,
         s=1, rasterized=True, edgecolors='none', marker='o', zorder=0
     )
     pc, contours = hexbin_contours(
-        axs[0], mwm_rgb['mg_h'], mwm_rgb['ce_mg_corr'], mwm_rgb['age'],
+        axs[0], mwm_sample['mg_h'], mwm_sample['ce_mg_corr'], mwm_sample['age'],
         gridsize=30, extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
         cmap=cmap, norm=norm, mincnt=10, contours=4,
     )
@@ -41,8 +41,8 @@ def main(style='paper'):
     # Indicate median abundance errors
     axs[0].errorbar(
         0.3, 0.7, 
-        xerr=mwm_rgb['e_mg_h'].median(), 
-        yerr=mwm_rgb['e_ce_mg'].median(), 
+        xerr=mwm_sample['e_mg_h'].median(), 
+        yerr=mwm_sample['e_ce_mg'].median(), 
         c='k', capsize=0, elinewidth=1,
     )
     axs[0].set_xlabel('[Mg/H]')
@@ -59,20 +59,20 @@ def main(style='paper'):
     norm = BoundaryNorm(np.arange(-0.6, 0.41, 0.1), cmap.N, extend='both')
     xlim = (0, 12)
     axs[1].scatter(
-        mwm_rgb['age'], mwm_rgb['ce_mg_corr'], 
-        c=mwm_rgb['fe_h_corr'], cmap=cmap, norm=norm,
+        mwm_sample['age'], mwm_sample['ce_mg_corr'], 
+        c=mwm_sample['fe_h_corr'], cmap=cmap, norm=norm,
         s=1, rasterized=True, edgecolors='none', marker='o', zorder=0
     )
     pc, contours = hexbin_contours(
-        axs[1], mwm_rgb['age'], mwm_rgb['ce_mg_corr'], mwm_rgb['fe_h_corr'],
+        axs[1], mwm_sample['age'], mwm_sample['ce_mg_corr'], mwm_sample['fe_h_corr'],
         gridsize=30, extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
         cmap=cmap, norm=norm, mincnt=10, contours=4,
     )
     fig.colorbar(pc, ax=axs[1], label='[Fe/H]')
     # Indicate median abundance errors
-    age_err_low = np.median(mwm_rgb['age'] - mwm_rgb['e_n_age'])
-    age_err_high = np.median(mwm_rgb['e_p_age'] - mwm_rgb['age'])
-    med_abund_err = mwm_rgb['e_ce_h'].median()
+    age_err_low = np.median(mwm_sample['age'] - mwm_sample['e_n_age'])
+    age_err_high = np.median(mwm_sample['e_p_age'] - mwm_sample['age'])
+    med_abund_err = mwm_sample['e_ce_h'].median()
     axs[1].errorbar(
         10, 0.7, 
         xerr=[[age_err_low], [age_err_high]], 

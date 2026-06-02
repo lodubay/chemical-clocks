@@ -9,13 +9,13 @@ from matplotlib.colors import BoundaryNorm, Normalize
 from matplotlib.cm import ScalarMappable
 
 from utils import binned_quantiles
-from plotting import insert_colorbar_axes, colored_text_legend, ONE_COLUMN_WIDTH
+from plotting import insert_colorbar_axes, ONE_COLUMN_WIDTH
 import paths
 
 def main(style='paper', cmap='jet'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'sample.csv')
     radius_bin_edges = np.arange(2.5, 15.6, 1)
     age_bin_edges = np.arange(0.5, 10.6, 1)
     fine_Rg_bins = np.arange(0, 16.1, 0.5)

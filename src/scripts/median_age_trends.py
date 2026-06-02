@@ -21,7 +21,7 @@ ZLIM = (0, 0.5)
 def main(style='paper', cmap=RADIUS_COLORMAP, min_count=10):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'sample.csv')
     # Calculate residual abundances
     mwm_rgb = residual_abundances(mwm_rgb, rbins=RBINS, zbins=[ZLIM])
     # Select only low-alpha, near-midplane stars

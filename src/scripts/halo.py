@@ -21,7 +21,7 @@ DENSITY_COLORMAP = 'binary_r'
 
 def main(style='paper'):
     # Get data
-    data = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
+    data = pd.read_csv(paths.data / 'sample.csv')
     # Kinematically-selected halo
     halo = data[data['E']/1e5 > halo_ELz_cut(data['Lz']/1e3)]
     # halo = data[(data['z_max'] > 3) | (data['vphi'] > -120)]

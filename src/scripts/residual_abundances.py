@@ -21,7 +21,7 @@ SAMPLE_SIZE = 1000 # number of stars to plot in each panel, randomly selected
 def main(style='paper'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'sample.csv')
     mwm_res = residual_abundances(mwm_rgb)
     mwm_res_ages = mwm_res[mwm_res['good_age']].copy() # Good ages only
 

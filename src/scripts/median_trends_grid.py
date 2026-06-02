@@ -18,7 +18,7 @@ SAMPLE_SIZE = 1000 # number of stars to plot in each panel, randomly sampled
 def main(style='paper'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'sample.csv')
     # Local sample for comparison
     local_sample = mwm_rgb[
         (mwm_rgb['Rg'] >= 7) &

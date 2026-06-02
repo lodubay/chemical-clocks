@@ -8,14 +8,13 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
 import paths
-from mwm_sample import LOGG_CUT, TEFF_CUT
+from sample import LOGG_CUT, TEFF_CUT
 from plotting import colored_text_legend, insert_colorbar_axes, TWO_COLUMN_WIDTH, ABUNDANCE_COLORMAP
 from colormaps import paultol
 
 
 def main(style='paper'):
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    # mwm_rgb = good_ages(mwm_rgb)
+    mwm_sample = pd.read_csv(paths.data / 'sample.csv')
     plt.style.use(paths.styles / f'{style}.mplstyle')
     fig, axs = plt.subplots(
         1, 2, 
@@ -25,13 +24,13 @@ def main(style='paper'):
     )
     # First panel: compare full sample to sample with good ages
     axs[0].scatter(
-        mwm_rgb['teff'], mwm_rgb['logg'],
-        # c=mwm_rgb['ce_h'], cmap='viridis', vmin=-1.5, vmax=0.5,
+        mwm_sample['teff'], mwm_sample['logg'],
+        # c=mwm_sample['ce_h'], cmap='viridis', vmin=-1.5, vmax=0.5,
         rasterized=True, s=1, marker='.', edgecolors='none', c='k', 
         label='Full sample'
     )
     # Indicate stars with good ages
-    mwm_ages = mwm_rgb[mwm_rgb['good_age']].copy()
+    mwm_ages = mwm_sample[mwm_sample['good_age']].copy()
     axs[0].scatter(
         mwm_ages['teff'], mwm_ages['logg'],
         rasterized=True, s=1, marker='.', edgecolors='none', 
@@ -39,8 +38,8 @@ def main(style='paper'):
     )
     # Second panel: color-code full sample by [Ce/H]
     pc = axs[1].scatter(
-        mwm_rgb['teff'], mwm_rgb['logg'],
-        c=mwm_rgb['ce_h'], cmap=ABUNDANCE_COLORMAP, vmin=-1.5, vmax=0.5,
+        mwm_sample['teff'], mwm_sample['logg'],
+        c=mwm_sample['ce_h'], cmap=ABUNDANCE_COLORMAP, vmin=-1.5, vmax=0.5,
         rasterized=True, s=1, marker='.', edgecolors='none'
     )
     cax = insert_colorbar_axes(fig)

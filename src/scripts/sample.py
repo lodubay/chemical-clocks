@@ -22,12 +22,12 @@ def main():
     # Import full DR19 catalog (takes a while)
     print('Importing DR19 catalog...')
     mwm_full = fits_to_pandas(
-        paths.data / 'MWM' / 'astraAllStarASPCAP-0.6.0.fits.gz', 
+        paths.data / 'catalogs/astraAllStarASPCAP-0.6.0.fits.gz', 
         hdu=2
     )
     # Join row-matched StarFlow age catalog
     starflow = fits_to_pandas(
-        paths.data / 'MWM' / 'StarFlow_summary_v1_0_1.fits'
+        paths.data / 'catalogs/StarFlow_summary_v1_0_1.fits'
     )
     # Flag good ages
     starflow['good_age'] = (
@@ -109,7 +109,7 @@ def main():
 
     # Export catalogs
     print('Exporting sample of %s stars (sample.csv)...' % sample.shape[0])
-    sample.to_csv(paths.data / 'MWM' / 'sample.csv', index=False)
+    sample.to_csv(paths.data / 'sample.csv', index=False)
     print('Done!')
 
 
@@ -163,7 +163,7 @@ def add_kinematics(df, id_name='sdss_id', verbose=False):
     df : pandas.DataFrame
         Input DataFrame merged with Gaia orbit parameters.
     """
-    fitspath = paths.data / 'MWM' / 'sdssv-mwm-dr19-apogee-actions.fits'
+    fitspath = paths.data / 'catalogs/sdssv-mwm-dr19-apogee-actions.fits'
     with fits.open(fitspath) as hdul:
         kinematic = hdul[1].data
     if verbose: print('Finished reading in data!')
@@ -245,7 +245,7 @@ def compute_upper_limits(df):
     and flag abundances lower than the limit.
     """
     coeffs = pd.read_csv(
-        paths.data / 'MWM' / 'shetrone_dr17_limits.csv', index_col='species'
+        paths.data / 'shetrone_dr17_limits.csv', index_col='species'
     )
     for el, row in coeffs.iterrows():
         df['lim_%s_h' % el] = abund_limit_func(
@@ -289,8 +289,8 @@ def logg_calibrations(df):
     logg_bin_centers = get_bin_centers(logg_bin_edges)
     grid = (MgH_bin_centers, logg_bin_centers)
     # Load calibration grids
-    fe_offsets = np.load(paths.data / 'MWM' / 'fe_offset_grid.npy')
-    ce_offsets = np.load(paths.data / 'MWM' / 'ce_offset_grid.npy')
+    fe_offsets = np.load(paths.data / 'fe_offset_grid.npy')
+    ce_offsets = np.load(paths.data / 'ce_offset_grid.npy')
 
     # Interpolate & apply log(g) corrections
     feh_corr = np.empty(df.shape[0])

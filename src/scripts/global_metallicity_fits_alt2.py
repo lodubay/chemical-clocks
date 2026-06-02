@@ -32,7 +32,7 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
     radius_bin_edges = np.arange(2.5, 15.5+dr, dr)
 
     # Import MWM sample
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'sample.csv')
     mwm_rgb = mwm_rgb[mwm_rgb['good_age']].copy()
     solar_sample = mwm_rgb[ # Solar metallicity sample
         (mwm_rgb[MET_COL] >= -0.1) &

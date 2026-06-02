@@ -13,7 +13,7 @@ RLIM = (7, 9)
 ZLIM = (0, 2)
 
 def main(style='poster'):
-    mwm_sample = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
+    mwm_sample = pd.read_csv(paths.data / 'sample.csv')
     local_sample = mwm_sample[
         (mwm_sample['Rg'] >= RLIM[0]) & 
         (mwm_sample['Rg'] < RLIM[1]) & 

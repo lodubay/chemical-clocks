@@ -149,4 +149,4 @@ def kde2D_path(xcol, ycol, galr_lim, absz_lim):
     kde_dir = '_'.join([''.join(xcol.split('_')).lower(),
                         ''.join(ycol.split('_')).lower()])
     filename = 'r%s-%s_z%s-%s.dat' % (galr_lim + absz_lim)
-    return paths.data / 'MWM' / 'kde' / kde_dir / filename
+    return paths.data / 'kde' / kde_dir / filename

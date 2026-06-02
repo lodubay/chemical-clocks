@@ -30,13 +30,13 @@ def main(style='paper', cmap='viridis'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
 
     # Data
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    mwm_rgb = mwm_rgb[mwm_rgb['good_age']].copy()
-    local_sample = mwm_rgb[
-        (mwm_rgb['Rg'] >= RLIM[0]) &
-        (mwm_rgb['Rg'] < RLIM[1]) &
-        (mwm_rgb['z_max'] >= ZLIM[0]) &
-        (mwm_rgb['z_max'] < ZLIM[1])
+    mwm_sample = pd.read_csv(paths.data / 'sample.csv')
+    mwm_sample = mwm_sample[mwm_sample['good_age']].copy()
+    local_sample = mwm_sample[
+        (mwm_sample['Rg'] >= RLIM[0]) &
+        (mwm_sample['Rg'] < RLIM[1]) &
+        (mwm_sample['z_max'] >= ZLIM[0]) &
+        (mwm_sample['z_max'] < ZLIM[1])
     ]
     # Restrict age trends to low-alpha stars only
     local_low_alpha = local_sample[local_sample['low_alpha']]
@@ -77,9 +77,9 @@ def main(style='paper', cmap='viridis'):
     cbar = fig.colorbar(pc, ax=axs[0], fraction=0.05, label=MET_LABEL)
 
     # Indicate median abundance errors
-    age_err_low = np.median(mwm_rgb['age'] - mwm_rgb['e_n_age'])
-    age_err_high = np.median(mwm_rgb['e_p_age'] - mwm_rgb['age'])
-    med_abund_err = mwm_rgb['e_ce_h'].median()
+    age_err_low = np.median(mwm_sample['age'] - mwm_sample['e_n_age'])
+    age_err_high = np.median(mwm_sample['e_p_age'] - mwm_sample['age'])
+    med_abund_err = mwm_sample['e_ce_h'].median()
     axs[0].errorbar(
         8, 0.6, 
         xerr=[[age_err_low], [age_err_high]], 

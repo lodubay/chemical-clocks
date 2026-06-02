@@ -51,7 +51,7 @@ axs[1,0].plot(xarr, dem_reg[0] * xarr + dem_reg[1], 'r-', label='Deming')
 axs[1,0].set_title('Mock, underestimated y-errors')
 
 # Import MWM data
-sample = pd.read_csv(paths.data / 'MWM/sample.csv')
+sample = pd.read_csv(paths.data / 'sample.csv')
 snsm = sample[
     (sample['Rg'] >= 7) &
     (sample['Rg'] < 9) &

@@ -26,13 +26,13 @@ SOLAR_AGE = 4.6 # Gyr
 
 def main(style='paper', cmap=ABUNDANCE_COLORMAP):
     # Data
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
-    local_sample = mwm_rgb[
-        (mwm_rgb['Rg'] >= RLIM[0]) &
-        (mwm_rgb['Rg'] < RLIM[1]) &
-        (mwm_rgb['z_max'] >= ZLIM[0]) &
-        (mwm_rgb['z_max'] < ZLIM[1]) &
-        (mwm_rgb['good_age'])
+    mwm_sample = pd.read_csv(paths.data / 'sample.csv')
+    local_sample = mwm_sample[
+        (mwm_sample['Rg'] >= RLIM[0]) &
+        (mwm_sample['Rg'] < RLIM[1]) &
+        (mwm_sample['z_max'] >= ZLIM[0]) &
+        (mwm_sample['z_max'] < ZLIM[1]) &
+        (mwm_sample['good_age'])
     ].copy()
     local_sample['e_age'] = 0.5 * (
         (local_sample['e_p_age'] - local_sample['age']) + 

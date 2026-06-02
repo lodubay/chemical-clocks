@@ -9,7 +9,7 @@ from matplotlib.colors import BoundaryNorm, LogNorm
 from matplotlib.ticker import MultipleLocator
 from astropy.io import ascii
 
-from mwm_sample import abundance_ratio
+from sample import abundance_ratio
 from utils import fits_to_pandas
 from plotting import ONE_COLUMN_WIDTH, DENSITY_COLORMAP
 import paths
@@ -27,7 +27,7 @@ def main(style='paper'):
     ylim = (-0.8, 0.8)
 
     # Plot full MWM DR19 sample
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'sample.csv')
     mwm_ages = mwm_rgb[mwm_rgb['good_age']].copy()
     pcm0 = axs[0].hexbin(
         mwm_ages['age'], mwm_ages['ce_mg'],
@@ -70,7 +70,7 @@ def main(style='paper'):
     axs[0].set_title('(a) StarFlow', y=0.82)
 
     # APOKASC-3 catalog
-    apokasc_csv_path = paths.data / 'MWM' / 'APOKASC3_MWM.csv'
+    apokasc_csv_path = paths.data / 'catalogs/APOKASC3_MWM.csv'
     if apokasc_csv_path.exists():
         apokasc3 = pd.read_csv(apokasc_csv_path)
     else:
@@ -120,7 +120,7 @@ def main(style='paper'):
     axs[1].set_title('(b) APOKASC-3', y=0.82)
 
     # OCCAM DR19 open clusters
-    occam19 = pd.read_csv(paths.data / 'MWM' / 'occam_19cluster-rgb.csv')
+    occam19 = pd.read_csv(paths.data / 'catalogs/occam_19cluster-rgb.csv')
     occam19['CG_Age'] = (10**(occam19['CG_logAge']))/1e9
     occam19['Ce_Mg'] = occam19['Ce_H'] - occam19['Mg_H']
     occam19['Ce_Mg_ERR'] = np.sqrt(occam19['Ce_H_ERR']**2 + occam19['Mg_H_ERR']**2)
@@ -198,7 +198,7 @@ def casali_relation(age, feh):
 def join_apokasc_mwm():
     """Join APOKASC-3 catalogs with abundances and parameters from MWM DR19."""
     # APOKASC-3 catalog
-    apokasc3 = ascii.read(paths.data / 'APOGEE' / 'apokasc3_rec_mrt.txt').to_pandas()
+    apokasc3 = ascii.read(paths.data / 'catalogs/apokasc3_rec_mrt.txt').to_pandas()
     apokasc3['APOGEE_ID'] = apokasc3['2MASS'].str.replace('2MASS J', '2M')
     # Select gold sample only
     apokasc3 = apokasc3[
@@ -213,7 +213,7 @@ def join_apokasc_mwm():
     )
     # Import full DR19 catalog
     mwm_full = fits_to_pandas(
-        paths.data / 'MWM' / 'astraAllStarASPCAP-0.6.0.fits.gz', 
+        paths.data / 'catalogs/astraAllStarASPCAP-0.6.0.fits.gz', 
         hdu=2
     )
     # drop duplicate SDSS-V IDs with the lowest SNR
