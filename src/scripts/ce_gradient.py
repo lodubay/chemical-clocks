@@ -32,7 +32,7 @@ def main(style='paper', cmap='jet'):
         sharex=True,
         gridspec_kw={'hspace': 0.}
     )
-    fig.subplots_adjust(right=0.8)
+    fig.subplots_adjust(left=0.1, right=0.75)
     cax = insert_colorbar_axes(fig, 'horizontal', pad=0.05)
     age_cmap = plt.get_cmap(cmap)
     norm = BoundaryNorm(age_bin_edges, age_cmap.N)
@@ -155,7 +155,8 @@ def main(style='paper', cmap='jet'):
     colored_text_legend(
         axs[0], 
         loc='center left', 
-        bbox_to_anchor=(1, 0)
+        bbox_to_anchor=(1, 0),
+        title='Age'
     )
 
     plt.savefig(paths.figures / 'ce_gradient')
