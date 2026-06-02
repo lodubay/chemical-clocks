@@ -14,7 +14,8 @@ TWO_COLUMN_WIDTH = 7.
 # Default colormaps
 DENSITY_COLORMAP = 'gist_heat_r'
 AGE_COLORMAP = 'Spectral_r'
-RADIUS_COLORMAP = 'viridis_r'
+RADIUS_COLORMAP = 'managua'
+ABUNDANCE_COLORMAP = 'viridis'
 
 # Hayden plot bins
 RBINS = [(3, 5), (5, 7), (7, 9), (9, 11), (11, 13)] # left to right

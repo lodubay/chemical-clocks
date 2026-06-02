@@ -11,7 +11,7 @@ from astropy.io import ascii
 
 from mwm_sample import abundance_ratio
 from utils import fits_to_pandas
-from plotting import truncate_colormap, ONE_COLUMN_WIDTH
+from plotting import ONE_COLUMN_WIDTH, DENSITY_COLORMAP
 import paths
 
 def main(style='paper'):
@@ -33,7 +33,7 @@ def main(style='paper'):
         mwm_ages['age'], mwm_ages['ce_mg'],
         C=np.ones(mwm_ages.shape[0]),
         reduce_C_function=np.sum,
-        cmap='gist_heat_r',
+        cmap=DENSITY_COLORMAP,
         gridsize=30,
         linewidths=0.2,
         extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
@@ -80,7 +80,7 @@ def main(style='paper'):
         apokasc3['AgeBest'], apokasc3['MWM_CE_MG'],
         C=np.ones(apokasc3.shape[0]),
         reduce_C_function=np.sum,
-        cmap='gist_heat_r',
+        cmap=DENSITY_COLORMAP,
         gridsize=30,
         linewidths=0.2,
         extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
@@ -133,11 +133,12 @@ def main(style='paper'):
         (occam19['Mg_H_ERR'] < 0.2) & 
         (occam19['rgb_N_stars'] > 1) 
     ]
+    occam19.sort_values(by='rgb_N_stars', inplace=True)
     im = axs[2].scatter(
         occam19['CG_Age'], occam19['Ce_Mg'], 
         s = 15, 
         c = np.log10(occam19['rgb_N_stars']), 
-        cmap = 'viridis', 
+        cmap = DENSITY_COLORMAP, 
         # vmin = 0, vmax = 18
         # norm = LogNorm()
         vmin=0

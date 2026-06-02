@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize, LogNorm, BoundaryNorm
 from matplotlib.ticker import MultipleLocator
 
-from plotting import ONE_COLUMN_WIDTH
+from plotting import ONE_COLUMN_WIDTH, ABUNDANCE_COLORMAP, AGE_COLORMAP
 import paths
 
 def main(style='paper'):
@@ -23,7 +23,7 @@ def main(style='paper'):
     )
 
     # First panel: [Ce/Mg] vs [Mg/H], color-coded by median age
-    cmap = plt.get_cmap('Spectral_r')
+    cmap = plt.get_cmap(AGE_COLORMAP)
     norm = BoundaryNorm(np.arange(0, 11, 1), cmap.N, extend='max')
     xlim = (-0.7, 0.5)
     ylim = (-0.9, 0.9)
@@ -55,7 +55,7 @@ def main(style='paper'):
     axs[0].yaxis.set_minor_locator(MultipleLocator(0.1))
 
     # Second panel: [Ce/Mg] vs age, color-coded by [Fe/H]
-    cmap = plt.get_cmap('viridis')
+    cmap = plt.get_cmap(ABUNDANCE_COLORMAP)
     norm = BoundaryNorm(np.arange(-0.8, 0.41, 0.1), cmap.N, extend='both')
     xlim = (0, 12)
     axs[1].scatter(

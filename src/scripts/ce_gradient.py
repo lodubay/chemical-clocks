@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from matplotlib.colors import BoundaryNorm, Normalize
+from matplotlib.cm import ScalarMappable
 
 from utils import binned_quantiles
 from plotting import insert_colorbar_axes, colored_text_legend, ONE_COLUMN_WIDTH
@@ -28,14 +29,17 @@ def main(style='paper', cmap='jet'):
     # Set up figure
     fig, axs = plt.subplots(
         2, 1,
-        figsize=(ONE_COLUMN_WIDTH, 1.5*ONE_COLUMN_WIDTH),
+        figsize=(ONE_COLUMN_WIDTH, 1.67*ONE_COLUMN_WIDTH),
         sharex=True,
         gridspec_kw={'hspace': 0.}
     )
-    fig.subplots_adjust(left=0.1, right=0.75)
-    cax = insert_colorbar_axes(fig, 'horizontal', pad=0.05)
+    # fig.subplots_adjust(left=0.1, right=0.95)
     age_cmap = plt.get_cmap(cmap)
-    norm = BoundaryNorm(age_bin_edges, age_cmap.N)
+    age_norm = BoundaryNorm(age_bin_edges, age_cmap.N)
+    age_cax = insert_colorbar_axes(fig, 'horizontal', pad=0.05)
+    density_cmap = 'binary'
+    density_norm = Normalize(vmin=0, vmax=0.2)
+    density_cax = insert_colorbar_axes(fig, 'horizontal', pad=0.05)
     xlim = (2, 16)
     ylim = [(-0.6, 0.6), (-0.6, 0.6)]
 
@@ -61,14 +65,15 @@ def main(style='paper', cmap='jet'):
         H_norm_cols = H / np.sum(H, axis=0, keepdims=True)
         pcm = axs[i].pcolormesh(
             xedges, yedges, H_norm_cols,
-            cmap='binary',
-            norm=Normalize(vmin=0, vmax=0.2)
+            cmap=density_cmap,
+            norm=density_norm
         )
         # fig.colorbar(pcm, ax=axs[i])
 
         for j in range(len(age_bin_edges)-1):
             age_bin = age_bin_edges[j:j+2]
             mean_age = np.mean(age_bin)
+            color = age_cmap(age_norm(mean_age))
             # Plot high-alpha trends
             high_alpha_subset = all_high_alpha[
                 (all_high_alpha['age'] >= age_bin[0]) &
@@ -85,13 +90,13 @@ def main(style='paper', cmap='jet'):
             # )
             axs[i].plot(
                 *high_alpha_medians[:-1], '--', 
-                color=age_cmap(norm(mean_age)), zorder=3
+                color=color, zorder=3
             )
             axs[i].fill_between(
                 high_alpha_medians[0],
                 high_alpha_medians[1]+high_alpha_medians[2],
                 high_alpha_medians[1]-high_alpha_medians[2],
-                color=age_cmap(norm(mean_age)),
+                color=color,
                 edgecolor='none', alpha=0.5, zorder=1
             )
             # Plot low-alpha trends
@@ -111,23 +116,35 @@ def main(style='paper', cmap='jet'):
             # )
             axs[i].plot(
                 *low_alpha_medians[:-1], '-', 
-                color=age_cmap(norm(mean_age)), zorder=4, 
+                color=color, 
+                zorder=4, 
                 label=f'{int(mean_age)} Gyr'
             )
             axs[i].fill_between(
                 low_alpha_medians[0],
                 low_alpha_medians[1]+low_alpha_medians[2],
                 low_alpha_medians[1]-low_alpha_medians[2],
-                color=age_cmap(norm(mean_age)),
-                edgecolor='none', alpha=0.5, zorder=2
+                color=color,
+                edgecolor='none', 
+                alpha=0.5, 
+                zorder=2
             )
+    # Density colorbar
     fig.colorbar(
         pcm, 
-        cax=cax, 
+        cax=density_cax, 
         orientation='horizontal', 
         label='Column-normalized density', 
         extend='max'
     )
+    # Age bin colorbar
+    fig.colorbar(
+        ScalarMappable(cmap=age_cmap, norm=age_norm),
+        cax=age_cax,
+        orientation='horizontal',
+        label='Stellar age [Gyr]'
+    )
+    age_cax.xaxis.set_major_locator(MultipleLocator(1))
 
     axs[0].set_xlim(xlim)
     axs[0].set_ylim(ylim[0])
@@ -142,7 +159,7 @@ def main(style='paper', cmap='jet'):
 
     axs[0].set_ylabel('[Ce/H]')
     axs[1].set_ylabel('[Ce/Mg]')
-    axs[1].set_xlabel(r'$R_{\rm guide}$ [kpc]')
+    axs[1].set_xlabel('Guiding radius [kpc]')
 
     # for ax in axs:
     #     colored_text_legend(
@@ -152,12 +169,12 @@ def main(style='paper', cmap='jet'):
     #         framealpha=1,
     #         edgecolor='k'
     #     )
-    colored_text_legend(
-        axs[0], 
-        loc='center left', 
-        bbox_to_anchor=(1, 0),
-        title='Age'
-    )
+    # colored_text_legend(
+    #     axs[0], 
+    #     loc='center left', 
+    #     bbox_to_anchor=(1, 0),
+    #     title='Age'
+    # )
 
     plt.savefig(paths.figures / 'ce_gradient')
     plt.close()

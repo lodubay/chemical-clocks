@@ -9,7 +9,7 @@ from matplotlib.ticker import MultipleLocator
 
 import paths
 from mwm_sample import LOGG_CUT, TEFF_CUT
-from plotting import colored_text_legend, insert_colorbar_axes, TWO_COLUMN_WIDTH
+from plotting import colored_text_legend, insert_colorbar_axes, TWO_COLUMN_WIDTH, ABUNDANCE_COLORMAP
 from colormaps import paultol
 
 
@@ -40,7 +40,7 @@ def main(style='paper'):
     # Second panel: color-code full sample by [Ce/H]
     pc = axs[1].scatter(
         mwm_rgb['teff'], mwm_rgb['logg'],
-        c=mwm_rgb['ce_h'], cmap='viridis', vmin=-1.5, vmax=0.5,
+        c=mwm_rgb['ce_h'], cmap=ABUNDANCE_COLORMAP, vmin=-1.5, vmax=0.5,
         rasterized=True, s=1, marker='.', edgecolors='none'
     )
     cax = insert_colorbar_axes(fig)

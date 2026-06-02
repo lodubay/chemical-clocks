@@ -10,7 +10,7 @@ from matplotlib.ticker import MultipleLocator
 from matplotlib.gridspec import GridSpec
 from scipy import stats
 
-from plotting import TWO_COLUMN_WIDTH
+from plotting import TWO_COLUMN_WIDTH, ABUNDANCE_COLORMAP
 from utils import get_bin_centers
 from global_metallicity_fits import fit_metallicity_bins
 import paths
@@ -24,7 +24,7 @@ AGE_DELTA = 5 # Gyr, linear age shift for regression
 SOLAR_AGE = 4.6 # Gyr
 
 
-def main(style='paper'):
+def main(style='paper', cmap=ABUNDANCE_COLORMAP):
     # Data
     mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
     local_sample = mwm_rgb[
@@ -52,7 +52,7 @@ def main(style='paper'):
     # Metallicity bins
     met_bins = np.arange(-0.45, 0.46, 0.1)
     age_arr = np.arange(0, 12.1, 0.1)
-    cmap = plt.get_cmap('viridis')
+    cmap = plt.get_cmap(cmap)
     norm = BoundaryNorm(met_bins, cmap.N, extend='both')
 
     # Get best-fit regressions

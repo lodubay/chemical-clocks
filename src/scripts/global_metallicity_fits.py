@@ -10,7 +10,7 @@ from matplotlib.colors import BoundaryNorm
 from scipy import stats
 
 from utils import get_bin_centers
-from plotting import ONE_COLUMN_WIDTH, colored_text_legend, truncate_colormap
+from plotting import ONE_COLUMN_WIDTH, colored_text_legend, RADIUS_COLORMAP
 import paths
 
 RBINS = [(3, 5), (5, 7), (7, 9), (9, 11), (11, 13), (13, 15)]
@@ -22,7 +22,7 @@ MIN_COUNT = 20 # Minimum number of stars in each bin for trend fitting
 AGE_DELTA = 5 # Gyr, linear age shift for regression
 SOLAR_AGE = 4.6 # Gyr
 
-def main(style='paper', cmap='viridis_r'):
+def main(style='paper', cmap=RADIUS_COLORMAP):
     plt.style.use(paths.styles / f'{style}.mplstyle')
 
     # Metallicity bins
