@@ -10,7 +10,7 @@ from matplotlib.colors import BoundaryNorm
 from scipy import stats
 
 from utils import get_bin_centers
-from plotting import ONE_COLUMN_WIDTH, colored_text_legend
+from plotting import ONE_COLUMN_WIDTH, colored_text_legend, truncate_colormap
 import paths
 
 RBINS = [(3, 5), (5, 7), (7, 9), (9, 11), (11, 13), (13, 15)]
@@ -69,14 +69,18 @@ def main(style='paper', cmap='viridis_r'):
             slopes = np.array([f.slope for f in region_fits])
             errors = np.array([f.stderr for f in region_fits])
             # Plot fit slopes
+            if mean_radius == 8:
+                color = 'k'
+            else:
+                color = cmap(norm(mean_radius))
             ax.plot(
                 mets, slopes, '.-',
-                color=cmap(norm(mean_radius)),
+                color=color,
                 label=f'{int(mean_radius)} kpc'
             )
             ax.fill_between(
                 mets, slopes - errors, slopes + errors,
-                color=cmap(norm(mean_radius)), 
+                color=color, 
                 alpha=0.5, edgecolor='none'
             )
             # ax.errorbar(
@@ -84,10 +88,11 @@ def main(style='paper', cmap='viridis_r'):
             #     yerr=errors, 
             #     marker='o', c='k', linestyle='none', ms=3, capsize=0
             # )
-            # Plot Solar neighborhood fits for comparison
-            ax.plot(local_mets, local_slopes, 'k--', zorder=0)
-            # Dotted horizontal line
-            ax.axhline(0, ls=':', c='gray', zorder=0)
+        # Plot Solar neighborhood fits for comparison
+        if i<2:
+            ax.plot(local_mets, local_slopes, 'k--')
+        # Dotted horizontal line
+        ax.axhline(0, ls=':', c='gray', zorder=0)
 
     # Format axes
     axs[0].set_xlim((-0.7, 0.6))
