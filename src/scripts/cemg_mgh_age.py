@@ -56,7 +56,7 @@ def main(style='paper'):
 
     # Second panel: [Ce/Mg] vs age, color-coded by [Fe/H]
     cmap = plt.get_cmap(ABUNDANCE_COLORMAP)
-    norm = BoundaryNorm(np.arange(-0.8, 0.41, 0.1), cmap.N, extend='both')
+    norm = BoundaryNorm(np.arange(-0.6, 0.41, 0.1), cmap.N, extend='both')
     xlim = (0, 12)
     axs[1].scatter(
         mwm_rgb['age'], mwm_rgb['ce_mg_corr'], 
