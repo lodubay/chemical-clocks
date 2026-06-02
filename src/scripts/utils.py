@@ -10,8 +10,8 @@ import pandas as pd
 from astropy.table import Table
 import vice
 
-from multizone._globals import RANDOM_SEED, MAX_SF_RADIUS, ZONE_WIDTH
 from stats import median_standard_error
+from _globals import RANDOM_SEED
 
 # =============================================================================
 # SCIENCE FUNCTIONS
@@ -333,34 +333,6 @@ def binned_medians(data, col, bin_col, bins=50, bin_edges=[], min_count=0):
         data, col, bin_col, 
         q=0.5, bins=bins, bin_edges=bin_edges, min_count=min_count
     )
-
-
-def radial_gradient(multioutput, parameter, index=-1, 
-                    Rmax=MAX_SF_RADIUS, zone_width=ZONE_WIDTH):
-    """
-    Return the value of the given model parameter at all zones.
-    
-    Parameters
-    ----------
-    multioutput : vice.multioutput
-        VICE multi-zone output instance for the desired model.
-    parameter : str
-        Name of parameter in vice.history dataframe.
-    index : int, optional
-        Index to select for each zone. The default is -1, which corresponds
-        to the last simulation timestep or the present day.
-    Rmax : float, optional
-        Maximum radius in kpc. The default is 15.5.
-    zone_width : float, optional
-        Annular zone width in kpc. The default is 0.1.
-        
-    Returns
-    -------
-    list
-        Parameter values at each zone at the given time index.
-    """
-    return [multioutput.zones['zone%i' % z].history[index][parameter] 
-            for z in range(int(Rmax/zone_width))]
 
 
 def plot_gas_abundance(ax, mzs, xcol, ycol, label='', **kwargs):

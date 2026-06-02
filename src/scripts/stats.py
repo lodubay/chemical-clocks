@@ -3,7 +3,7 @@ Generic statistical routines for this project.
 """
 
 import numpy as np
-from multizone._globals import RANDOM_SEED
+from _globals import RANDOM_SEED
 
 def deming_regression(x_obs, y_obs, x_err, y_err):
     """
