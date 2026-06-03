@@ -47,7 +47,7 @@ def main(style='paper', cmap=RADIUS_COLORMAP, min_count=10):
     lowz_ages = all_lowz[all_lowz['good_age']].copy()
     low_alpha_ages = lowz_ages[lowz_ages['low_alpha']]
     high_alpha_ages = lowz_ages[lowz_ages['high_alpha']]
-    for i, col in enumerate(['ce_mg', 'delta_ce_h']):
+    for i, col in enumerate(['ce_mg_corr', 'delta_ce_h']):
         # Plot all stars
         pcm = axs[i].hexbin(
             lowz_ages['age'], lowz_ages[col],

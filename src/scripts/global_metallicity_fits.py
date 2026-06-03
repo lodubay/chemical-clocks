@@ -15,7 +15,7 @@ from plotting import ONE_COLUMN_WIDTH, colored_text_legend, RADIUS_COLORMAP, ins
 import paths
 
 ZLIM = (0, 0.5) # global z_max limits
-MET_COL = 'fe_h' # Column with metallicity values
+MET_COL = 'fe_h_corr' # Column with metallicity values
 MET_LABEL = '[Fe/H]'
 AGE_FIT_RANGE = (1, 8) # Range of ages to fit linear trend
 MIN_COUNT = 20 # Minimum number of stars in each bin for trend fitting
@@ -108,7 +108,7 @@ def main(style='paper', cmap=RADIUS_COLORMAP, zlim=ZLIM):
     axs[0].yaxis.set_major_locator(MultipleLocator(0.05))
     axs[0].yaxis.set_minor_locator(MultipleLocator(0.01))
     axs[0].set_ylabel('Slope [dex/Gyr]')
-    axs[1].set_ylim((-0.12, 0.38))
+    axs[1].set_ylim((-0.2, 0.34))
     axs[1].yaxis.set_major_locator(MultipleLocator(0.1))
     axs[1].yaxis.set_minor_locator(MultipleLocator(0.02))
     axs[1].set_ylabel(r'[Ce/Mg] at $\tau=5$ Gyr')

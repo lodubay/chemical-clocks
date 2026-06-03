@@ -18,7 +18,7 @@ SAMPLE_FRACTION = 0.25
 
 def main(style='paper'):
     # Import MWM sample
-    mwm_rgb = pd.read_csv(paths.data / 'MWM' / 'sample.csv')
+    mwm_rgb = pd.read_csv(paths.data / 'sample.csv')
     # Solar neighborhood sample
     mwm_rgb_local = mwm_rgb[
         (mwm_rgb['Rg'] >= 7) &

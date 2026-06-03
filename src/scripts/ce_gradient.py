@@ -43,7 +43,7 @@ def main(style='paper', cmap='jet'):
     xlim = (2, 16)
     ylim = [(-0.6, 0.6), (-0.6, 0.6)]
 
-    for i, col in enumerate(['ce_h', 'ce_mg']):
+    for i, col in enumerate(['ce_h_corr', 'ce_mg_corr']):
         # Plot all stars
         # pcm = axs[i].hexbin(
         #     all_lowz['Rg'], all_lowz[col],

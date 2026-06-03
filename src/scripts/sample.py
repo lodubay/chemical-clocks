@@ -311,9 +311,13 @@ def logg_calibrations(df):
             grid
         )
 
+    # Additional zero-point offset: set corrected median = uncorrected median
+    feh_zpt = np.median(feh_corr - df['fe_h'])
+    ceh_zpt = np.median(ceh_corr - df['ce_h'])
+
     # Apply to sample DataFrame
-    df['fe_h_corr'] = feh_corr
-    df['ce_h_corr'] = ceh_corr
+    df['fe_h_corr'] = feh_corr - feh_zpt
+    df['ce_h_corr'] = ceh_corr - ceh_zpt
     df['fe_mg_corr'] = df['fe_h_corr'] - df['mg_h']
     df['mg_fe_corr'] = df['mg_h'] - df['fe_h_corr']
     df['ce_mg_corr'] = df['ce_h_corr'] - df['mg_h']
