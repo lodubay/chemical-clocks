@@ -109,7 +109,7 @@ def plot_spectrum_comparison(
     """
     download_sdss_spectra(sdss_id_list, verbose=verbose, overwrite=overwrite)
 
-    fig = plt.figure(figsize=(TWO_COLUMN_WIDTH, 0.6*TWO_COLUMN_WIDTH))
+    fig = plt.figure(figsize=(TWO_COLUMN_WIDTH, 0.5*TWO_COLUMN_WIDTH))
     gs1 = GridSpec(1, 3, figure=fig, left=0.08, right=0.72, wspace=0.2)
 
     # Plot spectral windows
@@ -190,7 +190,7 @@ def plot_spectrum_comparison(
                 )
     
     # Custom legend
-    ax0.set_ylim((None, 1.4))
+    ax0.set_ylim((None, 1.44))
     handles = [
         Line2D([0], [0], ls='none', marker='o', ms=4, mec='k', mfc='w'),
         Line2D([0], [0], c='k'),
@@ -200,7 +200,7 @@ def plot_spectrum_comparison(
     ax0.legend(handles, labels, loc='upper right', frameon=True)
 
     # Plot Kiel diagram
-    gs2 = GridSpec(2, 1, left=0.78, right=0.98, top=1., hspace=0.25)
+    gs2 = GridSpec(2, 1, left=0.79, right=0.98, top=1., hspace=0.3)
     kiel_ax = fig.add_subplot(gs2[0])
     norm = Normalize(vmin=1, vmax=600)
     hexbin_kwargs = dict(
