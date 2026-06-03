@@ -87,7 +87,7 @@ def main(style='paper'):
     ax.xaxis.set_minor_locator(MultipleLocator(0.1))
     ax.yaxis.set_major_locator(MultipleLocator(0.5))
     ax.yaxis.set_minor_locator(MultipleLocator(0.1))
-    colored_text_legend(ax, loc='upper left', title='Yield tables')
+    colored_text_legend(ax, loc='upper left', invert=True)
 
     plt.savefig(paths.figures / 'ssp_yields')
     plt.close()
