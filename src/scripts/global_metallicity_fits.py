@@ -54,7 +54,7 @@ def main(style='paper', cmap=RADIUS_COLORMAP, zlim=ZLIM):
             (mwm_sample['Rg'] < rlim[1]) &
             (mwm_sample['z_max'] >= zlim[0]) &
             (mwm_sample['z_max'] < zlim[1]) &
-            (mwm_sample['good_age']) # limit to good ages
+            (mwm_sample['good_age']) & # limit to good ages
             (mwm_sample['low_alpha']) # restrict age trends to low-alpha only
         ]
         # Bin by metallicity and fit linear trend to stars
@@ -101,7 +101,7 @@ def main(style='paper', cmap=RADIUS_COLORMAP, zlim=ZLIM):
     )
 
     # Format axes
-    axs[0].set_xlim((-0.7, 0.6))
+    axs[0].set_xlim((-0.7, 0.5))
     axs[0].set_ylim((-0.1, 0.05))
     axs[0].xaxis.set_major_locator(MultipleLocator(0.5))
     axs[0].xaxis.set_minor_locator(MultipleLocator(0.1))
