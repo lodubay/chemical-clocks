@@ -109,7 +109,7 @@ def plot_spectrum_comparison(
     """
     download_sdss_spectra(sdss_id_list, verbose=verbose, overwrite=overwrite)
 
-    fig = plt.figure(figsize=(TWO_COLUMN_WIDTH, 0.55*TWO_COLUMN_WIDTH))
+    fig = plt.figure(figsize=(TWO_COLUMN_WIDTH, 0.5*TWO_COLUMN_WIDTH))
     gs1 = GridSpec(1, 3, figure=fig, left=0.08, right=0.72, top=0.85, wspace=0.2)
 
     # Plot spectral windows
