@@ -7,105 +7,113 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from matplotlib.colors import BoundaryNorm
+from matplotlib.cm import ScalarMappable
 from scipy import stats
 
 from utils import get_bin_centers
-from plotting import ONE_COLUMN_WIDTH, colored_text_legend, RADIUS_COLORMAP
+from plotting import ONE_COLUMN_WIDTH, colored_text_legend, RADIUS_COLORMAP, insert_colorbar_axes
 import paths
 
-RBINS = [(3, 5), (5, 7), (7, 9), (9, 11), (11, 13), (13, 15)]
-ZBINS = [(1, 2), (0.5, 1), (0, 0.5)] # top to bottom
+ZLIM = (0, 0.5) # global z_max limits
 MET_COL = 'fe_h' # Column with metallicity values
 MET_LABEL = '[Fe/H]'
 AGE_FIT_RANGE = (1, 8) # Range of ages to fit linear trend
 MIN_COUNT = 20 # Minimum number of stars in each bin for trend fitting
 AGE_DELTA = 5 # Gyr, linear age shift for regression
-SOLAR_AGE = 4.6 # Gyr
 
-def main(style='paper', cmap=RADIUS_COLORMAP):
+
+def main(style='paper', cmap=RADIUS_COLORMAP, zlim=ZLIM):
     plt.style.use(paths.styles / f'{style}.mplstyle')
 
     # Metallicity bins
     met_bin_edges = np.arange(-0.85, 0.56, 0.1)
-    dr = RBINS[0][1] - RBINS[0][0]
-    radius_bin_edges = np.arange(RBINS[0][0], RBINS[-1][1]+dr, dr)
+    dr = 2
+    radius_bin_edges = np.arange(3, 15+dr, dr)
 
     # Import MWM sample
-    mwm_rgb = pd.read_csv(paths.data / 'sample.csv')
-    mwm_rgb = mwm_rgb[mwm_rgb['good_age']].copy()
-    local_sample = mwm_rgb[
-        (mwm_rgb['Rg'] >= 7) &
-        (mwm_rgb['Rg'] < 9) &
-        (mwm_rgb['z_max'] < 0.5) &
-        (mwm_rgb['low_alpha']) # restrict age trends to low-alpha only
-    ]
-    local_fits, local_mets = fit_metallicity_bins(local_sample, met_bin_edges)
-    local_slopes = [f.slope for f in local_fits]
+    mwm_sample = pd.read_csv(paths.data / 'sample.csv')
 
     # Set up figure
     fig, axs = plt.subplots(
-        len(ZBINS), 1,
-        figsize=(ONE_COLUMN_WIDTH, 2*ONE_COLUMN_WIDTH), 
-        sharex=True, sharey=True,
-        gridspec_kw={'hspace': 0, 'wspace': 0},
+        2,
+        figsize=(ONE_COLUMN_WIDTH, 1.5*ONE_COLUMN_WIDTH), 
+        sharex=True,
+        gridspec_kw={'hspace': 0}
     )
     cmap = plt.get_cmap(cmap)
     norm = BoundaryNorm(radius_bin_edges, cmap.N)
     # plt.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.95)
+    cax = insert_colorbar_axes(fig, orientation='horizontal', pad=0.05)
 
-    for i, ax in enumerate(axs):
-        zlim = ZBINS[i]
-        for j, rlim in enumerate(RBINS):
-            mean_radius = np.mean(rlim)
-            region = mwm_rgb[
-                (mwm_rgb['Rg'] >= rlim[0]) &
-                (mwm_rgb['Rg'] < rlim[1]) &
-                (mwm_rgb['z_max'] >= zlim[0]) &
-                (mwm_rgb['z_max'] < zlim[1]) &
-                (mwm_rgb['low_alpha']) # restrict age trends to low-alpha only
-            ]
-            # Bin by metallicity and fit linear trend to stars
-            region_fits, mets = fit_metallicity_bins(region, met_bin_edges)
-            slopes = np.array([f.slope for f in region_fits])
-            errors = np.array([f.stderr for f in region_fits])
-            # Plot fit slopes
-            if mean_radius == 8:
-                color = 'k'
-            else:
-                color = cmap(norm(mean_radius))
-            ax.plot(
-                mets, slopes, '.-',
-                color=color,
-                label=f'{int(mean_radius)} kpc'
-            )
-            ax.fill_between(
-                mets, slopes - errors, slopes + errors,
-                color=color, 
-                alpha=0.5, edgecolor='none'
-            )
-            # ax.errorbar(
-            #     mets, slopes, 
-            #     yerr=errors, 
-            #     marker='o', c='k', linestyle='none', ms=3, capsize=0
-            # )
-        # Plot Solar neighborhood fits for comparison
-        if i<2:
-            ax.plot(local_mets, local_slopes, 'k--')
-        # Dotted horizontal line
-        ax.axhline(0, ls=':', c='gray', zorder=0)
+    for j in range(len(radius_bin_edges)-1):
+        rlim = radius_bin_edges[j:j+2]
+        mean_radius = np.mean(rlim)
+        color = cmap(norm(mean_radius))
+        region = mwm_sample[
+            (mwm_sample['Rg'] >= rlim[0]) &
+            (mwm_sample['Rg'] < rlim[1]) &
+            (mwm_sample['z_max'] >= zlim[0]) &
+            (mwm_sample['z_max'] < zlim[1]) &
+            (mwm_sample['good_age']) # limit to good ages
+            (mwm_sample['low_alpha']) # restrict age trends to low-alpha only
+        ]
+        # Bin by metallicity and fit linear trend to stars
+        region_fits, mets = fit_metallicity_bins(region, met_bin_edges)
+        # Plot fit slopes
+        slopes = np.array([f.slope for f in region_fits])
+        errors = np.array([f.stderr for f in region_fits])
+        axs[0].plot(
+            mets, slopes, '.-',
+            color=color,
+            label=f'{int(mean_radius)} kpc'
+        )
+        axs[0].fill_between(
+            mets, slopes - errors, slopes + errors,
+            color=color, 
+            alpha=0.5, 
+            edgecolor='none'
+        )
+        # Plot intercepts
+        intercepts = np.array([f.intercept for f in region_fits])
+        int_errs = np.array([f.intercept_stderr for f in region_fits])
+        axs[1].plot(mets, intercepts, '.-', color=color)
+        axs[1].fill_between(
+            mets, intercepts - int_errs, intercepts + int_errs,
+            color=color,
+            alpha=0.5,
+            edgecolor='none'
+        )
+    # Dotted horizontal line at 0
+    axs[0].axhline(0, ls=':', c='gray', zorder=0)
+    # indicate Solar value
+    axs[1].plot(0, 0, 'wo', zorder=9)
+    axs[1].text(
+        0, 0, r'$\odot$',
+        va='center', ha='center', zorder=10, weight='bold', usetex=True
+    )
+
+    # Colorbar
+    fig.colorbar(
+        ScalarMappable(norm, cmap), 
+        cax=cax, 
+        orientation='horizontal', 
+        label='Guiding radius [kpc]'
+    )
 
     # Format axes
     axs[0].set_xlim((-0.7, 0.6))
-    axs[0].set_ylim((-0.08, 0.08))
+    axs[0].set_ylim((-0.1, 0.05))
     axs[0].xaxis.set_major_locator(MultipleLocator(0.5))
     axs[0].xaxis.set_minor_locator(MultipleLocator(0.1))
     axs[0].yaxis.set_major_locator(MultipleLocator(0.05))
     axs[0].yaxis.set_minor_locator(MultipleLocator(0.01))
-    axs[-1].set_xlabel(MET_LABEL)
-    for i, ax in enumerate(axs):
-        ax.set_title(r'$%s\leq z_{\rm max}<%s$ kpc' % ZBINS[i], y=0.83)
-        ax.set_ylabel('Slope [dex/Gyr]')
-    colored_text_legend(axs[0], loc='center right', frameon=True)
+    axs[0].set_ylabel('Slope [dex/Gyr]')
+    axs[1].set_ylim((-0.12, 0.38))
+    axs[1].yaxis.set_major_locator(MultipleLocator(0.1))
+    axs[1].yaxis.set_minor_locator(MultipleLocator(0.02))
+    axs[1].set_ylabel(r'[Ce/Mg] at $\tau=5$ Gyr')
+    axs[1].set_xlabel(MET_LABEL)
+    # colored_text_legend(ax, loc='center right', frameon=True)
 
     plt.savefig(paths.figures / 'global_metallicity_fits')
 
