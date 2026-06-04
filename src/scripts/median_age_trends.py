@@ -121,7 +121,7 @@ def main(style='paper', cmap=RADIUS_COLORMAP, min_count=10):
     age_err_high = np.median(mwm_rgb_ages['e_p_age'] - mwm_rgb_ages['age'])
     med_abund_err = mwm_rgb_ages['e_ce_h'].median()
     axs[0].errorbar(
-        10, 0.5, 
+        8, 0.5, 
         xerr=[[age_err_low], [age_err_high]], 
         yerr=med_abund_err, 
         c='gray', capsize=0, #elinewidth=0.5,
