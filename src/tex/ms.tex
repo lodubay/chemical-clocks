@@ -361,16 +361,20 @@ To disentangle the evolution of Ce from that of Mg, we define a residual abundan
     \Delta\bracket{Ce} \equiv \bracket{Ce} - {\rm med}(\bracket{Ce} | \bracket{Mg}),
 \end{equation}
 with the median trend computed separately for the low- and high-Ia populations. This is a simplified version of the residual abundance analysis of \citet{weinberg_chemical_2022}. Figure \ref{fig:residual-explainer} illustrates the residual abundance calculation for the Solar neighborhood. We found in Section \ref{sec:galactic-trends} that abundance trends vary with position in the Galaxy, so we compute the median high-Ia trend separately for each region presented in Figure \ref{fig:median-trends-grid}: five $2\kpc$-wide bins in $R_g$ between $3-13\kpc$, and three bins in $z_{\rm max}$ corresponding to $0-0.5\kpc$, $0.5-1\kpc$, and $1-2\kpc$. For low-Ia stars, we use the global median trend because variations between regions are small and some regions have few low-Ia stars (see Figure \ref{fig:median-trends-grid}). 
-% \todo{Should I just use the global median instead, or a more sophisticated 2-process treatment?}
 
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/median_age_trends.pdf}
-    \caption{Median age--abundance trends in bins of guiding radius. Solid (dashed) lines plot the median trends for the high-Ia (low-Ia) sub-samples. Semi-transparent bands represent the standard error on the median abundance in each age bin. Stars are restricted to $z_{\rm max}<0.5$ kpc.}
+    \caption{Median age--abundance trends in bins of guiding radius. Solid (dashed) lines plot the median trends for the high-Ia (low-Ia) sub-samples. Semi-transparent bands represent the standard error on the median abundance in each age bin. The underlying 2-D histogram plots the density of the full sample in age--abundance space. Stars are restricted to $z_{\rm max}<0.5$ kpc in both panels. The gray error bars in the top panel indicate the median age and abundance uncertainties.}
     \label{fig:median-age-trends}
 \end{figure}
 
-\todo{Discuss Figure \ref{fig:median-age-trends} in lots of detail.} Figure \ref{fig:median-age-trends} shows the variation in the [Ce/Mg] and $\Delta\bracket{Ce}$--age trends with guiding radius. Within the high-Ia population, both the [Ce/H] and $\Delta\bracket{Ce}$--age trends vary with $R_g$. The slope is steepest in the outer Galaxy ($R_g=13-15\kpc$) and flat in the inner Galaxy ($R_g=3-5\kpc$). \todo{Is the break at 6 Gyr ages important? It could be influenced by sampling (e.g., sparser training sample at high ages, low metallicities).}
+\todo{Discuss Figure \ref{fig:median-age-trends} in lots of detail.} 
+Figure \ref{fig:median-age-trends} shows the variation in the [Ce/Mg] and $\Delta\bracket{Ce}$--age trends with guiding radius $R_g$. In the high-Ia population, the [Ce/Mg]--age trends in the outer galaxy ($R_g>9\kpc$) are both significantly steeper and normalized to higher [Ce/Mg] values than in the solar neighborhood, while in the inner galaxy ($R_g<7\kpc$) the trends are shallow or flat. The binned median trends appear linear for ages $\lesssim6\Gyr$, but for older stars there is some evidence for a break in the relation. By contrast, the low-Ia population shows a uniformly flat [Ce/Mg]--age trend that is consistent across $R_g=3-11\kpc$. 
+
+The bottom panel of Figure \ref{fig:median-age-trends} shows the residual abundance trends with age across the Galaxy. The residual abundance $\Delta\bracket{Ce}$ eliminates the difference in the trend normalization, but the variation in slope with $R_g$ is still present. Figure \ref{fig:median-age-trends} illustrates that even after factoring out the metallicity dependence, the Ce age--abundance trends still show variation across the Galaxy. 
+
+\todo{Is the break at 6 Gyr ages important? It could be influenced by sampling (e.g., sparser training sample at high ages, low metallicities).}
 \todo{Note that even if a chemical clock is calibrated in a limited region, radial migration means that the relation could be contaminated by stars that have experienced a different star formation history.}
 
 \subsection{Radial Abundance Gradients}
@@ -378,7 +382,7 @@ with the median trend computed separately for the low- and high-Ia populations. 
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/gradients.pdf}
-    \caption{Radial gradients of [Ce/H] and [Ce/Mg] as a function of stellar age. Solid (dashed) lines plot the median abundance in bins of guiding radius for the high-Ia (low-Ia) sub-sample, color-coded by stellar age. Stars are restricted to $z_{\rm max}<0.5$ kpc for both sub-samples.}
+    \caption{Radial gradients of [Ce/H] and [Ce/Mg] as a function of stellar age. Solid (dashed) lines plot the median abundance in bins of guiding radius for the high-Ia (low-Ia) sub-sample, color-coded by stellar age. Stars are restricted to $z_{\rm max}<0.5$ kpc for both sub-samples. The underlying 2-D histogram plots the density of stars in each bin of abundance and radius, normalized to 1 in each radial bin.}
     \label{fig:gradients}
 \end{figure}
 
@@ -392,7 +396,7 @@ Figure \ref{fig:gradients} shows the radial [Ce/H] and [Ce/Mg] gradients in bins
 \begin{figure*}
     \centering
     \includegraphics[width=0.8\linewidth]{figures/halo.pdf}
-    \caption{{\it Top left:} Kinematic selection for MW halo stars. {\it Top right:} Chemical selection for accreted stars. {\it Bottom left:} Abundance ratios (non-$\log(g)$-corrected) for {\it in situ} (orange diamonds) and accreted (turquoise circles) halo stars. The blue and pink contours indicate the density of high-Ia and low-Ia disk stars, respectively. The solid curves plot a rolling median for each of the four populations. The black dotted lines indicate the boundary where abundances are flagged for being too close to a grid edgem, and the gray dotted line indicates the approximate region where the \citet{shetrone_apache_2025} upper limits dominate the sample. {\it Bottom right:} Normalized distributions of [Ce/Mg] for the four populations. \todo{Show LMC and other dwarf trends for comparison?}}
+    \caption{{\it Top left:} Kinematic selection for MW halo stars. {\it Top right:} Chemical selection for accreted stars. {\it Bottom left:} Abundance ratios (non-$\log(g)$-corrected) for {\it in situ} (orange diamonds) and accreted (turquoise circles) halo stars. The blue and pink contours indicate the density of high-Ia and low-Ia disk stars, respectively. The solid curves plot a rolling median for each of the four populations. The black dotted lines indicate the boundary where abundances are flagged for being too close to a grid edgem, and the gray dotted line indicates the approximate region where the \citet{shetrone_apache_2025} upper limits dominate the sample. {\it Bottom right:} Normalized distributions of [Ce/Mg] for the four populations. \todo{Show local dwarf trends from \citet{hasselquist_apogee_2021,shetrone_apache_2025} for comparison.}}
     \label{fig:halo}
 \end{figure*}
 
