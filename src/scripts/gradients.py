@@ -176,7 +176,7 @@ def main(style='paper', cmap='jet'):
     #     title='Age'
     # )
 
-    plt.savefig(paths.figures / 'ce_gradient')
+    plt.savefig(paths.figures / 'gradients')
     plt.close()
 
 
