@@ -9,6 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from matplotlib.colors import BoundaryNorm, Normalize
+from matplotlib.cm import ScalarMappable
 
 from residual_abundances import residual_abundances
 from utils import binned_quantiles
@@ -34,14 +35,15 @@ def main(style='paper', cmap=RADIUS_COLORMAP, min_count=10):
     # Set up figure
     fig, axs = plt.subplots(
         2, 1,
-        figsize=(ONE_COLUMN_WIDTH, 1.5*ONE_COLUMN_WIDTH),
+        figsize=(ONE_COLUMN_WIDTH, 1.67*ONE_COLUMN_WIDTH),
         sharex=True,
         gridspec_kw={'hspace': 0.}
     )
-    cax = insert_colorbar_axes(fig, 'horizontal', pad=0.05)
+    radial_cax = insert_colorbar_axes(fig, orientation='horizontal', pad=0.05)
+    density_cax = insert_colorbar_axes(fig, 'horizontal', pad=0.05)
     radial_cmap = plt.get_cmap(cmap)
     norm = BoundaryNorm(radius_bin_edges, radial_cmap.N)
-    xlim = (0, 13)
+    xlim = (0, 11)
     ylim = [(-0.5, 0.7), (-0.6, 0.6)]
 
     lowz_ages = all_lowz[all_lowz['good_age']].copy()
@@ -106,7 +108,13 @@ def main(style='paper', cmap=RADIUS_COLORMAP, min_count=10):
                 color=radial_cmap(norm(mean_radius)),
                 edgecolor='none', alpha=0.5, zorder=1
             )
-    fig.colorbar(pcm, cax=cax, orientation='horizontal', extend='max', label='Number of stars')
+    fig.colorbar(
+        pcm, 
+        cax=density_cax, 
+        orientation='horizontal', 
+        extend='max', 
+        label='Number of stars'
+    )
     # Indicate median abundance errors
     mwm_rgb_ages = mwm_rgb[mwm_rgb['good_age']].copy()
     age_err_low = np.median(mwm_rgb_ages['age'] - mwm_rgb_ages['e_n_age'])
@@ -117,6 +125,13 @@ def main(style='paper', cmap=RADIUS_COLORMAP, min_count=10):
         xerr=[[age_err_low], [age_err_high]], 
         yerr=med_abund_err, 
         c='gray', capsize=0, #elinewidth=0.5,
+    )
+    # Radial colorbar
+    fig.colorbar(
+        ScalarMappable(norm, radial_cmap), 
+        cax=radial_cax, 
+        orientation='horizontal', 
+        label='Guiding radius [kpc]'
     )
 
     axs[0].set_xlim(xlim)
@@ -134,8 +149,8 @@ def main(style='paper', cmap=RADIUS_COLORMAP, min_count=10):
     axs[1].set_ylabel(r'$\Delta$[Ce/H]')
     axs[1].set_xlabel('Age [Gyr]')
 
-    for ax in axs:
-        colored_text_legend(ax, invert=True, loc='center right')
+    # for ax in axs:
+    #     colored_text_legend(ax, invert=True, loc='center right')
 
     plt.savefig(paths.figures / 'median_age_trends')
     plt.close()
