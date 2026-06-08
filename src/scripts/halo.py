@@ -9,11 +9,12 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 from matplotlib.colors import LogNorm
 from matplotlib.ticker import MultipleLocator
+from astropy.io import ascii
 
 import paths
 from plotting import TWO_COLUMN_WIDTH, colored_text_legend
 from colormaps import paultol
-from utils import binned_quantiles, get_bin_centers
+from utils import binned_quantiles, get_bin_centers, fits_to_pandas
 from contours import plot_kde2D_contours
 
 DENSITY_COLORMAP = 'binary_r'
@@ -167,7 +168,7 @@ def main(style='paper'):
     ax2.xaxis.set_minor_locator(MultipleLocator(0.1))
     ax2.yaxis.set_major_locator(MultipleLocator(0.5))
     ax2.yaxis.set_minor_locator(MultipleLocator(0.1))
-    xlim = (-1.6, 0.499)
+    xlim = (-1.8, 0.499)
     ylim = (-1., 1.)
     ax2.set_xlim(xlim)
     ax2.set_ylim(ylim)
@@ -256,6 +257,31 @@ def main(style='paper'):
         rolling_accreted['ce_mg'].median(), 
         '-', color=accreted_color, linewidth=median_linewidth, zorder=4,
     )
+    # Compare Hasselquist et al. (2021) dwarf median trends
+    dr17_dwarfs = get_hasselquist_dwarfs()
+    textcoords = [
+        (-1.6, -0.4),
+        (-1.72, -0.28),
+        (-1.48, -0.48)
+    ]
+    ls_list = ['-', '--', '-.']
+    for i, sys in enumerate(['LMC', 'SMC', 'Sgr']):
+        df = dr17_dwarfs[dr17_dwarfs['Sys'] == sys]
+        sorted_df = df.sort_values('MG_H')
+        rolling_df = sorted_df.rolling(
+            30, min_periods=30, step=30, on='MG_H', center=True
+        )
+        ax2.plot(
+            rolling_df['MG_H'].median(), 
+            rolling_df['CE_MG'].median(),
+            'k', ls=ls_list[i]
+        )
+        ax2.text(
+            textcoords[i][0],
+            textcoords[i][1],
+            sys,
+            bbox={'color': 'w', 'pad': 0.5, 'alpha': 1}
+        )
     # Indicate grid edges
     mgh_arr = np.arange(-2.5, 1.25, 0.25)
     ax2.plot(mgh_arr, -2.1 - mgh_arr, 'k:') # edge of stars flagged bad
@@ -325,6 +351,35 @@ def halo_chem_cut(alfe):
     Chemical cut in [Mn/Mg]-[Al/Fe] plane to select accreted stars.
     """
     return np.where(alfe > -0.2, -0.6-2*alfe, -0.2)
+
+
+def get_hasselquist_dwarfs():
+    """
+    Select APOGEE DR17 targets in dwarf galaxies using the Hasselquist et al. 
+    (2021) selection table.
+    """
+    select_table = ascii.read(
+        paths.data / 'catalogs' / 'hasselquist2021_table2_mrt.txt'
+    ).to_pandas().set_index('ID')
+    dr17_full = fits_to_pandas(
+        paths.data / 'catalogs' / 'allStarLite-dr17-synspec_rev1.fits', hdu=1
+    )
+    # Drop duplicate observations
+    dr17_full = dr17_full[dr17_full['EXTRATARG'] != 16].set_index('APOGEE_ID').copy()
+    # Make catalog of dwarf members
+    dr17_dwarfs = dr17_full.join(select_table, how='right')
+    # Drop flagged abundances, require S/N > 70
+    dr17_dwarfs = dr17_dwarfs[
+        (dr17_dwarfs['CE_FE_FLAG'] == 0) &
+        (dr17_dwarfs['MG_FE_FLAG'] == 0) &
+        (dr17_dwarfs['SNR'] > 70)
+    ].copy()
+    dr17_dwarfs['MG_H'] = dr17_dwarfs['MG_FE'] + dr17_dwarfs['FE_H']
+    dr17_dwarfs['CE_MG'] = dr17_dwarfs['CE_FE'] - dr17_dwarfs['MG_FE']
+    # dr17_dwarfs['CE_MG_ERR'] = np.sqrt(
+    #     dr17_dwarfs['CE_FE_ERR']**2 + dr17_dwarfs['MG_FE_ERR']**2
+    # )
+    return dr17_dwarfs[['Sys', 'MG_H', 'CE_MG']]
 
 
 if __name__ == '__main__':
