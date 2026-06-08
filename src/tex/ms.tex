@@ -126,7 +126,7 @@ However, there is evidence that the $[s/\alpha]$--age relation is not universal.
 
 From a theoretical perspective, the $[s/\alpha]$ chemical clock's mechanism is not understood in detail. Galactic chemical evolution (GCE) models  with standard AGB yields predict qualitatively different evolution than observed \citep[e.g.,][]{grisoni_modelling_2020,ratcliffe_chemical_2024}. \todo{Discuss GCE model predictions and how they differ from observations.}
 
-We quantify the age--[Ce/Mg] relation as a function of metallicity, $\alpha$-enhancement, and Galactic position using data from the Milky Way Mapper program of the Sloan Digital Sky Survey (SDSS-V). We then explore possible mechanisms for the relation, such as modifications to the star formation history and yield prescription, in multizone GCE models. In Section \ref{sec:data}, we describe our observational dataset. In Section \ref{sec:results}, we present the chemical abundance trends in our sample. In Section \ref{sec:gce}, we compare our results with chemical evolution model predictions. In Section \ref{sec:conclusions}, we summarize our conclusions.
+We quantify the age--[Ce/Mg] relation as a function of metallicity, $\alpha$-enhancement, and Galactic position using data from the Milky Way Mapper program of the Sloan Digital Sky Survey (SDSS-V). We then explore possible mechanisms for the relation, such as modifications to the star formation history and yield prescription, in multizone GCE models. In Section \ref{sec:data}, we describe our observational dataset. In Section \ref{sec:results}, we present the chemical abundance trends in our Milky Way disk sample, and in Section \ref{sec:halo}, we present abundance trends in the halo. We discuss our results in Section \ref{sec:discussion} and summarize our conclusions in Section \ref{sec:conclusions}.
 
 \todo{Somewhere discuss why cerium is chosen and differences between Ce and other $s$-process elements like Y.}
 
@@ -271,7 +271,7 @@ We follow the procedure outlined in \citet{sit_chemical_2024} to remove $\log(g)
 
 Figure \ref{fig:logg-calibrations} shows the effect of the corrective offsets on [Ce/Mg] and [Fe/Mg]. The corrective offsets reduce variation in the Ce trends to the $\sim0.1\dex$ level, ensuring that abundances are consistent across the full range of $\log(g)$ in the sample. We see similar levels of improvement when applying the analysis in Figure \ref{fig:logg-calibrations} to specific regions of the Galaxy (e.g., inner disk, solar neighborhood, and outer disk). We have tested running our analysis on the un-corrected abundances and found minimal differences in our results. We have also compared our approach to that of \citet{meszaros_sdss-v_2025}, who correct for trends in $T_{\rm eff}$ within open clusters. While both approaches reduce abundance correlations with $T_{\rm eff}$, our method better reduces the correlations with $\log(g)$, allowing us to more accurately compare abundance trends across the Galactic disk. Throughout the remainder of this paper, we will use these corrected abundances unless otherwise noted.
 
-\section{Results}
+\section{Disk Age--Abundance Patterns}
 \label{sec:results}
 
 \subsection{Age Trend Validation}
@@ -365,32 +365,36 @@ with the median trend computed separately for the low- and high-Ia populations. 
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/median_age_trends.pdf}
-    \caption{Median age--abundance trends in bins of guiding radius. Solid (dashed) lines plot the median trends for the high-Ia (low-Ia) sub-samples. Semi-transparent bands represent the standard error on the median abundance in each age bin. The underlying 2-D histogram plots the density of the full sample in age--abundance space. Stars are restricted to $z_{\rm max}<0.5$ kpc in both panels. The gray error bars in the top panel indicate the median age and abundance uncertainties.}
+    \caption{Median age--abundance trends in bins of guiding radius. Solid (dashed) lines plot the median trends in age bins of 1 Gyr for the high-Ia (low-Ia) sub-samples. Semi-transparent bands represent the standard error on the median abundance in each age bin. The underlying 2-D histogram plots the density of the full sample in age--abundance space. Stars are restricted to $z_{\rm max}<0.5$ kpc in both panels. The gray error bars in the top panel indicate the median age and abundance uncertainties.}
     \label{fig:median-age-trends}
 \end{figure}
 
-\todo{Discuss Figure \ref{fig:median-age-trends} in lots of detail.} 
-Figure \ref{fig:median-age-trends} shows the variation in the [Ce/Mg] and $\Delta\bracket{Ce}$--age trends with guiding radius $R_g$. In the high-Ia population, the [Ce/Mg]--age trends in the outer galaxy ($R_g>9\kpc$) are both significantly steeper and normalized to higher [Ce/Mg] values than in the solar neighborhood, while in the inner galaxy ($R_g<7\kpc$) the trends are shallow or flat. The binned median trends appear linear for ages $\lesssim6\Gyr$, but for older stars there is some evidence for a break in the relation. By contrast, the low-Ia population shows a uniformly flat [Ce/Mg]--age trend that is consistent across $R_g=3-11\kpc$. 
+Figure \ref{fig:median-age-trends} shows the variation in the [Ce/Mg] and $\Delta\bracket{Ce}$--age trends with guiding radius $R_g$. In the high-Ia population, the [Ce/Mg]--age trends in the outer galaxy ($R_g>9\kpc$) are both significantly steeper and normalized to higher [Ce/Mg] values than in the solar neighborhood, while in the inner galaxy ($R_g<7\kpc$) the trends are shallow or flat. This matches the findings of \citet{casali_time_2023} and \citet{ratcliffe_chemical_2024}, who both observe a weaker trend in the inner Galaxy. By contrast, the low-Ia population shows a uniformly flat [Ce/Mg]--age trend that is consistent across $R_g=3-11\kpc$. 
 
-The bottom panel of Figure \ref{fig:median-age-trends} shows the residual abundance trends with age across the Galaxy. The residual abundance $\Delta\bracket{Ce}$ eliminates the difference in the trend normalization, but the variation in slope with $R_g$ is still present. Figure \ref{fig:median-age-trends} illustrates that even after factoring out the metallicity dependence, the Ce age--abundance trends still show variation across the Galaxy. 
+Figure \ref{fig:median-age-trends} also shows evidence for a possible break in the age--[Ce/Mg] relation beyond $R_g>7\kpc$. This break, at $\tau\approx6\Gyr$, has also been observed by \citet{casali_time_2023} at similar radii in APOGEE DR17. \citet{ratcliffe_chemical_2024} also observed non-linear trends in the [Ce/Mg]--age relation when binned by present-day and birth radii. However, this feature may be influenced by systematic effects, such as the decreasing density of the sample or the sparse sampling of asteroseismic training data at old ages and low metallicities. The age range of $6-8\Gyr$ is also where the sample transitions from high-Ia to low-Ia dominated, which could affect the trends in each of the sub-samples. \todo{Elaborate further on whether these are real trends or sample statistics?}
 
-\todo{Is the break at 6 Gyr ages important? It could be influenced by sampling (e.g., sparser training sample at high ages, low metallicities).}
-\todo{Note that even if a chemical clock is calibrated in a limited region, radial migration means that the relation could be contaminated by stars that have experienced a different star formation history.}
+The bottom panel of Figure \ref{fig:median-age-trends} shows the residual abundance trends with age across the Galaxy. The residual abundance $\Delta\bracket{Ce}$ normalizes the trends to 0 at the median of the distribution ($\tau\approx3\Gyr$), but variation in slope with $R_g$ is still present. \todo{Mention that outer galaxy trends all overlap now.} Even with metallicity trends subtracted out independently in each region, the age trend still steepens with increasing $R_g$. Figure \ref{fig:median-age-trends} illustrates that even after factoring out the metallicity dependence, the Ce age--abundance trends still show variation across the Galaxy. \todo{If space, more discussion on what the residual abundances tell us about Ce enrichment.}
 
 \subsection{Radial Abundance Gradients}
 
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/gradients.pdf}
-    \caption{Radial gradients of [Ce/H] and [Ce/Mg] as a function of stellar age. Solid (dashed) lines plot the median abundance in bins of guiding radius for the high-Ia (low-Ia) sub-sample, color-coded by stellar age. Stars are restricted to $z_{\rm max}<0.5$ kpc for both sub-samples. The underlying 2-D histogram plots the density of stars in each bin of abundance and radius, normalized to 1 in each radial bin.}
+    \caption{Radial gradients of [Ce/H] and [Ce/Mg] as a function of stellar age. Solid (dashed) lines plot the median abundance in bins of guiding radius for the high-Ia (low-Ia) sub-sample, color-coded by stellar age. The shaded areas indicate the standard error of the median at each bin. Stars are restricted to $z_{\rm max}<0.5$ kpc for both sub-samples. The underlying 2-D histogram plots the density of stars in each bin of abundance and radius, normalized to 1 in each radial bin.}
     \label{fig:gradients}
 \end{figure}
 
-Figure \ref{fig:gradients} shows the radial [Ce/H] and [Ce/Mg] gradients in bins of stellar age. Within the high-Ia population, the radial [Ce/H] gradient is negative with a remarkably consistent slope for $\ge5\Gyr$ old stars, whereas it is nearly flat for the youngest stars. The [Ce/Mg] gradient evolves in a similar direction, except the oldest stars show a mostly flat gradient (from $6-8\Gyr$, excluding the $9\Gyr$ bin because it contains few stars), while the youngest stars exhibit a steep {\it positive} gradient. Within the $4\kpc$ radial bin, the median [Ce/H] and [Ce/Mg] are consistent to within $\pm0.1\dex$ in all age bins. The low-Ia population exhibits a flat gradient in both [Ce/H] and [Ce/Mg] that is consistent across multiple age bins, although age uncertainties are likely responsible for most of the $\lesssim8\Gyr$ old stars. Notably, the Ce abundances of low-Ia stars are significantly lower (by $0.3\dex$) than high-Ia stars of similar age and $R_g$.
+Figure \ref{fig:gradients} shows the radial [Ce/H] and [Ce/Mg] gradients in bins of stellar age. Within the high-Ia population, the radial [Ce/H] gradient is negative with a remarkably consistent slope for $\ge5\Gyr$ old stars, whereas it is nearly flat for the youngest stars. The [Ce/Mg] gradient evolves in a similar direction, except the oldest stars show a mostly flat gradient (from $6-8\Gyr$, excluding the $9\Gyr$ bin because it contains few stars), while the youngest stars exhibit a steep {\it positive} gradient. Within the $4\kpc$ radial bin, the median [Ce/H] and [Ce/Mg] are consistent to within $\pm0.1\dex$ in all age bins. The low-Ia population exhibits a flat gradient in both [Ce/H] and [Ce/Mg] that is consistent across multiple age bins, although age uncertainties are likely responsible for many of the $\lesssim8\Gyr$ old stars. Notably, the Ce abundances of low-Ia stars are significantly lower (by $0.3\dex$ in [Ce/Mg] or up to $0.5\dex$ in [Ce/H]) than high-Ia stars of similar age and $R_g$.
 
-\todo{Literature comparison.} \citet{sales-silva_exploring_2022} find that younger open clusters exhibit a flatter radial [Ce/H] gradient and higher overall [Ce/H] than older clusters, which qualitatively agrees with the top panel of Figure \ref{fig:gradients}. They also found a positive gradient for [Ce/Fe] with little change in slope as a function of age. 
+Figure \ref{fig:gradients} reinforces our findings from earlier sections. The age-decomposition of the radial gradients indicate little evolution in the inner Galaxy across the full age range, and als minimal evolution in the outer galaxy for $\gtrsim6\Gyr$ old stars. The evolution to higher [Ce/H] and [Ce/Mg] ratios is significant for young stars in the outer Galaxy, but this highlights the localized nature of true ``chemical clock'' behavior. Using data from the OCCAM survey, \citet{sales-silva_exploring_2022} similarly found that young open clusters exhibit a flatter radial [Ce/H] gradient and higher overall [Ce/H] than older clusters, and recently \citet{otto_open_2026} found that the gradient in [Ce/Fe] is positive and steepest for the youngest clusters.
 
-\subsection{The Halo}
+\subsection{Summary}
+
+We confirm the global correlation between [Ce/Mg] and age in the MWM DR19 dataset. We find that this relation depends significantly on metallicity, and even after correcting for this dependence we still observe variation in the trend across the Galaxy. Similarly, a decomposition of the radial Ce gradient with age reveals varying trends with radius and non-monotonic evolution between the low-Ia, old high-Ia, and young high-Ia populations. 
+% Halo stars behave non-monatonically with metallicity and have [Ce/Mg] ratios in between the low- and high-Ia populations. 
+Overall, the data suggest that the [Ce/Mg] is influenced by both the star formation history and the physics of AGB nucleosynthesis, complicating its use as a chemical clock.
+
+\section{Halo Abundance Patterns}
 \label{sec:halo}
 
 \begin{figure*}
@@ -400,12 +404,15 @@ Figure \ref{fig:gradients} shows the radial [Ce/H] and [Ce/Mg] gradients in bins
     \label{fig:halo}
 \end{figure*}
 
+In this section, we investigate Ce abundance trends in the Milky Way's halo. Halo stars are older and lower-metallicity than our main disk sample, so they fall outside of the optimal parameter space of the StarFlow age catalog. As a result, we do not investigate trends with age in this section. Furthermore, we do not apply the corrective $\log(g)$ abundance offsets to the halo sample because many of the stars fall outside the metallicity range of the calibration sample (see Section \ref{sec:logg-corrections}).
+
 We define our halo sample by the following cut in the $E-L_z$ plane:
 \begin{equation}
     \frac{E_{\rm halo}}{\SI{e5}{\kilo\meter\squared\per\second\squared}} > -0.7 - \exp\Big(\frac{L_z}{\SI{1.5e3}{\kilo\parsec\kilo\meter\per\second}}\Big).
     \label{eq:halo-cut}
 \end{equation}
-\citet{hawkins_using_2015} proposed using [Mn/Mg] and [Al/Fe] to distinguish stars accreted from dwarf galaxies from stars that were born in the disk or proto-Milky Way. We split our halo sample into accreted and {\it in situ} populations using the following chemical cut:
+This cut is {\it ad hoc} but we have found that it successfully excludes the most obvious disk stars. 
+\citet{hawkins_using_2015} first proposed using [Mn/Mg] and [Al/Fe] to distinguish stars accreted from dwarf galaxies from stars that were born in the disk or proto-Milky Way. We split our halo sample into accreted and {\it in situ} populations using the following chemical cut:
 \begin{equation}
     \bracket[Mg]{Mn}_{\rm acc.} <
     \begin{cases}
@@ -414,21 +421,15 @@ We define our halo sample by the following cut in the $E-L_z$ plane:
     \end{cases}
     \label{eq:accreted-cut}
 \end{equation}
-We do not apply the corrective $\log(g)$ abundance offsets to the halo sample because many of the stars fall outside the metallicity range of the calibration sample.
+Because we use Mg as our reference element, we note that the sign convention in Equation \ref{eq:accreted-cut} is reversed from the typical convention in the literature, $\bracket[Mn]{Mg}$. Both cuts are illustrated in the top panels of Figure \ref{fig:halo}.
 
-Figure \ref{fig:halo} plots [Ce/Mg] as a function of [Mg/H] for the halo stars as compared to the Milky Way disk. Most of the accreted stars have $\bracket{Mg}<-0.8$, while the {\it in situ} stars have $\bracket{Mg}>-1.0$, so there is some overlap between the two populations. There is a positive correlation between [Ce/Mg] and [Mg/H] for accreted stars, with [Ce/Mg] increasing by $\sim0.2\dex$ over $\sim0.4\dex$ in [Mg/H]. The {\it in situ} stars show a negative correlation, and the highest-[Mg/H] halo stars have similar [Ce/Mg] ratios to the low-Ia disk population. Interestingly, the median trends of both populations overlap at $\bracket[Mg]{Ce}\approx0$ from $-1\lesssim\bracket{Mg}\lesssim-0.8$, despite being clearly separated in [Al/Fe]. \todo{The accreted halo stars sit at roughly Solar [Ce/Mg] ratios, in between the low-Ia and high-Ia disk populations. One explanation is more efficient star formation during the formation of the low-Ia population, which would lead to greater production of elements with shorter enrichment timescales, such as Mg, over the longer timescales of AGB stars.}
+Figure \ref{fig:halo} plots [Ce/Mg] as a function of [Mg/H] for the halo stars as compared to the Milky Way disk. Most of the chemically accreted stars have $\bracket{Mg}<-0.8$, while the {\it in situ} stars have $\bracket{Mg}>-1.0$, so there is some overlap between the two populations. We note that below $\bracket{Mg}\leq-1.0$, an increasing fraction of the sample is excluded due to falling below the abundance upper limits from \citep{shetrone_apache_2025}. There is a positive correlation between [Ce/Mg] and [Mg/H] for accreted stars, with [Ce/Mg] increasing by $\sim0.2\dex$ over $\sim0.4\dex$ in [Mg/H]. In contrast, the {\it in situ} halo stars show a negative correlation, and the highest-metallicity halo stars have [Ce/Mg] ratios similar to the low-Ia disk population. Interestingly, the median trends of the accreted and {\it in situ} halo overlap at $\bracket[Mg]{Ce}\approx0$ between $-1\lesssim\bracket{Mg}\lesssim-0.8$, despite being clearly separated in their [Al/Fe] ratios. \todo{The accreted halo stars sit at roughly Solar [Ce/Mg] ratios, in between the low-Ia and high-Ia disk populations. One explanation is more efficient star formation during the formation of the low-Ia population, which would lead to greater production of elements with shorter enrichment timescales, such as Mg, over the longer timescales of AGB stars.}
 
 \todo{We are not able to constrain a low-metallicity plateau for [Ce/Mg] in Figure \ref{fig:halo}. The fact that accreted population has higher [Ce/Mg] than the in-situ and low-Ia populations (which should have similar or younger ages) suggests that a delayed enrichment component is important to the evolution even at $\bracket{Mg}\leq-1.0$.}
 
 \todo{Literature comparison.} \citet{skuladottir_neutron-capture_2020} studied n-capture trends in the Sculptor dwarf galaxy ($-2\lesssim\bracket{Fe}\lesssim-1$) and found that [Ba/Fe] ($\sim$pure $s$-process) increases with [Fe/H] before a plateau at the Solar value, [La/Fe] and [Nd/Fe] (mix of $s$ and $r$) decrease (but not as steeply as Eu), while [Y/Fe] shows a flat trend that is inconsistent with the Milky Way. \citet{hasselquist_apogee_2021} studied APOGEE abundances in five dwarf galaxies (LMC, SMC, GSE, Sgr, and Fnx) and found a consistent trend of increasing [Ce/Mg] with [Mg/H], with the most metal-rich stars (at $\bracket{Mg}\approx-0.5$) having [Ce/Mg] more consistent with the thin disk than the thick disk. \citet{shetrone_apache_2025} similarly show increasing [Ce/Fe] with [Fe/H] for stars in several dSph galaxies (mostly Fnx), which is consistent with the MW low-Ia disk until $\bracket{Fe}\approx-1$. \citet{razera_abundance_2022} and \citet{ernandes_abundances_2026} studied bulge spheroid stars from APOGEE and found relatively high $\bracket[Fe]{Ce}\approx+0.5$, peaking at $\bracket{Fe}\approx-0.8$ and declining to higher metallicities. 
 
 \citet{sales-silva_perspective_2024} studied the [Ce/Fe] ratios in the Galactic bulge and bar, and found decreasing [Ce/Fe] and [Ce/Mg] with increasing [Fe/H], matching our {\it in situ} trend but opposite our accreted star trend. \citet{carrillo_detailed_2022} found $\bracket[Fe]{Ce}\approx+0.3$ in high-$\alpha$ accreted stars in the halo, which would correspond to $\bracket[Mg]{Ce}\approx0$ given the population's elevated [Mg/Fe] ratios.
-
-\subsection{Summary}
-
-We confirm the global correlation between [Ce/Mg] and age in the MWM DR19 dataset. We find that this relation depends significantly on metallicity, and even after correcting for this dependence we still observe variation in the trend across the Galaxy. Similarly, a decomposition of the radial Ce gradient with age reveals varying trends with radius and non-monotonic evolution between the low-Ia, old high-Ia, and young high-Ia populations. Halo stars behave non-monatonically with metallicity and have [Ce/Mg] ratios in between the low- and high-Ia populations. Overall, the data suggest that the [Ce/Mg] is influenced by both the star formation history and the physics of AGB nucleosynthesis, complicating its use as a chemical clock.
-
-\todo{Make it clear somewhere that if [Ce/Mg] evolution was driven by AGB physics alone, we would not expect to see such different behavior in different regions of the galaxy.}
 
 % \section{Galactic Chemical Evolution}
 % \label{sec:gce}
@@ -467,6 +468,11 @@ We confirm the global correlation between [Ce/Mg] and age in the MWM DR19 datase
 \todo{Discuss yield predictions in Figure \ref{fig:yields}, connect to metallicity dependence in Figures \ref{fig:local-metallicity-trends}, \ref{fig:global-metallicity-fits}.}
 
 \todo{Discuss differences between Ce and other $s$-process elements like Y, Ba; i.e., first- vs second-peak elements.}
+
+\todo{Note that even if a chemical clock is calibrated in a limited region, radial migration means that the relation could be contaminated by stars that have experienced a different star formation history.}
+For example, say that a sample of solar neighborhood stars was carefully assembled to calibrate the local age--[Ce/Mg] relation, taking into account the metallicity dependence observed in Figure \ref{fig:local-metallicity-trends}, and that this relation was used to estimate stellar ages within the solar neighborhood only.
+
+\todo{Make it clear somewhere that if [Ce/Mg] evolution was driven by AGB physics alone, we would not expect to see such different behavior in different regions of the galaxy.}
 
 \section{Summary}
 \label{sec:conclusions}
