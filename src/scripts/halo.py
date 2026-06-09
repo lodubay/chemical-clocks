@@ -43,8 +43,9 @@ def main(style='paper'):
     ax0 = fig.add_subplot(gs0[0])
     ax1 = fig.add_subplot(gs0[1])
     hexbin_kwargs = dict(
+        gridsize=(50, 33),
         cmap=DENSITY_COLORMAP, 
-        linewidths=0.2,
+        linewidths=0.1,
         reduce_C_function=logsum,
         mincnt=1
     )
@@ -80,7 +81,6 @@ def main(style='paper'):
     pc = ax0.hexbin(
         disk['Lz']/1e3, disk['E']/1e5,
         C=np.ones(disk.shape[0]),
-        gridsize=50,
         extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
         **hexbin_kwargs
     )
@@ -122,7 +122,6 @@ def main(style='paper'):
     pc = ax1.hexbin(
         disk['al_fe'], disk['mn_mg'],
         C=np.ones(disk.shape[0]),
-        gridsize=50,
         extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
         **hexbin_kwargs
     )
