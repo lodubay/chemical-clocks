@@ -82,7 +82,7 @@ def main(style='paper'):
     ax.set_xlim((-2.1, 0.6))
     ax.set_ylim((0, 1.5))
     ax.set_xlabel(r'$\log_{10}(Z/Z_\odot)$')
-    ax.set_ylabel(r'$M_{\rm Ce}/M_\star\,[\times10^{-%s}]$' % logprefactor)
+    ax.set_ylabel(r'$M^{\rm AGB}_{\rm Ce}/M_\star\,[\times10^{-%s}]$' % logprefactor)
     ax.xaxis.set_major_locator(MultipleLocator(0.5))
     ax.xaxis.set_minor_locator(MultipleLocator(0.1))
     ax.yaxis.set_major_locator(MultipleLocator(0.5))
