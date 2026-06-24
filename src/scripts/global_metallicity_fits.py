@@ -10,8 +10,8 @@ from matplotlib.colors import BoundaryNorm
 from matplotlib.cm import ScalarMappable
 from scipy import stats
 
-from utils import get_bin_centers
-from plotting import ONE_COLUMN_WIDTH, colored_text_legend, RADIUS_COLORMAP, insert_colorbar_axes
+from utils import import_sample
+from plotting import ONE_COLUMN_WIDTH, RADIUS_COLORMAP, insert_colorbar_axes
 import paths
 
 ZLIM = (0, 0.5) # global z_max limits
@@ -31,7 +31,7 @@ def main(style='paper', cmap=RADIUS_COLORMAP, zlim=ZLIM):
     radius_bin_edges = np.arange(3, 15+dr, dr)
 
     # Import MWM sample
-    mwm_sample = pd.read_csv(paths.data / 'sample.csv')
+    mwm_sample = import_sample(good_ages=True)
 
     # Set up figure
     fig, axs = plt.subplots(
@@ -54,7 +54,6 @@ def main(style='paper', cmap=RADIUS_COLORMAP, zlim=ZLIM):
             (mwm_sample['Rg'] < rlim[1]) &
             (mwm_sample['z_max'] >= zlim[0]) &
             (mwm_sample['z_max'] < zlim[1]) &
-            (mwm_sample['good_age']) & # limit to good ages
             (mwm_sample['low_alpha']) # restrict age trends to low-alpha only
         ]
         # Bin by metallicity and fit linear trend to stars

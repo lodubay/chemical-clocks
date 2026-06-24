@@ -8,13 +8,14 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
 import paths
+from utils import import_sample
 from sample import LOGG_CUT, TEFF_CUT
 from plotting import colored_text_legend, insert_colorbar_axes, TWO_COLUMN_WIDTH, ABUNDANCE_COLORMAP
 from colormaps import paultol
 
 
 def main(style='paper'):
-    mwm_sample = pd.read_csv(paths.data / 'sample.csv')
+    mwm_sample = import_sample(good_ages=False)
     plt.style.use(paths.styles / f'{style}.mplstyle')
     fig, axs = plt.subplots(
         1, 2, 

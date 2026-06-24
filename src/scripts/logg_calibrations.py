@@ -10,7 +10,7 @@ from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MultipleLocator
 from matplotlib.cm import ScalarMappable
 
-from utils import get_bin_centers, binned_quantiles
+from utils import get_bin_centers, binned_quantiles, import_sample
 from plotting import truncate_colormap, insert_colorbar_axes, ONE_COLUMN_WIDTH
 import paths
 
@@ -29,8 +29,7 @@ def main(style='paper', cmap_name='autumn'):
     logg_bin_centers = get_bin_centers(logg_bin_edges)
 
     # Load MWM data
-    calib_data = pd.read_csv(paths.data / 'sample.csv')
-    calib_data['fe_mg'] = -calib_data['mg_fe']
+    calib_data = import_sample(good_ages=False)
 
     # Plot
     plt.style.use(paths.styles / f'{style}.mplstyle')

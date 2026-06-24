@@ -7,19 +7,19 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
+from utils import import_sample
 import paths
 
 RLIM = (7, 9)
 ZLIM = (0, 2)
 
 def main(style='poster'):
-    mwm_sample = pd.read_csv(paths.data / 'sample.csv')
+    mwm_sample = import_sample(good_ages=True)
     local_sample = mwm_sample[
         (mwm_sample['Rg'] >= RLIM[0]) & 
         (mwm_sample['Rg'] < RLIM[1]) & 
         (mwm_sample['z_max'] >= ZLIM[0]) &
-        (mwm_sample['z_max'] < ZLIM[1]) &
-        (mwm_sample['good_age'])
+        (mwm_sample['z_max'] < ZLIM[1])
     ].copy()
     print(local_sample.shape[0])
     plt.style.use(paths.styles / f'{style}.mplstyle')

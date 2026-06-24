@@ -8,12 +8,12 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize, LogNorm, BoundaryNorm
 from matplotlib.ticker import MultipleLocator
 
+from utils import import_sample
 from plotting import ONE_COLUMN_WIDTH, ABUNDANCE_COLORMAP, AGE_COLORMAP
 import paths
 
 def main(style='paper'):
-    mwm_sample = pd.read_csv(paths.data / 'sample.csv')
-    mwm_sample = mwm_sample[mwm_sample['good_age']].copy()
+    mwm_sample = import_sample(good_ages=True)
     plt.style.use(paths.styles / f'{style}.mplstyle')
     fig, axs = plt.subplots(
         2, 

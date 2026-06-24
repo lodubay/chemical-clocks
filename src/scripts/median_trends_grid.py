@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
-from utils import binned_quantiles, sample_rows
+from utils import binned_quantiles, sample_rows, import_sample
 from plotting import setup_hayden_plot, iterate_rz_bins, colored_text_legend
 from colormaps import paultol
 import paths
@@ -18,7 +18,7 @@ SAMPLE_SIZE = 1000 # number of stars to plot in each panel, randomly sampled
 def main(style='paper'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
-    mwm_rgb = pd.read_csv(paths.data / 'sample.csv')
+    mwm_rgb = import_sample(good_ages=False)
     # Local sample for comparison
     local_sample = mwm_rgb[
         (mwm_rgb['Rg'] >= 7) &

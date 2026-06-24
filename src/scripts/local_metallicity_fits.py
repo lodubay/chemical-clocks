@@ -11,7 +11,7 @@ from matplotlib.gridspec import GridSpec
 from scipy import stats
 
 from plotting import TWO_COLUMN_WIDTH, ABUNDANCE_COLORMAP
-from utils import get_bin_centers
+from utils import get_bin_centers, import_sample
 from global_metallicity_fits import fit_metallicity_bins
 import paths
 
@@ -26,13 +26,12 @@ SOLAR_AGE = 4.6 # Gyr
 
 def main(style='paper', cmap=ABUNDANCE_COLORMAP):
     # Data
-    mwm_sample = pd.read_csv(paths.data / 'sample.csv')
+    mwm_sample = import_sample(good_ages=True)
     local_sample = mwm_sample[
         (mwm_sample['Rg'] >= RLIM[0]) &
         (mwm_sample['Rg'] < RLIM[1]) &
         (mwm_sample['z_max'] >= ZLIM[0]) &
-        (mwm_sample['z_max'] < ZLIM[1]) &
-        (mwm_sample['good_age'])
+        (mwm_sample['z_max'] < ZLIM[1])
     ].copy()
     local_sample['e_age'] = 0.5 * (
         (local_sample['e_p_age'] - local_sample['age']) + 

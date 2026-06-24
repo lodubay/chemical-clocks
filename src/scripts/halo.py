@@ -14,7 +14,7 @@ from astropy.io import ascii
 import paths
 from plotting import TWO_COLUMN_WIDTH, colored_text_legend
 from colormaps import paultol
-from utils import binned_quantiles, get_bin_centers, fits_to_pandas
+from utils import import_sample, get_bin_centers, fits_to_pandas
 from contours import plot_kde2D_contours
 
 DENSITY_COLORMAP = 'binary_r'
@@ -22,7 +22,7 @@ DENSITY_COLORMAP = 'binary_r'
 
 def main(style='paper'):
     # Get data
-    data = pd.read_csv(paths.data / 'sample.csv')
+    data = import_sample(good_ages=False)
     # Kinematically-selected halo
     halo = data[data['E']/1e5 > halo_ELz_cut(data['Lz']/1e3)]
     # halo = data[(data['z_max'] > 3) | (data['vphi'] > -120)]

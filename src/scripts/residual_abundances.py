@@ -9,7 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 
-from utils import binned_quantiles, sample_rows
+from utils import binned_quantiles, sample_rows, import_sample
 from plotting import colored_text_legend, iterate_rz_bins, ONE_COLUMN_WIDTH
 from colormaps import paultol
 import paths
@@ -20,7 +20,7 @@ SAMPLE_FRACTION = 0.25 # fraction of stars to plot in each panel
 
 def main(style='paper', sample_fraction=SAMPLE_FRACTION):
     # Import MWM sample
-    mwm_rgb = pd.read_csv(paths.data / 'sample.csv')
+    mwm_rgb = import_sample(good_ages=False)
     # Solar neighborhood sample
     mwm_rgb_local = mwm_rgb[
         (mwm_rgb['Rg'] >= 7) &
@@ -204,7 +204,7 @@ def residual_abundances(
             subset[newcol] = subset[col] - np.interp(
                 subset['mg_h'], *mgh_medians
             )
-            res_abund.append(subset[['sdss_id', newcol]].copy())
+            res_abund.append(subset[[newcol]].copy())
     # Calculate high-alpha residuals all together
     all_high_alpha = catalog[catalog['high_alpha']].copy()
     high_alpha_medians = binned_quantiles(
@@ -214,11 +214,10 @@ def residual_abundances(
     all_high_alpha[newcol] = all_high_alpha[col] - np.interp(
         all_high_alpha['mg_h'], *high_alpha_medians
     )
-    res_abund.append(all_high_alpha[['sdss_id', newcol]].copy())
+    res_abund.append(all_high_alpha[[newcol]].copy())
     # Join residual abundances to catalog DataFrame
     res_abund = pd.concat(res_abund)
-    res_abund.set_index('sdss_id', inplace=True)
-    catalog = catalog.join(res_abund, on='sdss_id')
+    catalog = catalog.join(res_abund)
     return catalog
 
 
@@ -232,7 +231,7 @@ if __name__ == '__main__':
         help='Plot style to use (default: paper).'
     )
     parser.add_argument('--sample-fraction',
-        type='float',
+        type=float,
         default=SAMPLE_FRACTION,
         help='Fraction of stars to randomly sample in each panel.'
     )

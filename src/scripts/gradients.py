@@ -8,23 +8,23 @@ from matplotlib.ticker import MultipleLocator
 from matplotlib.colors import BoundaryNorm, Normalize
 from matplotlib.cm import ScalarMappable
 
-from utils import binned_quantiles
+from utils import binned_quantiles, import_sample
 from plotting import insert_colorbar_axes, ONE_COLUMN_WIDTH
 import paths
 
 def main(style='paper', cmap='jet'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
     # Import MWM sample
-    mwm_rgb = pd.read_csv(paths.data / 'sample.csv')
+    mwm_rgb = import_sample(good_ages=True)
     radius_bin_edges = np.arange(2.5, 15.6, 1)
     age_bin_edges = np.arange(0.5, 10.6, 1)
     fine_Rg_bins = np.arange(0, 16.1, 0.5)
     fine_ce_bins = np.arange(-0.8, 0.81, 0.05)
 
     # Select only low-alpha, near-midplane stars
-    all_lowz = mwm_rgb[(mwm_rgb['z_max'] < 0.5) & (mwm_rgb['good_age'])].copy()
-    all_low_alpha = all_lowz[(mwm_rgb['low_alpha'])].copy()
-    all_high_alpha = all_lowz[(mwm_rgb['high_alpha'])].copy()
+    all_lowz = mwm_rgb[(mwm_rgb['z_max'] < 0.5)].copy()
+    all_low_alpha = all_lowz[(all_lowz['low_alpha'])].copy()
+    all_high_alpha = all_lowz[(all_lowz['high_alpha'])].copy()
     
     # Set up figure
     fig, axs = plt.subplots(
