@@ -4,31 +4,33 @@
 cd ./src/scripts/
 
 # Generate MWM sample data table
-python mwm_sample.py
+python sample.py
 
 # Plots
 echo "Plotting Figure 1..."
 python kiel_diagram.py
-echo "Plotting Figure 2..."
-python logg_calibrations.py
-echo "Plotting Figure 3..."
-python cemg_mgh_age.py
+echo "Plotting Figures 2 and 3..."
+python ce_lines.py
 echo "Plotting Figure 4..."
-python dataset_comparison.py
+python logg_calibrations.py
 echo "Plotting Figure 5..."
-python local_metallicity_trends.py
+python dataset_comparison.py
 echo "Plotting Figure 6..."
-python median_trends_grid.py
+python cemg_mgh_age.py
 echo "Plotting Figure 7..."
-python residual_explainer.py
+python local_metallicity_fits.py
 echo "Plotting Figure 8..."
-python median_age_trends.py
+python global_metallicity_fits.py
 echo "Plotting Figure 9..."
-python ce_gradient.py
+python median_trends_grid.py
 echo "Plotting Figure 10..."
-python halo.py
+python residual_abundances.py
 echo "Plotting Figure 11..."
-python onezone_sfh.py
+python median_age_trends.py
 echo "Plotting Figure 12..."
-python onezone_agb.py
+python gradients.py
+echo "Plotting Figure 13..."
+python halo.py
+echo "Plotting Figure 14..."
+python ssp_yields.py
 echo "Done!"
