@@ -1,6 +1,7 @@
 """
 This script plots the MWM [Ce/Mg]-[Mg/H] distribution color-coded by age.
 """
+import argparse
 
 import numpy as np
 import pandas as pd
@@ -15,6 +16,11 @@ import paths
 def main(style='paper'):
     mwm_sample = import_sample(good_ages=True)
     plt.style.use(paths.styles / f'{style}.mplstyle')
+    savedir = {
+        'paper': paths.figures,
+        'presentation': paths.extra/'presentation'
+    }[style]
+    savedir.mkdir(exist_ok=True)
     fig, axs = plt.subplots(
         2, 
         figsize=(ONE_COLUMN_WIDTH, 1.5*ONE_COLUMN_WIDTH), 
@@ -87,7 +93,7 @@ def main(style='paper'):
     axs[1].yaxis.set_major_locator(MultipleLocator(0.5))
     axs[1].yaxis.set_minor_locator(MultipleLocator(0.1))
 
-    plt.savefig(paths.figures / 'cemg_mgh_age')
+    plt.savefig(savedir / 'cemg_mgh_age')
     plt.close()
 
 
@@ -146,4 +152,13 @@ def hexbin_contours(
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Plot [Ce/Mg] vs [Mg/H] for halo stars.'
+    )
+    parser.add_argument('--style',
+        choices=('paper', 'presentation'),
+        default='paper',
+        help='Plot style to use (default: paper).'
+    )
+    args = parser.parse_args()
+    main(**vars(args))

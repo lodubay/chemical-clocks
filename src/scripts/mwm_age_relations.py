@@ -13,7 +13,7 @@ import paths
 RLIM = (7, 9)
 ZLIM = (0, 2)
 
-def main(style='poster'):
+def main(style='presentation'):
     mwm_sample = import_sample(good_ages=True)
     local_sample = mwm_sample[
         (mwm_sample['Rg'] >= RLIM[0]) & 
@@ -23,6 +23,11 @@ def main(style='poster'):
     ].copy()
     print(local_sample.shape[0])
     plt.style.use(paths.styles / f'{style}.mplstyle')
+    savedir = {
+        'paper': paths.figures,
+        'presentation': paths.extra/'presentation'
+    }[style]
+    savedir.mkdir(exist_ok=True)
     fig, axs = plt.subplots(
         1, 3, figsize=(8, 2.5), sharex=True, constrained_layout=True
     )
@@ -52,7 +57,7 @@ def main(style='poster'):
     axs[1].yaxis.set_minor_locator(MultipleLocator(0.05))
     axs[2].yaxis.set_major_locator(MultipleLocator(0.5))
     axs[2].yaxis.set_minor_locator(MultipleLocator(0.1))
-    plt.savefig(paths.figures / 'mwm_age_relations')
+    plt.savefig(savedir / 'mwm_age_relations')
     plt.close()
 
 

@@ -1,6 +1,7 @@
 """
 Plot the local [Ce/Mg]-age relation and fit a linear trend in metallicity bins.
 """
+import argparse
 
 import numpy as np
 import pandas as pd
@@ -41,6 +42,12 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
 
     # Set up figure
     plt.style.use(paths.styles / f'{style}.mplstyle')
+    savedir = {
+        'paper': paths.figures,
+        'presentation': paths.extra/'presentation'
+    }[style]
+    savedir.mkdir(exist_ok=True)
+
     fig, axs = plt.subplots(
         3, 3, 
         figsize=(TWO_COLUMN_WIDTH, 0.5*TWO_COLUMN_WIDTH),
@@ -219,7 +226,7 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
     ax1.yaxis.set_major_locator(MultipleLocator(0.1))
     ax1.yaxis.set_minor_locator(MultipleLocator(0.02))
 
-    plt.savefig(paths.figures / 'local_metallicity_fits')
+    plt.savefig(savedir / 'local_metallicity_fits')
 
 
 def casali_fit(age, feh):
@@ -230,4 +237,18 @@ def casali_fit(age, feh):
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Plot fits to the age--[Ce/Mg] in metallicity bins.'
+    )
+    parser.add_argument('--style',
+        choices=('paper', 'presentation'),
+        default='paper',
+        help='Plot style to use (default: "paper").'
+    )
+    parser.add_argument('--cmap',
+        default=ABUNDANCE_COLORMAP,
+        type=str,
+        help='Colormap for the metallicity bins (default: "viridis").'
+    )
+    args = parser.parse_args()
+    main(**vars(args))

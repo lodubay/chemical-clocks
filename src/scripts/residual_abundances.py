@@ -45,6 +45,11 @@ def main(style='paper', sample_fraction=SAMPLE_FRACTION):
 
     # Set up figure
     plt.style.use(paths.styles / f'{style}.mplstyle')
+    savedir = {
+        'paper': paths.figures,
+        'presentation': paths.extra/'presentation'
+    }[style]
+    savedir.mkdir(exist_ok=True)
     fig, axs = plt.subplots(2, 2, 
         figsize=(ONE_COLUMN_WIDTH, ONE_COLUMN_WIDTH),
         sharex='col', sharey='row', 
@@ -151,7 +156,7 @@ def main(style='paper', sample_fraction=SAMPLE_FRACTION):
         edgecolor='none'
     )
 
-    plt.savefig(paths.figures / 'residual_abundances')
+    plt.savefig(savedir / 'residual_abundances')
 
 
 def residual_abundances(
@@ -226,14 +231,14 @@ if __name__ == '__main__':
         description='Explainer plot for the residual abundance calculation.'
     )
     parser.add_argument('--style',
-        choices=('paper', 'poster'),
+        choices=('paper', 'presentation'),
         default='paper',
-        help='Plot style to use (default: paper).'
+        help='Plot style to use (default: "paper").'
     )
     parser.add_argument('--sample-fraction',
         type=float,
         default=SAMPLE_FRACTION,
-        help='Fraction of stars to randomly sample in each panel.'
+        help='Fraction of stars to randomly sample in each panel (default: 0.25).'
     )
     args = parser.parse_args()
     main(**vars(args))

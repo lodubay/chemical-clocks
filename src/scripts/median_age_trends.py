@@ -21,6 +21,11 @@ ZLIM = (0, 0.5)
 
 def main(style='paper', cmap=RADIUS_COLORMAP, min_count=10):
     plt.style.use(paths.styles / f'{style}.mplstyle')
+    savedir = {
+        'paper': paths.figures,
+        'presentation': paths.extra/'presentation'
+    }[style]
+    savedir.mkdir(exist_ok=True)
     # Import MWM sample
     mwm_rgb = import_sample(good_ages=False)
     # Calculate residual abundances (on all stars, not just good ages)
@@ -152,7 +157,7 @@ def main(style='paper', cmap=RADIUS_COLORMAP, min_count=10):
     # for ax in axs:
     #     colored_text_legend(ax, invert=True, loc='center right')
 
-    plt.savefig(paths.figures / 'median_age_trends')
+    plt.savefig(savedir / 'median_age_trends')
     plt.close()
 
 
@@ -162,13 +167,13 @@ if __name__ == '__main__':
 multiple radial bins.'
     )
     parser.add_argument('--style',
-        choices=('paper', 'poster'),
+        choices=('paper', 'presentation'),
         default='paper',
-        help='Plot style to use (default: paper).'
+        help='Plot style to use (default: "paper").'
     )
     parser.add_argument('--cmap',
         default=RADIUS_COLORMAP,
-        help='Colormap to use for radial dimension.'
+        help='Colormap to use for radial dimension (default: "managua").'
     )
     parser.add_argument('--min-count', 
         type=int,

@@ -21,6 +21,11 @@ END_TIME = 13.2 # Gyr
 
 def main(style='paper'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
+    savedir = {
+        'paper': paths.figures,
+        'presentation': paths.extra/'presentation'
+    }[style]
+    savedir.mkdir(exist_ok=True)
     plt.rcParams['axes.prop_cycle'] = plt.cycler('color', paultol.bright.colors)
     fig, ax = plt.subplots(
         figsize=(ONE_COLUMN_WIDTH, 0.7*ONE_COLUMN_WIDTH), 
@@ -89,7 +94,7 @@ def main(style='paper'):
     ax.yaxis.set_minor_locator(MultipleLocator(0.1))
     colored_text_legend(ax, loc='upper left', invert=True)
 
-    plt.savefig(paths.figures / 'ssp_yields')
+    plt.savefig(savedir / 'ssp_yields')
     plt.close()
 
 
@@ -133,9 +138,9 @@ if __name__ == '__main__':
         description='Plot the mass and metallicity dependence of AGB yields.'
     )
     parser.add_argument('--style',
-        choices=('paper', 'poster'),
+        choices=('paper', 'presentation'),
         default='paper',
-        help='Plot style to use (default: paper).'
+        help='Plot style to use (default: "paper").'
     )
     args = parser.parse_args()
     main(**vars(args))

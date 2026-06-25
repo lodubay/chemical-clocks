@@ -2,6 +2,8 @@
 Plot median [Ce/Mg] vs [Mg/H] in different Galactic regions and for
 high- and low-alpha populations.
 """
+import argparse
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -17,6 +19,11 @@ SAMPLE_SIZE = 1000 # number of stars to plot in each panel, randomly sampled
 
 def main(style='paper'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
+    savedir = {
+        'paper': paths.figures,
+        'presentation': paths.extra/'presentation'
+    }[style]
+    savedir.mkdir(exist_ok=True)
     # Import MWM sample
     mwm_rgb = import_sample(good_ages=False)
     # Local sample for comparison
@@ -132,8 +139,17 @@ def main(style='paper'):
     # Text-only lengend
     leg = colored_text_legend(axs[0,0], loc='upper left')
 
-    plt.savefig(paths.figures / 'median_trends_grid')
+    plt.savefig(savedir / 'median_trends_grid')
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Plot median trends in [Ce/Mg] vs [Mg/H] across the Galaxy.'
+    )
+    parser.add_argument('--style',
+        choices=('paper', 'presentation'),
+        default='paper',
+        help='Plot style to use (default: "paper").'
+    )
+    args = parser.parse_args()
+    main(**vars(args))

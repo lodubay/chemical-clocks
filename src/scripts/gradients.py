@@ -1,6 +1,8 @@
 """
 Plot the [Ce/H] and [Ce/Mg] radial gradient as a function of stellar age.
 """
+import argparse
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -14,6 +16,12 @@ import paths
 
 def main(style='paper', cmap='jet'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
+    savedir = {
+        'paper': paths.figures,
+        'presentation': paths.extra/'presentation'
+    }[style]
+    savedir.mkdir(exist_ok=True)
+
     # Import MWM sample
     mwm_rgb = import_sample(good_ages=True)
     radius_bin_edges = np.arange(2.5, 15.6, 1)
@@ -176,9 +184,23 @@ def main(style='paper', cmap='jet'):
     #     title='Age'
     # )
 
-    plt.savefig(paths.figures / 'gradients')
+    plt.savefig(savedir / 'gradients')
     plt.close()
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Plot radial gradients of [Ce/H] and [Ce/Mg] in age bins.'
+    )
+    parser.add_argument('--style',
+        choices=('paper', 'presentation'),
+        default='paper',
+        help='Plot style to use (default: "paper").'
+    )
+    parser.add_argument('--cmap',
+        default='jet',
+        type=str,
+        help='Colormap for the age bins (default: "jet").'
+    )
+    args = parser.parse_args()
+    main(**vars(args))

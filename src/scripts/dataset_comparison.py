@@ -2,6 +2,8 @@
 This script compares the age--[Ce/Mg] relations for MWM DR19 against the
 OCCAM DR19 open cluster sample and against APOKASC-3.
 """
+import argparse
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -17,6 +19,11 @@ import paths
 def main(style='paper'):
     # Figure setup
     plt.style.use(paths.styles / f'{style}.mplstyle')
+    savedir = {
+        'paper': paths.figures,
+        'presentation': paths.extra/'presentation'
+    }[style]
+    savedir.mkdir(exist_ok=True)
     fig, axs = plt.subplots(
         3, sharex=True, sharey=True,
         figsize=(ONE_COLUMN_WIDTH, 1.8 * ONE_COLUMN_WIDTH),
@@ -183,7 +190,7 @@ def main(style='paper'):
     axs[-1].set_xlabel('Age [Gyr]')
     for ax in axs:
         ax.set_ylabel('[Ce/Mg]')
-    plt.savefig(paths.figures / 'dataset_comparison')
+    plt.savefig(savedir / 'dataset_comparison')
     plt.close()
 
 
@@ -240,4 +247,13 @@ def join_apokasc_mwm():
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Compare age--[Ce/Mg] relations from different datasets.'
+    )
+    parser.add_argument('--style',
+        choices=('paper', 'presentation'),
+        default='paper',
+        help='Plot style to use (default: paper).'
+    )
+    args = parser.parse_args()
+    main(**vars(args))

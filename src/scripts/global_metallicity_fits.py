@@ -2,6 +2,8 @@
 This script plots the slope of the age-[Ce/Mg] trend as a function of 
 metallicity for each region of the Galaxy.
 """
+import argparse
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -22,8 +24,13 @@ MIN_COUNT = 20 # Minimum number of stars in each bin for trend fitting
 AGE_DELTA = 5 # Gyr, linear age shift for regression
 
 
-def main(style='paper', cmap=RADIUS_COLORMAP, zlim=ZLIM):
+def main(style='paper', cmap=RADIUS_COLORMAP):
     plt.style.use(paths.styles / f'{style}.mplstyle')
+    savedir = {
+        'paper': paths.figures,
+        'presentation': paths.extra/'presentation'
+    }[style]
+    savedir.mkdir(exist_ok=True)
 
     # Metallicity bins
     met_bin_edges = np.arange(-0.85, 0.56, 0.1)
@@ -52,8 +59,8 @@ def main(style='paper', cmap=RADIUS_COLORMAP, zlim=ZLIM):
         region = mwm_sample[
             (mwm_sample['Rg'] >= rlim[0]) &
             (mwm_sample['Rg'] < rlim[1]) &
-            (mwm_sample['z_max'] >= zlim[0]) &
-            (mwm_sample['z_max'] < zlim[1]) &
+            (mwm_sample['z_max'] >= ZLIM[0]) &
+            (mwm_sample['z_max'] < ZLIM[1]) &
             (mwm_sample['low_alpha']) # restrict age trends to low-alpha only
         ]
         # Bin by metallicity and fit linear trend to stars
@@ -114,7 +121,7 @@ def main(style='paper', cmap=RADIUS_COLORMAP, zlim=ZLIM):
     axs[1].set_xlabel(MET_LABEL)
     # colored_text_legend(ax, loc='center right', frameon=True)
 
-    plt.savefig(paths.figures / 'global_metallicity_fits')
+    plt.savefig(savedir / 'global_metallicity_fits')
 
 
 def fit_metallicity_bins(
@@ -179,4 +186,18 @@ def fit_metallicity_bins(
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='Plot fits to the age--[Ce/Mg] relation across radial bins.'
+    )
+    parser.add_argument('--style',
+        choices=('paper', 'presentation'),
+        default='paper',
+        help='Plot style to use (default: "paper").'
+    )
+    parser.add_argument('--cmap',
+        default=RADIUS_COLORMAP,
+        type=str,
+        help='Colormap for the radial bins (default: "managua").'
+    )
+    args = parser.parse_args()
+    main(**vars(args))

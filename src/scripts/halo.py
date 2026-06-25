@@ -38,6 +38,11 @@ def main(style='paper'):
     
     # Set up figure
     plt.style.use(paths.styles / f'{style}.mplstyle')
+    savedir = {
+        'paper': paths.figures,
+        'presentation': paths.extra/'presentation'
+    }[style]
+    savedir.mkdir(exist_ok=True)
     fig = plt.figure(figsize=(0.8*TWO_COLUMN_WIDTH, 0.8*TWO_COLUMN_WIDTH))
     gs0 = GridSpec(1, 2, figure=fig, top=0.98, bottom=0.64, wspace=0.35)
     ax0 = fig.add_subplot(gs0[0])
@@ -324,7 +329,7 @@ def main(style='paper'):
     # colored_text_legend(ax3, loc='upper left')
 
     plt.subplots_adjust(bottom=0.08, top=0.96, left=0.08, right=0.92)
-    plt.savefig(paths.figures / 'halo')
+    plt.savefig(savedir / 'halo')
     plt.close()
 
 
@@ -386,7 +391,7 @@ if __name__ == '__main__':
         description='Plot [Ce/Mg] vs [Mg/H] for halo stars.'
     )
     parser.add_argument('--style',
-        choices=('paper', 'poster'),
+        choices=('paper', 'presentation'),
         default='paper',
         help='Plot style to use (default: paper).'
     )

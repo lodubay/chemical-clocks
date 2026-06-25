@@ -44,6 +44,11 @@ CE_WINDOWS = [
 
 def main(style='paper', verbose=False, overwrite=False):
     plt.style.use(paths.styles / f'{style}.mplstyle')
+    savedir = {
+        'paper': paths.figures,
+        'presentation': paths.extra/'presentation'
+    }[style]
+    savedir.mkdir(exist_ok=True)
     if verbose: print('Importing MWM sample file...')
     mwm_sample = import_sample(good_ages=False)
     # First figure: stars with similar log(g) and metallicity but different Ce
@@ -68,7 +73,8 @@ def main(style='paper', verbose=False, overwrite=False):
         mwm_sample=mwm_sample,
         fname='ce_lines_1', 
         verbose=verbose, 
-        overwrite=overwrite
+        overwrite=overwrite,
+        savedir=savedir
     )
     # Second figure: exploring different log(g) and metallicity values
     if verbose: print('\nFigure 2: parameter space coverage')
@@ -92,7 +98,8 @@ def main(style='paper', verbose=False, overwrite=False):
         mwm_sample=mwm_sample,
         fname='ce_lines_2',
         verbose=verbose,
-        overwrite=overwrite
+        overwrite=overwrite,
+        savedir=savedir
     )
 
 
@@ -102,7 +109,8 @@ def plot_spectrum_comparison(
         mwm_sample=None, 
         fname='ce_lines', 
         verbose=False, 
-        overwrite=False
+        overwrite=False,
+        savedir=paths.figures
     ):
     """
     Plot a figure comparing Ce windows for multiple SDSS spectra.
@@ -268,7 +276,7 @@ def plot_spectrum_comparison(
     if verbose:
         print(mwm_sample.loc[sdss_id_list][['obj', 'snr', 'logg', 'm_h_atm', 'alpha_m_atm', 'fe_h', 'ce_fe']])
     
-    plt.savefig(paths.figures / fname)
+    plt.savefig(savedir / fname)
 
 
 def download_sdss_spectra(sdss_id_list, verbose=True, overwrite=False):
@@ -316,10 +324,10 @@ def download_sdss_spectra(sdss_id_list, verbose=True, overwrite=False):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Plot [Ce/Mg] vs [Mg/H] for halo stars.'
+        description='Plot spectral windows for selected MWM stars.'
     )
     parser.add_argument('--style',
-        choices=('paper', 'poster'),
+        choices=('paper', 'presentation'),
         default='paper',
         help='Plot style to use (default: paper).'
     )
