@@ -157,13 +157,13 @@ def main(style='paper', cmap=RADIUS_COLORMAP, min_count=10):
     # for ax in axs:
     #     colored_text_legend(ax, invert=True, loc='center right')
 
-    plt.savefig(savedir / 'median_age_trends')
+    plt.savefig(savedir / 'residual_age_trends')
     plt.close()
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Plot median Ce abundances as a function of age in \
+        description='Plot residual Ce abundances as a function of age in \
 multiple radial bins.'
     )
     parser.add_argument('--style',
