@@ -200,17 +200,18 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
         0, 0, r'$\odot$',
         va='center', ha='center', zorder=10, weight='bold', usetex=True
     )
-    # Casali et al. (2025) comparison
-    xarr = np.arange(-0.5, 0.51, 0.01)
-    ax0.plot(
-        xarr, casali_fit(1, xarr) - casali_fit(0, xarr), 
-        'k--', zorder=1, label='Casali et al. (2025)'
-    )
-    ax1.plot(
-        xarr, casali_fit(AGE_DELTA, xarr),
-        'k--', zorder=1, label='Casali et al. (2025)'
-    )
-    ax0.legend(loc='upper left')
+    if style == 'paper':
+        # Casali et al. (2025) comparison
+        xarr = np.arange(-0.5, 0.51, 0.01)
+        ax0.plot(
+            xarr, casali_fit(1, xarr) - casali_fit(0, xarr), 
+            'k--', zorder=1, label='Casali et al. (2025)'
+        )
+        ax1.plot(
+            xarr, casali_fit(AGE_DELTA, xarr),
+            'k--', zorder=1, label='Casali et al. (2025)'
+        )
+        ax0.legend(loc='upper left')
     ax0.set_title('Best-Fit Parameters')
     ax1.set_xlabel('[Fe/H]')
     ax0.set_ylabel(r'Slope [dex Gyr$^{-1}$]')

@@ -101,22 +101,23 @@ def main(style='paper'):
                 fmt='o-', markersize=3, color=high_alpha_color, capsize=0
             )
         # Indicate number of low- and high-Ia stars in region
-        if i==j==0:
-            sample_size_high_alpha = r'$N=%s$' % high_alpha.shape[0]
-            sample_size_low_alpha = r'$N=%s$' % low_alpha.shape[0]
-        else:
-            sample_size_high_alpha = str(high_alpha.shape[0])
-            sample_size_low_alpha = str(low_alpha.shape[0])
-        ax.text(
-            0.91, 0.91, sample_size_low_alpha, 
-            color=low_alpha_color, 
-            ha='right', va='top', transform=ax.transAxes,
-        )
-        ax.text(
-            0.91, 0.79, sample_size_high_alpha, 
-            color=high_alpha_color, 
-            ha='right', va='top', transform=ax.transAxes,
-        )
+        if style == 'paper':
+            if i==j==0:
+                sample_size_high_alpha = r'$N=%s$' % high_alpha.shape[0]
+                sample_size_low_alpha = r'$N=%s$' % low_alpha.shape[0]
+            else:
+                sample_size_high_alpha = str(high_alpha.shape[0])
+                sample_size_low_alpha = str(low_alpha.shape[0])
+            ax.text(
+                0.91, 0.91, sample_size_low_alpha, 
+                color=low_alpha_color, 
+                ha='right', va='top', transform=ax.transAxes,
+            )
+            ax.text(
+                0.91, 0.79, sample_size_high_alpha, 
+                color=high_alpha_color, 
+                ha='right', va='top', transform=ax.transAxes,
+            )
     # Indicate median abundance errors
     axs[0,0].errorbar(
         0.4, -0.5, 
