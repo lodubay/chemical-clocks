@@ -85,13 +85,13 @@ def main(style='paper', verbose=False):
     ax0.xaxis.set_minor_locator(MultipleLocator(0.5))
     ax0.yaxis.set_major_locator(MultipleLocator(0.5))
     ax0.yaxis.set_minor_locator(MultipleLocator(0.1))
-    xlim = (-6.5, 4.5)
+    xlim = (-4.5, 6.5)
     ylim = (-2.5, 0)
     ax0.set_xlim(xlim)
     ax0.set_ylim(ylim)
     # Plot disk stars
     pc = ax0.hexbin(
-        disk['Lz']/1e3, disk['E']/1e5,
+        -disk['Lz']/1e3, disk['E']/1e5,
         C=np.ones(disk.shape[0]),
         extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
         **hexbin_kwargs
@@ -99,24 +99,24 @@ def main(style='paper', verbose=False):
     fig.colorbar(pc, ax=ax0, label=r'$\log N$ (disk)', pad=0., use_gridspec=True)
     # Plot accreted & in-situ
     ax0.scatter(
-        insitu['Lz']/1e3, insitu['E']/1e5,
+        -insitu['Lz']/1e3, insitu['E']/1e5,
         c=insitu_color,
         **scatter_kwargs
     )
     ax0.scatter(
-        accreted['Lz']/1e3, accreted['E']/1e5,
+        -accreted['Lz']/1e3, accreted['E']/1e5,
         c=accreted_color,
         **scatter_kwargs
     )
     # Indicate boundary
     Lz_arr = np.arange(-6.5, 5.1, 0.1)
-    ax0.plot(Lz_arr, halo_ELz_cut(Lz_arr), '-', color='k')
+    ax0.plot(-Lz_arr, halo_ELz_cut(Lz_arr), '-', color='k')
     ax0.text(
-        1.5, -0.5, 'Halo', 
+        -3, -0.5, 'Halo', 
         fontsize=plt.rcParams['axes.titlesize']
     )
     ax0.text(
-        -4, -2, 'Disk', 
+        2, -2, 'Disk', 
         fontsize=plt.rcParams['axes.titlesize']
     )
 
@@ -296,7 +296,7 @@ def main(style='paper', verbose=False):
     # Indicate grid edges
     mgh_arr = np.arange(-2.5, 1.25, 0.25)
     ax2.plot(mgh_arr, -2.1 - mgh_arr, 'k:') # edge of stars flagged bad
-    ax2.plot(mgh_arr, -1.6 - mgh_arr, color='gray', ls=':') # indicates region of upper limits (manual)
+    ax2.plot(mgh_arr, -1.5 - mgh_arr, color='gray', ls=':') # indicates region of upper limits (manual)
     ax2.plot(mgh_arr, 0.9 - mgh_arr, 'k:') # edge of stars flagged bad
     # Indicate median abundance error
     ax2.errorbar(
