@@ -203,6 +203,7 @@ def add_kinematics(df, id_name='sdss_id', verbose=False):
             kinematic_dr3.actions[:,0],
             kinematic_dr3.actions[:,1],
             kinematic_dr3.actions[:,2],
+            np.sum(np.abs(kinematic_dr3.actions), axis=1),
             kinematic_dr3.E,
             kinematic_dr3.L[:,0],
             kinematic_dr3.L[:,1],
@@ -215,7 +216,8 @@ def add_kinematics(df, id_name='sdss_id', verbose=False):
         columns=[
             'sdss_id','galx','galy','galz','galr','galphi',
             'vx','vy','vz','vr','vphi',
-            'Jx','Jy','Jz','E','Lx','Ly','Lz','ecc',
+            'Jr','Jphi','Jz', 'Jtot', 
+            'E','Lx','Ly','Lz','ecc',
             'z_max','Rg','orbit_flags']
     )
     
