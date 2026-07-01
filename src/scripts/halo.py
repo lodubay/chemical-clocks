@@ -20,9 +20,16 @@ from contours import plot_kde2D_contours
 DENSITY_COLORMAP = 'binary_r'
 
 
-def main(style='paper'):
+def main(style='paper', verbose=False):
     # Get data
-    data = import_sample(good_ages=False)
+    fullsample = import_sample(good_ages=False)
+    # Drop flagged abundances
+    data = fullsample[
+        (fullsample['al_h_flags'] == 0) &
+        (fullsample['mn_h_flags'] == 0)
+    ]
+    dropped_stars = fullsample.shape[0] - data.shape[0]
+    if verbose: print(f'Dropped {dropped_stars} flagged abundances.')
     # Kinematically-selected halo
     halo = data[data['E']/1e5 > halo_ELz_cut(data['Lz']/1e3)]
     # halo = data[(data['z_max'] > 3) | (data['vphi'] > -120)]
@@ -390,10 +397,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Plot [Ce/Mg] vs [Mg/H] for halo stars.'
     )
-    parser.add_argument('--style',
+    parser.add_argument('-s', '--style',
         choices=('paper', 'presentation'),
         default='paper',
         help='Plot style to use (default: paper).'
+    )
+    parser.add_argument('-v', '--verbose',
+        action='store_true',
+        help='Print verbose output to terminal.'
     )
     args = parser.parse_args()
     main(**vars(args))
