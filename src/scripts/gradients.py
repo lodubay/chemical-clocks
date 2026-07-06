@@ -137,6 +137,9 @@ def main(style='paper', cmap='jet'):
                 alpha=0.5, 
                 zorder=2
             )
+    # Label low- and high-Ia trends
+    axs[0].text(3, 0.4, 'High-Ia', fontsize=plt.rcParams['axes.titlesize'])
+    axs[0].text(10.5, -0.4, 'Low-Ia', fontsize=plt.rcParams['axes.titlesize'])
     # Density colorbar
     fig.colorbar(
         pcm, 

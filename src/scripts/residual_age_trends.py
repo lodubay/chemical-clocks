@@ -121,8 +121,8 @@ def main(style='paper', cmap=RADIUS_COLORMAP, min_count=10):
         label='Number of stars'
     )
     # Label low- and high-Ia trends
-    axs[0].text(0.5, 0.5, 'High-Ia')
-    axs[0].text(2, -0.25, 'Low-Ia')
+    axs[0].text(0.5, 0.5, 'High-Ia', fontsize=plt.rcParams['axes.titlesize'])
+    axs[0].text(2, -0.25, 'Low-Ia', fontsize=plt.rcParams['axes.titlesize'])
     # Indicate median abundance errors
     mwm_rgb_ages = mwm_rgb[mwm_rgb['good_age']].copy()
     age_err_low = np.median(mwm_rgb_ages['age'] - mwm_rgb_ages['e_n_age'])
