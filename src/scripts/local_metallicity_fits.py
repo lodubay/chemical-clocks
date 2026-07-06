@@ -12,6 +12,7 @@ from matplotlib.gridspec import GridSpec
 from scipy import stats
 
 from plotting import TWO_COLUMN_WIDTH, ABUNDANCE_COLORMAP
+from contours import plot_kde2D_contours
 from utils import get_bin_centers, import_sample
 from global_metallicity_fits import fit_metallicity_bins
 import paths
@@ -73,10 +74,16 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
     # Left panels: individual fits in metallicity bins
     for i, ax in enumerate(axs.flatten()):
         # Underlying scatter plot of all low-alpha stars
-        ax.scatter(
-            local_sample['age'], local_sample['ce_mg_corr'],
-            color='gray', s=1, marker='o', rasterized=True, edgecolor='none'
+        plot_kde2D_contours(
+            ax, local_sample, 'age', 'ce_mg_corr', 
+            enclosed=[0.8, 0.5, 0.2], bandwidth=0.2, c='gray', 
+            plot_kwargs={'zorder':1},
+            overwrite=(i==0) # overwrite KDE calc the first time only
         )
+        # ax.scatter(
+        #     local_sample['age'], local_sample['ce_mg_corr'],
+        #     color='gray', s=1, marker='o', rasterized=True, edgecolor='none'
+        # )
         # Scatter plot of stars in metallicity range
         met_lim = tuple(np.round(met_bins[i:i+2], 2))
         met_center = np.mean(met_lim) # mean metallicity of bin
@@ -91,21 +98,15 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
             color=color, s=3, marker='o', rasterized=True, edgecolor='none'
         )
         # Plot high-alpha stars for reference (not fit)
-        subset_high_alpha = local_sample[
-            (local_sample[MET_COL] >= met_lim[0]) &
-            (local_sample[MET_COL] < met_lim[1]) &
-            (~local_sample['low_alpha'])
-        ]
-        ax.scatter(
-            subset_high_alpha['age'], subset_high_alpha['ce_mg_corr'], 
-            edgecolors=color, 
-            s=3, marker='o', rasterized=True, facecolors='w', linewidths=0.5
-        )
-        # Casali et al. (2025) relation for comparison
-        # ax.plot(age_arr, casali_relation(age_arr, met_center), 'w-', lw=2)
-        # ax.plot(
-        #     age_arr, casali_relation(age_arr, met_center), 'k:', 
-        #     label='Casali et al. (2025)'
+        # subset_high_alpha = local_sample[
+        #     (local_sample[MET_COL] >= met_lim[0]) &
+        #     (local_sample[MET_COL] < met_lim[1]) &
+        #     (~local_sample['low_alpha'])
+        # ]
+        # ax.scatter(
+        #     subset_high_alpha['age'], subset_high_alpha['ce_mg_corr'], 
+        #     edgecolors=color, 
+        #     s=3, marker='o', rasterized=True, facecolors='w', linewidths=0.5
         # )
         # Plot linear regression
         regress = fits[i]
