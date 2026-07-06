@@ -39,9 +39,13 @@ def main(style='paper', verbose=False):
     low_ia = disk[disk['high_alpha']]
     high_ia = disk[disk['low_alpha']]
     # Chemically-selected accreted stars
-    accreted = halo[halo['mn_mg'] < halo_chem_cut(halo['al_fe'])]
+    buffer = 0.05 # dex, buffer between chemically-selected populations
+    accreted = halo[halo['mn_mg'] < halo_chem_cut(halo['al_fe'])-buffer]
     # Chemically-selected in-situ halo stars
-    insitu = halo[halo['mn_mg'] > halo_chem_cut(halo['al_fe'])]
+    insitu = halo[
+        (halo['mn_mg'] > halo_chem_cut(halo['al_fe'])+buffer) &
+        (halo['mn_mg'] < insitu_chem_cut(halo['al_fe']))
+    ]
     
     # Set up figure
     plt.style.use(paths.styles / f'{style}.mplstyle')
@@ -127,7 +131,7 @@ def main(style='paper', verbose=False):
     ax1.xaxis.set_minor_locator(MultipleLocator(0.1))
     ax1.yaxis.set_major_locator(MultipleLocator(0.5))
     ax1.yaxis.set_minor_locator(MultipleLocator(0.1))
-    xlim = (-0.9, 0.6)
+    xlim = (-0.8, 0.7)
     ylim = (-1.1, 0.6)
     ax1.set_xlim(xlim)
     ax1.set_ylim(ylim)
@@ -138,6 +142,12 @@ def main(style='paper', verbose=False):
         **hexbin_kwargs
     )
     fig.colorbar(pc, ax=ax1, label=r'$\log N$ (disk)', pad=0., use_gridspec=True)
+    # Plot halo stars not in either chemical population
+    ax1.scatter(
+        halo['al_fe'], halo['mn_mg'],
+        c='gray',
+        **scatter_kwargs
+    )
     # Plot accreted, in situ stars
     ax1.scatter(
         insitu['al_fe'], insitu['mn_mg'],
@@ -150,21 +160,28 @@ def main(style='paper', verbose=False):
         **scatter_kwargs
     )
     # Indicate boundary
-    alfe_arr = np.arange(-0.9, 0.5, 0.1)
+    alfe_arr = np.arange(-0.9, 0.71, 0.01)
     ax1.plot(alfe_arr, halo_chem_cut(alfe_arr), '-', color='k')
+    ax1.plot(alfe_arr, insitu_chem_cut(alfe_arr), '-', color='k')
     ax1.text(
-        0.15, 0.4, 
+        0.25, -1, 
         insitu_label, 
         color='k',
         fontsize=plt.rcParams['axes.titlesize'], 
         # style='italic'
     )
     ax1.text(
-        -0.8, -1, 
+        -0.7, -1, 
         'Accreted', 
         fontsize=plt.rcParams['axes.titlesize'], 
         color='k',
         bbox={'color': 'w', 'pad': 1, 'alpha': 0.8}
+    )
+    ax1.text(
+        0.35, 0.4,
+        'Disk',
+        color='k',
+        fontsize=plt.rcParams['axes.titlesize'], 
     )
 
     # Set up second row
@@ -359,9 +376,17 @@ def halo_ELz_cut(Lz):
 
 def halo_chem_cut(alfe):
     """
-    Chemical cut in [Mn/Mg]-[Al/Fe] plane to select accreted stars.
+    Chemical cut in [Mn/Mg]-[Al/Fe] plane to select accreted stars from in-situ.
     """
-    return np.where(alfe > -0.2, -0.6-2*alfe, -0.2)
+    # return np.where(alfe > -0.2, -0.6-2*alfe, -0.2)
+    return -0.6-2*alfe
+
+
+def insitu_chem_cut(alfe):
+    """
+    Chemical cut in [Mn/Mg]-[Al/Fe] plane to separate in-situ stars from disk.
+    """
+    return np.where(alfe>=-0.2, -0.2, np.nan)
 
 
 def get_hasselquist_dwarfs():
