@@ -101,6 +101,12 @@ def main(style='paper', verbose=False):
         **hexbin_kwargs
     )
     fig.colorbar(pc, ax=ax0, label=r'$\log N$ (disk)', pad=0., use_gridspec=True)
+    # Plot halo stars not in either chemical population
+    ax0.scatter(
+        -halo['Lz']/1e3, halo['E']/1e5,
+        c='gray',
+        **scatter_kwargs
+    )
     # Plot accreted & in-situ
     ax0.scatter(
         -insitu['Lz']/1e3, insitu['E']/1e5,
