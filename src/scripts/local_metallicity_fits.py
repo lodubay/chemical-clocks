@@ -114,7 +114,7 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
         ax.plot( # extends beyond fit region
             age_arr[age_arr < AGE_FIT_RANGE[0]], 
             yfit[age_arr < AGE_FIT_RANGE[0]], 
-            'k--'
+            'k:'
         )
         ax.plot( # segment within fit region
             age_arr[(AGE_FIT_RANGE[0] <= age_arr) & (age_arr < AGE_FIT_RANGE[1])], 
@@ -124,7 +124,7 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
         ax.plot( # extends beyond fit region
             age_arr[age_arr >= AGE_FIT_RANGE[1]], 
             yfit[age_arr >= AGE_FIT_RANGE[1]], 
-            'k--'
+            'k:'
         )
         # indicate Solar value
         if met_lim[0] <= 0 < met_lim[1]:
