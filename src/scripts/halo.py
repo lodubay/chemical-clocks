@@ -68,10 +68,6 @@ def main(style='paper', verbose=False):
     scatter_kwargs = dict(
         s=2, rasterized=True, edgecolors='none',
     )
-    # accreted_color = paultol.bright.colors[5]
-    # insitu_color = paultol.bright.colors[2]
-    # low_ia_color = paultol.bright.colors[1]
-    # high_ia_color = paultol.bright.colors[0]
     accreted_color = paultol.vibrant.colors[1]
     insitu_color = paultol.vibrant.colors[2]
     low_ia_color = paultol.bright.colors[1]
@@ -202,7 +198,7 @@ def main(style='paper', verbose=False):
     ax2.xaxis.set_minor_locator(MultipleLocator(0.1))
     ax2.yaxis.set_major_locator(MultipleLocator(0.5))
     ax2.yaxis.set_minor_locator(MultipleLocator(0.1))
-    xlim = (-1.8, 0.499)
+    xlim = (-1.9, 0.499)
     ylim = (-1., 1.)
     ax2.set_xlim(xlim)
     ax2.set_ylim(ylim)
@@ -294,20 +290,21 @@ def main(style='paper', verbose=False):
     # Compare Hasselquist et al. (2021) dwarf median trends
     dr17_dwarfs = get_hasselquist_dwarfs()
     textcoords = [
-        (-1.6, -0.4),
-        (-1.72, -0.28),
-        (-1.48, -0.48)
+        (-1.8, -0.22),
+        (-1.8, 0.04),
+        (-1.55, -0.28)
     ]
     ls_list = ['-', '--', '-.']
     for i, sys in enumerate(['LMC', 'SMC', 'Sgr']):
         df = dr17_dwarfs[dr17_dwarfs['Sys'] == sys]
-        sorted_df = df.sort_values('MG_H')
+        sorted_df = df.sort_values('mg_h')
+        width = int(np.sqrt(df.shape[0]))
         rolling_df = sorted_df.rolling(
-            30, min_periods=30, step=30, on='MG_H', center=True
+            width, min_periods=30, step=30, on='mg_h', center=True
         )
         ax2.plot(
-            rolling_df['MG_H'].median(), 
-            rolling_df['CE_MG'].median(),
+            rolling_df['mg_h'].median(), 
+            rolling_df['ce_mg'].median(),
             'k', ls=ls_list[i]
         )
         ax2.text(
@@ -319,8 +316,10 @@ def main(style='paper', verbose=False):
     # Indicate grid edges
     mgh_arr = np.arange(-2.5, 1.25, 0.25)
     ax2.plot(mgh_arr, -2.1 - mgh_arr, 'k:') # edge of stars flagged bad
-    ax2.plot(mgh_arr, -1.5 - mgh_arr, color='gray', ls=':') # indicates region of upper limits (manual)
+    ax2.plot(mgh_arr, -1.5 - mgh_arr, color='gray', ls=':') # indicates region of upper limits (approximate)
     ax2.plot(mgh_arr, 0.9 - mgh_arr, 'k:') # edge of stars flagged bad
+    ax2.text(-1.22, -0.95, 'Grid edge', ha='right')
+    ax2.text(-0.62, -0.95, 'Upper limits', ha='right')
     # Indicate median abundance error
     ax2.errorbar(
         0.3, -0.8, 
@@ -403,25 +402,29 @@ def get_hasselquist_dwarfs():
     select_table = ascii.read(
         paths.data / 'catalogs' / 'hasselquist2021_table2_mrt.txt'
     ).to_pandas().set_index('ID')
-    dr17_full = fits_to_pandas(
-        paths.data / 'catalogs' / 'allStarLite-dr17-synspec_rev1.fits', hdu=1
+    mwm_full = fits_to_pandas(
+        paths.data / 'catalogs/astraAllStarASPCAP-0.6.0.fits.gz', 
+        hdu=2
     )
-    # Drop duplicate observations
-    dr17_full = dr17_full[dr17_full['EXTRATARG'] != 16].set_index('APOGEE_ID').copy()
+    # Limit to DR17 non-duplicate data to match Hasselquist et al. (2021)
+    mwm_full = mwm_full[
+        (mwm_full['sdss4_apogee_extra_target_flags'] != 16) &
+        (mwm_full['release'] == 'dr17')
+    ]
+    # drop duplicate SDSS-V IDs with the lowest SNR
+    mwm_full.sort_values(['sdss4_apogee_id', 'snr'], inplace=True, ascending=True)
+    mwm_full.drop_duplicates(subset='sdss4_apogee_id', keep='last', inplace=True)
+    mwm_full.set_index('sdss4_apogee_id', inplace=True)
     # Make catalog of dwarf members
-    dr17_dwarfs = dr17_full.join(select_table, how='right')
+    mwm_dwarfs = mwm_full.join(select_table, how='right')
     # Drop flagged abundances, require S/N > 70
-    dr17_dwarfs = dr17_dwarfs[
-        (dr17_dwarfs['CE_FE_FLAG'] == 0) &
-        (dr17_dwarfs['MG_FE_FLAG'] == 0) &
-        (dr17_dwarfs['SNR'] > 70)
+    mwm_dwarfs = mwm_dwarfs[
+        (mwm_dwarfs['ce_h_flags'] == 0) &
+        (mwm_dwarfs['mg_h_flags'] == 0) &
+        (mwm_dwarfs['snr'] > 70)
     ].copy()
-    dr17_dwarfs['MG_H'] = dr17_dwarfs['MG_FE'] + dr17_dwarfs['FE_H']
-    dr17_dwarfs['CE_MG'] = dr17_dwarfs['CE_FE'] - dr17_dwarfs['MG_FE']
-    # dr17_dwarfs['CE_MG_ERR'] = np.sqrt(
-    #     dr17_dwarfs['CE_FE_ERR']**2 + dr17_dwarfs['MG_FE_ERR']**2
-    # )
-    return dr17_dwarfs[['Sys', 'MG_H', 'CE_MG']]
+    mwm_dwarfs['ce_mg'] = mwm_dwarfs['ce_h'] - mwm_dwarfs['mg_h']
+    return mwm_dwarfs[['Sys', 'mg_h', 'ce_mg']]
 
 
 if __name__ == '__main__':
