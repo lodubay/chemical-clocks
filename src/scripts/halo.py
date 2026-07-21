@@ -133,8 +133,8 @@ def main(style='paper', verbose=False):
     ax1.xaxis.set_minor_locator(MultipleLocator(0.1))
     ax1.yaxis.set_major_locator(MultipleLocator(0.5))
     ax1.yaxis.set_minor_locator(MultipleLocator(0.1))
-    xlim = (-0.8, 0.7)
-    ylim = (-1.1, 0.6)
+    xlim = (-0.7, 0.7)
+    ylim = (-1.2, 0.7)
     ax1.set_xlim(xlim)
     ax1.set_ylim(ylim)
     pc = ax1.hexbin(
@@ -166,24 +166,27 @@ def main(style='paper', verbose=False):
     ax1.plot(alfe_arr, halo_chem_cut(alfe_arr), '-', color='k')
     ax1.plot(alfe_arr, insitu_chem_cut(alfe_arr), '-', color='k')
     ax1.text(
-        0.25, -1, 
-        insitu_label, 
+        0.25, -1.1, 
+        'Low-Ia/\n%s' % insitu_label, 
         color='k',
         fontsize=plt.rcParams['axes.titlesize'], 
-        # style='italic'
+        # style='italic',
+        bbox={'color': 'w', 'pad': 1, 'alpha': 0.8}
     )
     ax1.text(
-        -0.7, -1, 
+        -0.6, -1.1, 
         'Accreted', 
         fontsize=plt.rcParams['axes.titlesize'], 
         color='k',
         bbox={'color': 'w', 'pad': 1, 'alpha': 0.8}
     )
     ax1.text(
-        0.35, 0.4,
-        'Disk',
+        0.6, 0.35,
+        'High-Ia\nDisk',
         color='k',
         fontsize=plt.rcParams['axes.titlesize'], 
+        ha='right',
+        bbox={'color': 'w', 'pad': 1, 'alpha': 0.8}
     )
 
     # Set up second row
