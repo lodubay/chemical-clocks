@@ -169,7 +169,7 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
     axs[0,0].yaxis.set_minor_locator(MultipleLocator(0.1))
     axs[-1,1].set_xlabel('Age [Gyr]')
     axs[1,0].set_ylabel('[Ce/Mg]')
-    axs[0,1].set_title('Bins in [Fe/H]')
+    axs[0,1].set_title('Bins in [Fe/H] (High-Ia stars only)')
 
     # Right panels: plot slope and intercept vs metallicity
     gs = GridSpec(2, 1, figure=fig, left=0.75, right=0.98, hspace=0)
