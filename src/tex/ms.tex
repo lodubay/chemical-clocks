@@ -115,7 +115,7 @@
 
 \lettrine{S}{tellar ages} are a vital component of Galactic archaeology studies. Stellar age data provide direct measurements of the Galaxy's evolution over time and allow for better comparisons with chemical evolution models. Recent years have seen an explosion of large stellar catalogs with age measurements for $10^5-10^6$ stars \citep[e.g.,][]{xiang_time_2022,nataf_accurate_2024,stone-martinez_starflow_2025,wang_spectroscopic_2025,roberts_cn_2026}. However, age estimation techniques typically apply to a limited range of stellar parameters, and systematic offsets exist between different methods.
 % However, age estimation techniques are often observationally expensive or apply to a limited range of stellar parameters. 
-``Chemical clocks,'' or empirically-calibrated relations between stellar age and atmospheric abundance ratios, promise reliable spectroscopic age estimates over a wider parameter space. 
+``Chemical clocks,'' or empirically-calibrated relations between stellar age and atmospheric abundance ratios, promise reliable spectroscopic age estimates over a wider parameter space \citep[e.g.,][]{hayden_galah_2022}. 
 % The best-studied chemical clock is [C/N], which has a strong foundation in stellar physics but can only be used for stars on the red giant branch (RGB).
 
 A number of studies have proposed the use of $[s/\alpha]$\textemdash the ratio of elements produced by the slow neutron-capture process in asymptotic giant branch (AGB) stars to the $\alpha$-elements produced in core-collapse supernovae (CCSNe)\textemdash as a chemical clock. A remarkably tight correlation between [Y/Mg] and age was found in solar twins \citep{nissen_high-precision_2015} and red clump stars \citep{slumstrup_ymg_2017}, and \citet{nissen_high-precision_2015,nissen_high-precision_2016} first proposed using [Y/Mg] as a chemical clock.
@@ -186,9 +186,10 @@ We limit our study to red giant branch (RGB) stars because the Ce abundances in 
     \item $S/N>100$;
     \item No bad flag or spectrum flags;
     \item No Mg, Fe, or Ce abundance flags (avoiding stars close to grid edges);
-    \item No SDSS-IV EXTRATARG flag.
+    \item $\sigma_{\bracket{X}}<0.2\dex$ for Mg, Fe, and Ce;
+    \item No SDSS-IV EXTRATARG flag (limit to the APOGEE Main Red Star Sample).
 \end{itemize}
-This produces a primary sample of \todo{121,322} stars. All of our stars have a radial velocity scatter $\sigma(v_{\rm rad})<1\kms$ and 84\% have $\sigma(v_{\rm rad})<0.1\kms$, indicating minimal contamination from variable stars or binaries.
+This produces a primary sample of \todo{121,322} stars.\footnote{Out of the full sample of $\sim\num{900000}$ stars in DR19 \citep{meszaros_sdss-v_2025}, the largest reductions in sample size are due to the quality and targeting cuts ($\sim60\%$), RGB selection ($\sim58\%$), and $S/N$ requirement ($\sim26\%$), with smaller reductions due to the abundance quality cuts.} All of our stars have a radial velocity scatter $\sigma(v_{\rm rad})<1\kms$ and 84\% have $\sigma(v_{\rm rad})<0.1\kms$, indicating minimal contamination from variable stars or binaries.
 
 The right-hand panel of Figure \ref{fig:kiel-diagram} plots a Kiel diagram ($T_{\rm eff}$ vs $\log(g)$) of this sample, color-coded by [Ce/H]. The abundances shown have not been corrected for trends with $\log(g)$ (see Section \ref{sec:logg-corrections}), but the corrected abundance patterns are similar. We have run our analysis on more limited samples, including a stricter $S/N$ requirement and narrower $\log(g)$ range, and found no significant difference in our results.
 
