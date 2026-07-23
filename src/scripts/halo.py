@@ -18,6 +18,8 @@ from utils import import_sample, get_bin_centers, fits_to_pandas
 from contours import plot_kde2D_contours
 
 DENSITY_COLORMAP = 'binary_r'
+HALO_LZ_CUT = 0.3 # cut in abs(Lz/Jtot) for halo stars
+DISK_LZ_CUT = 0.6 # cut in abs(Lz/Jtot) for disk stars
 
 
 def main(style='paper', verbose=False):
@@ -30,22 +32,41 @@ def main(style='paper', verbose=False):
     ]
     dropped_stars = fullsample.shape[0] - data.shape[0]
     if verbose: print(f'Dropped {dropped_stars} flagged abundances.')
-    # Kinematically-selected halo
-    halo = data[data['E']/1e5 > halo_ELz_cut(data['Lz']/1e3)]
-    # halo = data[(data['z_max'] > 3) | (data['vphi'] > -120)]
-    # Kinematically-selected disk stars
-    disk = data[data['E']/1e5 < halo_ELz_cut(data['Lz']/1e3)].copy()
-    # disk = data[(data['z_max'] < 3) & (data['vphi'] < -120)]
+
+    # Halo and disk orbit selections via the "Action Diamond"
+    ad_halo_mask = np.abs(data['Lz']/data['Jtot']) < HALO_LZ_CUT
+    ad_disk_mask = data['Lz']/data['Jtot'] > 0.6
+    # Crude spatial bulge selection
+    bulge_mask = data['galr'] < 3
+    # Feuillet et al. (2020) GSE selection
+    feuillet_gse_mask = (
+        (np.sqrt(data['Jr']) > 30) &
+        (np.sqrt(data['Jr']) < 50) &
+        (data['Lz'] > -500) &
+        (data['Lz'] < 500)
+    )
+
+    # Chemical accreted & in-situ population selection
+    buffer = 0.05 # dex, buffer between chemically-selected populations
+    chem_accreted_mask = data['mn_mg'] < halo_chem_cut(data['al_fe'])-buffer
+    chem_insitu_mask = (
+        (data['mn_mg'] > halo_chem_cut(data['al_fe'])+buffer) & 
+        (data['mn_mg'] < -0.2)
+    )
+
+    # Apply orbit selections
+    disk = data[ad_disk_mask]
     low_ia = disk[disk['high_alpha']]
     high_ia = disk[disk['low_alpha']]
-    # Chemically-selected accreted stars
-    buffer = 0.05 # dex, buffer between chemically-selected populations
-    accreted = halo[halo['mn_mg'] < halo_chem_cut(halo['al_fe'])-buffer]
-    # Chemically-selected in-situ halo stars
-    insitu = halo[
-        (halo['mn_mg'] > halo_chem_cut(halo['al_fe'])+buffer) &
-        (halo['mn_mg'] < insitu_chem_cut(halo['al_fe']))
-    ]
+    intermediate = data[(~ad_disk_mask) & (~ad_halo_mask)]
+    bulge = data[ad_halo_mask & bulge_mask]
+    # halo = data[ad_halo_mask & (~bulge_mask)]
+
+    # Apply chemical selections
+    accreted = data[ad_halo_mask & (~bulge_mask) & chem_accreted_mask & (~feuillet_gse_mask)]
+    insitu = data[ad_halo_mask & (~bulge_mask) & chem_insitu_mask]
+    other_chem = data[ad_halo_mask & (~bulge_mask) & (~chem_insitu_mask) & (~chem_accreted_mask)]
+    gse = data[feuillet_gse_mask & chem_accreted_mask]
     
     # Set up figure
     plt.style.use(paths.styles / f'{style}.mplstyle')
@@ -56,8 +77,8 @@ def main(style='paper', verbose=False):
     savedir.mkdir(exist_ok=True)
     fig = plt.figure(figsize=(0.8*TWO_COLUMN_WIDTH, 0.8*TWO_COLUMN_WIDTH))
     gs0 = GridSpec(1, 2, figure=fig, top=0.98, bottom=0.64, wspace=0.35)
-    ax0 = fig.add_subplot(gs0[0])
-    ax1 = fig.add_subplot(gs0[1])
+    ax0 = fig.add_subplot(gs0[0]) # E-Lz plane
+    ax1 = fig.add_subplot(gs0[1]) # [Mn/Mg] - [Al/Fe] plane
     hexbin_kwargs = dict(
         gridsize=(50, 33),
         cmap=DENSITY_COLORMAP, 
@@ -70,8 +91,14 @@ def main(style='paper', verbose=False):
     )
     accreted_color = paultol.vibrant.colors[1]
     insitu_color = paultol.vibrant.colors[2]
+    gse_color = paultol.vibrant.colors[4]
     low_ia_color = paultol.bright.colors[1]
     high_ia_color = paultol.bright.colors[0]
+    other_color = paultol.vibrant.colors[6]
+    accreted_marker = 'D'
+    insitu_marker = 'o'
+    gse_marker = 's'
+    other_marker = 'o'
     # Italicize "in situ" if LaTeX is installed
     if plt.rcParams['text.usetex']:
         insitu_label = r'\textit{In situ}'
@@ -91,38 +118,31 @@ def main(style='paper', verbose=False):
     ax0.set_ylim(ylim)
     # Plot disk stars
     pc = ax0.hexbin(
-        -disk['Lz']/1e3, disk['E']/1e5,
+        disk['Lz']/1e3, disk['E']/1e5,
         C=np.ones(disk.shape[0]),
         extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
         **hexbin_kwargs
     )
     fig.colorbar(pc, ax=ax0, label=r'$\log N$ (disk)', pad=0., use_gridspec=True)
-    # Plot halo stars not in either chemical population
-    ax0.scatter(
-        -halo['Lz']/1e3, halo['E']/1e5,
-        c='gray',
-        **scatter_kwargs
-    )
-    # Plot accreted & in-situ
-    ax0.scatter(
-        -insitu['Lz']/1e3, insitu['E']/1e5,
-        c=insitu_color,
-        **scatter_kwargs
-    )
-    ax0.scatter(
-        -accreted['Lz']/1e3, accreted['E']/1e5,
-        c=accreted_color,
-        **scatter_kwargs
-    )
-    # Indicate boundary
-    Lz_arr = np.arange(-6.5, 5.1, 0.1)
-    ax0.plot(-Lz_arr, halo_ELz_cut(Lz_arr), '-', color='k')
+    # Scatter plot of sub-samples
+    subsamples = [intermediate, bulge, insitu, accreted, gse]
+    colors = [other_color, other_color, insitu_color, accreted_color, gse_color]
+    markers = [other_marker, other_marker, insitu_marker, accreted_marker, gse_marker]
+    for i, df in enumerate(subsamples):
+        ax0.scatter(
+            df['Lz']/1e3, df['E']/1e5, 
+            c=colors[i], marker=markers[i], **scatter_kwargs
+        )
     ax0.text(
-        -3, -0.5, 'Halo', 
+        -2.5, -0.4, 'Halo', 
         fontsize=plt.rcParams['axes.titlesize']
     )
     ax0.text(
-        2, -2, 'Disk', 
+        2.5, -1.5, 'Disk', 
+        fontsize=plt.rcParams['axes.titlesize']
+    )
+    ax0.text(
+        -3, -2.2, 'Bulge',
         fontsize=plt.rcParams['axes.titlesize']
     )
 
@@ -144,23 +164,15 @@ def main(style='paper', verbose=False):
         **hexbin_kwargs
     )
     fig.colorbar(pc, ax=ax1, label=r'$\log N$ (disk)', pad=0., use_gridspec=True)
-    # Plot halo stars not in either chemical population
-    ax1.scatter(
-        halo['al_fe'], halo['mn_mg'],
-        c='gray',
-        **scatter_kwargs
-    )
-    # Plot accreted, in situ stars
-    ax1.scatter(
-        insitu['al_fe'], insitu['mn_mg'],
-        c=insitu_color,
-        **scatter_kwargs
-    )
-    ax1.scatter(
-        accreted['al_fe'], accreted['mn_mg'],
-        c=accreted_color,
-        **scatter_kwargs
-    )
+    # Scatter plot of sup-samples
+    subsamples = [other_chem, insitu, accreted, gse]
+    colors = [other_color, insitu_color, accreted_color, gse_color]
+    markers = [other_marker, insitu_marker, accreted_marker, gse_marker]
+    for i, df in enumerate(subsamples):
+        ax1.scatter(
+            df['al_fe'], df['mn_mg'], 
+            c=colors[i], marker=markers[i], **scatter_kwargs
+        )
     # Indicate boundary
     alfe_arr = np.arange(-0.9, 0.71, 0.01)
     ax1.plot(alfe_arr, halo_chem_cut(alfe_arr), '-', color='k')
@@ -190,7 +202,7 @@ def main(style='paper', verbose=False):
     )
 
     # Set up second row
-    gs1 = GridSpec(1, 2, figure=fig, width_ratios=[4, 1], bottom=0.08, top=0.56, right=0.88, wspace=0.)
+    gs1 = GridSpec(1, 2, figure=fig, width_ratios=[4, 1], bottom=0.08, top=0.53, right=0.88, wspace=0.)
     ax2 = fig.add_subplot(gs1[0])
     ax3 = fig.add_subplot(gs1[1], sharey=ax2)
 
@@ -202,108 +214,91 @@ def main(style='paper', verbose=False):
     ax2.yaxis.set_major_locator(MultipleLocator(0.5))
     ax2.yaxis.set_minor_locator(MultipleLocator(0.1))
     xlim = (-1.9, 0.499)
-    ylim = (-1., 1.)
+    ylim = (-1., 0.8)
     ax2.set_xlim(xlim)
     ax2.set_ylim(ylim)
     scatter_kwargs['s'] = 5
     median_linewidth = 2
     contour_linewidth = 0.5
     border_linewidth = 3
-    # Plot chemically-selected accreted stars
-    ax2.scatter(
-        accreted['mg_h'], accreted['ce_mg'],
-        c=accreted_color, marker='D', zorder=1,
-        label='Accreted Halo',
-        **scatter_kwargs
-    )
-    # Plot in-situ halo stars
-    ax2.scatter(
-        insitu['mg_h'], insitu['ce_mg'], 
-        c=insitu_color, marker='o', zorder=2,
-        label=insitu_label + ' Halo',
-        **scatter_kwargs
-    )
-    # Plot rolling median of high-Ia stars
-    sorted_high_ia = high_ia.sort_values('mg_h')[['mg_h', 'ce_mg']]
-    rolling_high_ia = sorted_high_ia.rolling(
-        2000, min_periods=1000, step=1000, on='mg_h', center=True
-    )
-    ax2.plot(
-        rolling_high_ia['mg_h'].median(), rolling_high_ia['ce_mg'].median(), 
-        'w-', linewidth=border_linewidth, zorder=3,
-    )
-    ax2.plot(
-        rolling_high_ia['mg_h'].median(), rolling_high_ia['ce_mg'].median(), 
-        '-', color=high_ia_color, linewidth=median_linewidth, zorder=4, 
-        label='High-Ia Disk'
-    )
-    # Rolling median of low-Ia stars
-    sorted_low_ia = low_ia.sort_values('mg_h')[['mg_h', 'ce_mg']]
-    rolling_low_ia = sorted_low_ia.rolling(
-        1000, min_periods=1000, step=300, on='mg_h', center=True
-    )
-    ax2.plot(
-        rolling_low_ia['mg_h'].median(), rolling_low_ia['ce_mg'].median(), 
-        'w-', linewidth=border_linewidth, zorder=3,
-    )
-    ax2.plot(
-        rolling_low_ia['mg_h'].median(), rolling_low_ia['ce_mg'].median(), 
-        '-', linewidth=median_linewidth, color=low_ia_color, zorder=4, 
-        label='Low-Ia Disk'
-    )
-    # Plot contours for low- and high-Ia stars
-    plot_kde2D_contours(
-        ax2, high_ia, 'mg_h', 'ce_mg', c=high_ia_color, lw=contour_linewidth,
-        path=paths.data / 'MWM' / 'kde' / 'mgh_cemg' / 'all_high_ia.dat'
-    )
-    plot_kde2D_contours(
-        ax2, low_ia, 'mg_h', 'ce_mg', c=low_ia_color, lw=contour_linewidth,
-        path=paths.data / 'MWM' / 'kde' / 'mgh_cemg' / 'all_low_ia.dat'
-    )
-    # Rolling median of in-situ stars
-    sorted_insitu = insitu.sort_values('mg_h')[['mg_h', 'ce_mg']]
-    rolling_insitu = sorted_insitu.rolling(
-        200, min_periods=100, step=30, on='mg_h', center=True
-    )
-    ax2.plot(
-        rolling_insitu['mg_h'].median(), 
-        rolling_insitu['ce_mg'].median(), 
-        'w-', linewidth=border_linewidth, zorder=3,
-    )
-    ax2.plot(
-        rolling_insitu['mg_h'].median(), 
-        rolling_insitu['ce_mg'].median(), 
-        '-', color=insitu_color, linewidth=median_linewidth, zorder=4
-    )
-    # Rolling median of accreted stars
-    sorted_accreted = accreted.sort_values('mg_h')[['mg_h', 'ce_mg']]
-    rolling_accreted = sorted_accreted.rolling(
-        200, min_periods=100, step=30, on='mg_h', center=True
-    )
-    ax2.plot(
-        rolling_accreted['mg_h'].median(), 
-        rolling_accreted['ce_mg'].median(), 
-        'w-', linewidth=border_linewidth, zorder=3
-    )
-    ax2.plot(
-        rolling_accreted['mg_h'].median(), 
-        rolling_accreted['ce_mg'].median(), 
-        '-', color=accreted_color, linewidth=median_linewidth, zorder=4,
-    )
+    # Scatter plot and rolling medians of halo sub-populations
+    subsamples = [gse, accreted, insitu]
+    colors = [gse_color, accreted_color, insitu_color]
+    markers = [gse_marker, accreted_marker, insitu_marker]
+    labels = ['GSE', 'Accreted Halo', insitu_label + ' Halo']
+    for i, df in enumerate(subsamples):
+        ax2.scatter(
+            df['mg_h'], 
+            df['ce_mg'], 
+            c=colors[i], 
+            marker=markers[i], 
+            zorder=2,
+            label=labels[i],
+            **scatter_kwargs
+        )
+        # Rolling median
+        sorted_mgh = df.sort_values('mg_h')[['mg_h', 'ce_mg']]
+        rolling_mgh = sorted_mgh.rolling(
+            100, min_periods=30, step=30, on='mg_h', center=True
+        )
+        ax2.plot(
+            rolling_mgh['mg_h'].median(), 
+            rolling_mgh['ce_mg'].median(), 
+            'w-', 
+            linewidth=border_linewidth, 
+            zorder=3
+        )
+        ax2.plot(
+            rolling_mgh['mg_h'].median(), 
+            rolling_mgh['ce_mg'].median(), 
+            '-', 
+            color=colors[i], 
+            linewidth=median_linewidth, 
+            zorder=5,
+        )
+    # Rolling median and contours for low- and high-Ia disk stars
+    subsamples = [low_ia, high_ia]
+    colors = [low_ia_color, high_ia_color]
+    labels = ['Low-Ia Disk', 'High-Ia Disk']
+    fnames = ['all_low_ia.dat', 'all_high_ia.dat']
+    for i, df in enumerate(subsamples):
+        sorted_mgh = df.sort_values('mg_h')[['mg_h', 'ce_mg']]
+        rolling_mgh = sorted_mgh.rolling(
+            1000, min_periods=1000, step=1000, on='mg_h', center=True
+        )
+        ax2.plot(
+            rolling_mgh['mg_h'].median(), 
+            rolling_mgh['ce_mg'].median(), 
+            'w-', 
+            linewidth=border_linewidth, 
+            zorder=3,
+        )
+        ax2.plot(
+            rolling_mgh['mg_h'].median(), 
+            rolling_mgh['ce_mg'].median(), 
+            '-', 
+            linewidth=median_linewidth, 
+            color=colors[i], 
+            zorder=4, 
+            label=labels[i]
+        )
+        plot_kde2D_contours(
+            ax2, df, 'mg_h', 'ce_mg', c=colors[i], lw=contour_linewidth,
+            path=paths.data / 'MWM' / 'kde' / 'mgh_cemg' / fnames[i]
+        )
     # Compare Hasselquist et al. (2021) dwarf median trends
     dr17_dwarfs = get_hasselquist_dwarfs()
     textcoords = [
-        (-1.8, -0.22),
-        (-1.8, 0.04),
-        (-1.55, -0.28)
+        (-1.75, -0.18),
+        (-1.8, 0.0),
+        (-1.5, -0.2)
     ]
     ls_list = ['-', '--', '-.']
     for i, sys in enumerate(['LMC', 'SMC', 'Sgr']):
         df = dr17_dwarfs[dr17_dwarfs['Sys'] == sys]
         sorted_df = df.sort_values('mg_h')
-        width = int(np.sqrt(df.shape[0]))
         rolling_df = sorted_df.rolling(
-            width, min_periods=30, step=30, on='mg_h', center=True
+            100, min_periods=30, step=30, on='mg_h', center=True
         )
         ax2.plot(
             rolling_df['mg_h'].median(), 
@@ -314,7 +309,7 @@ def main(style='paper', verbose=False):
             textcoords[i][0],
             textcoords[i][1],
             sys,
-            bbox={'color': 'w', 'pad': 0.5, 'alpha': 1}
+            # bbox={'color': 'w', 'pad': 0.5, 'alpha': 1}
         )
     # Indicate grid edges
     mgh_arr = np.arange(-2.5, 1.25, 0.25)
@@ -332,12 +327,13 @@ def main(style='paper', verbose=False):
     )
     colored_text_legend(
         ax2, 
-        loc='upper right', 
-        ncols=2,
+        loc='lower left', 
+        ncols=5,
         columnspacing=1,
         fontsize=plt.rcParams['axes.titlesize'],
-        frameon=True,
-        framealpha=0.8,
+        # frameon=True,
+        # framealpha=0.8,
+        bbox_to_anchor=(0.03, 0.98)
     )
 
 
@@ -370,16 +366,6 @@ def logsum(x):
     Log of the sum of an array.
     """
     return np.log10(np.sum(x))
-
-
-def halo_ELz_cut(Lz):
-    """
-    Arbitrary halo cut - find a better one in the literature
-    """
-    # # return -0.55 - np.exp(Lz / 2.5)
-    return np.where(Lz<-3, 0, -0.7 - np.exp(Lz / 1.5))
-    # return -0.6 - np.exp(Lz / 1.2)
-    # return np.where(Lz<0, -0.7 - np.exp(Lz / 1.5), -3)
 
 
 def halo_chem_cut(alfe):
