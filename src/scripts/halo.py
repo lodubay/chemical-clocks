@@ -34,24 +34,24 @@ def main(style='paper', verbose=False):
     if verbose: print(f'Dropped {dropped_stars} flagged abundances.')
 
     # Halo and disk orbit selections via the "Action Diamond"
-    ad_halo_mask = np.abs(data['Lz']/data['Jtot']) < HALO_LZ_CUT
-    ad_disk_mask = data['Lz']/data['Jtot'] > 0.6
+    ad_halo_mask = np.abs(data['Lz']/data['Jtot']) <= HALO_LZ_CUT
+    ad_disk_mask = data['Lz']/data['Jtot'] >= DISK_LZ_CUT
     # Crude spatial bulge selection
-    bulge_mask = data['galr'] < 3
+    bulge_mask = data['galr'] <= 3
     # Feuillet et al. (2020) GSE selection
     feuillet_gse_mask = (
-        (np.sqrt(data['Jr']) > 30) &
-        (np.sqrt(data['Jr']) < 50) &
-        (data['Lz'] > -500) &
-        (data['Lz'] < 500)
+        (np.sqrt(data['Jr']) >= 30) &
+        (np.sqrt(data['Jr']) <= 50) &
+        (data['Lz'] >= -500) &
+        (data['Lz'] <= 500)
     )
 
     # Chemical accreted & in-situ population selection
     buffer = 0.05 # dex, buffer between chemically-selected populations
-    chem_accreted_mask = data['mn_mg'] < halo_chem_cut(data['al_fe'])-buffer
+    chem_accreted_mask = data['mn_mg'] <= halo_chem_cut(data['al_fe'])-buffer
     chem_insitu_mask = (
-        (data['mn_mg'] > halo_chem_cut(data['al_fe'])+buffer) & 
-        (data['mn_mg'] < -0.2)
+        (data['mn_mg'] >= halo_chem_cut(data['al_fe'])+buffer) & 
+        (data['mn_mg'] <= -0.2)
     )
 
     # Apply orbit selections
@@ -336,12 +336,11 @@ def main(style='paper', verbose=False):
         bbox_to_anchor=(0.03, 0.98)
     )
 
-
     # Marginal panel with histograms
     cemg_bins = np.arange(-1.1, 1.12, 0.05)
-    colors = [high_ia_color, low_ia_color, insitu_color, accreted_color]
-    labels = ['High-Ia Disk', 'Low-Ia Disk', insitu_label + ' Halo', 'Accreted Halo']
-    for i, df in enumerate([high_ia, low_ia, insitu, accreted]):
+    colors = [high_ia_color, low_ia_color, insitu_color, accreted_color, gse_color]
+    # labels = ['High-Ia Disk', 'Low-Ia Disk', insitu_label + ' Halo', 'Accreted Halo']
+    for i, df in enumerate([high_ia, low_ia, insitu, accreted, gse]):
         hist, bin_edges = np.histogram(df['ce_mg'], cemg_bins, density=True)
         if i < 2:
             lw = 1
@@ -349,7 +348,7 @@ def main(style='paper', verbose=False):
             lw = 2
         ax3.plot(
             hist/hist.max(), get_bin_centers(bin_edges),
-            c=colors[i], lw=lw, label=labels[i]
+            c=colors[i], lw=lw, #label=labels[i]
         )
     ax3.set_xlabel('Density')
     ax3.set_xlim((0, 1.2))
