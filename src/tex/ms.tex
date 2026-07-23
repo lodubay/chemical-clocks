@@ -200,9 +200,11 @@ The right-hand panel of Figure \ref{fig:kiel-diagram} plots a Kiel diagram ($T_{
     \label{fig:kiel-diagram}
 \end{figure*}
 
-\subsection{Kinematics}
+\subsection{Kinematics and Orbits}
 
-The 6-D kinematic properties for stars in our sample are calculated using position, proper motion, parallax, and radial velocity measurements from {\it Gaia} DR3 \citep{gaia_collaboration_gaia_2023}. We adopt distance estimates from \citet{zhang_parameters_2023}, the {\it Gaia} parallax, and \citet{bailer-jones_estimating_2021}, taking the first finite value from these sources in the order listed. These coordinates are transformed into the Galactocentric cylindrical frame $(R,\phi,z)_{\rm gal}$ with {\tt astropy} \citep{astropy_collaboration_astropy_2013,astropy_collaboration_astropy_2018,astropy_collaboration_astropy_2022} using updated solar position and motion parameters from \citet{hunt_multiple_2022}. In particular, we adopt the Galactic position of the Sun $(R,z)_\odot=(8275,20.8)\pc$ \citep{gravity_collaboration_improved_2021,bennett_vertical_2019} and solar velocity with respect to the Galactic center $(v_x,v_y,v_z)_\odot=(8.4,251.8,8.4)\kms$ \citep{reid_proper_2020,gravity_collaboration_improved_2021}. Orbital parameters such as the angular momentum $L_z$ and orbital energy $E$ are calculated using the {\tt gala} package \citep{price-whelan_gala_2017} with the {\tt MilkyWayPotential2022} potential model. We note that this axisymmetric model lacks a bar or spiral perturbations. We use these orbital parameters primarily to bin the data on kpc scales, and we exclude the central $3\kpc$ of the Milky Way from our analysis, so our results should be minimally affected by limitations in the adopted potential model.
+The 6-D kinematic properties for stars in our sample are calculated using position, proper motion, parallax, and radial velocity measurements from {\it Gaia} DR3 \citep{gaia_collaboration_gaia_2023}. We adopt distance estimates from \citet{zhang_parameters_2023}, the {\it Gaia} parallax, and \citet{bailer-jones_estimating_2021}, taking the first finite value from these sources in the order listed. These coordinates are transformed into the Galactocentric cylindrical frame $(R,\phi,z)_{\rm gal}$ with {\tt astropy} \citep{astropy_collaboration_astropy_2013,astropy_collaboration_astropy_2018,astropy_collaboration_astropy_2022} using updated solar position and motion parameters from \citet{hunt_multiple_2022}. In particular, we adopt the Galactic position of the Sun $(R,z)_\odot=(8275,20.8)\pc$ \citep{gravity_collaboration_improved_2021,bennett_vertical_2019} and solar velocity with respect to the Galactic center $(v_x,v_y,v_z)_\odot=(8.4,251.8,8.4)\kms$ \citep{reid_proper_2020,gravity_collaboration_improved_2021}. 
+
+Orbital parameters such as the angular momentum $L_z$, orbital energy $E$, and actions $(J_R,J_\phi,J_z)$ are calculated using the {\tt gala} package \citep{price-whelan_gala_2017} with the {\tt MilkyWayPotential2022} potential model. We note that this axisymmetric model lacks a bar or spiral perturbations. We use these orbital parameters primarily to bin the data on kpc scales, and we exclude the central $3\kpc$ of the Milky Way from our analysis, so our results should be minimally affected by limitations in the adopted potential model.
 
 Throughout this study, we locate stars using their guiding center radius $R_g$ and maximum midplane distance $z_{\rm max}$ rather than their Galactocentric coordinates. A star's guiding radius is defined as the radius of a circular orbit with equal $L_z$ to the star, which we calculate assuming an \citet{eilers_circular_2019} circular velocity curve. This minimizes the effect of orbital ``blurring,'' where a star's eccentricity causes it to pass through a range of $R_{\rm gal}$. Similarly, binning by $z_{\rm max}$ reduces the contamination of stars on inclined orbits that happen to be passing near the midplane at the present day.
 
@@ -441,22 +443,28 @@ Overall, the data suggest that the [Ce/Mg] is influenced by both the star format
 
 In this section, we investigate [Ce/Mg] trends in the Milky Way's halo. Halo stars are older and lower-metallicity than our main disk sample, so they fall outside of the optimal parameter space of the StarFlow age catalog. As a result, we do not investigate trends with age in this section. Furthermore, we do not apply the corrective $\log(g)$ abundance offsets to the halo sample because many of the stars fall outside the metallicity range of the calibration sample (see Section \ref{sec:logg-corrections}). We additionally exclude a small number of stars with abundance flags for [Al/H] or [Mn/H].
 
-We define our halo sample by the following cut in the $E-L_z$ plane:
+\subsection{Halo Selection}
+\label{sec:halo-selection}
+
+We first define an initial halo sample using the orbital ``action diamond,'' which compresses the three orbital actions into a scaled, 2-D space \citep[see][]{lane_kinematic_2022}. Following \citet{feltzing_metal-weak_2023}, we select halo stars with $|L_z/J_{\rm tot}|<0.3$, where $J_{\rm tot}\equiv|J_R|+|L_z|+|J_z|$. We impose an additional cut on present-day galactocentric radius of $R_{\rm gal}>3\kpc$ to avoid contamination from stars in the bulge or bar. We also select disk stars with $|L_z/J_{\rm tot}|>0.6$ for comparison.
+
+We further sub-divide our kinematic halo sample in abundance space.
+\citet{hawkins_using_2015} first proposed using [Mn/Mg] and [Al/Fe] to distinguish stars accreted from dwarf galaxies from stars that were born in the disk or proto-Milky Way. We split our halo sample into accreted and {\it in situ} populations using the following chemical cuts:
 \begin{equation}
-    \frac{E_{\rm halo}}{\SI{e5}{\kilo\meter\squared\per\second\squared}} > -0.7 - \exp\Big(\frac{L_z}{\SI{1.5e3}{\kilo\parsec\kilo\meter\per\second}}\Big).
-    \label{eq:halo-cut}
-\end{equation}
-This cut is {\it ad hoc} but we have found that it successfully excludes the most obvious disk stars. \todo{I would like a better kinematic halo cut, but a local velocity-based selection doesn't work as well outside the solar neighborhood.} 
-\citet{hawkins_using_2015} first proposed using [Mn/Mg] and [Al/Fe] to distinguish stars accreted from dwarf galaxies from stars that were born in the disk or proto-Milky Way. We split our halo sample into accreted and {\it in situ} populations using the following chemical cut:
-\begin{equation}
-    \bracket[Mg]{Mn}_{\rm acc.} <
-    \begin{cases}
-        -0.2, & \bracket[Fe]{Al}<-0.2; \\
-        -0.6-2\times\bracket[Fe]{Al}, & \bracket[Fe]{Al}\ge-0.2.
-    \end{cases}
+    \bracket[Mg]{Mn}_{\rm accreted} <
+    -0.65-2\times\bracket[Fe]{Al},
     \label{eq:accreted-cut}
 \end{equation}
+and
+\begin{equation}
+    -0.55-2\times\bracket[Fe]{Al} < \bracket[Mg]{Mn}_{\rm {\it in\,situ}} < -0.2
+    \label{eq:insitu-cut}
+\end{equation}
 Because we use Mg as our reference element, we note that the sign convention in Equation \ref{eq:accreted-cut} is reversed from the typical convention in the literature, $\bracket[Mn]{Mg}$. Both cuts are illustrated in the top panels of Figure \ref{fig:halo}.
+
+We finally define a sample of stars belonging to the {\it Gaia} Sausage/Enceladus (GSE) population. GSE is a disrupted dwarf galaxy whose stars can be distinguished by their orbits \citep[e.g.,][]. \todo{Finish this section.}
+
+\subsection{[Ce/Mg] Trends in the Halo}
 
 The lower left panel in Figure \ref{fig:halo} plots [Ce/Mg] as a function of [Mg/H] for the halo stars as compared to the Milky Way disk. Most of the chemically accreted stars have $\bracket{Mg}<-0.8$, while the {\it in situ} stars have $\bracket{Mg}>-1.0$, so there is some overlap between the two populations. We note that below $\bracket{Mg}\leq-1.0$, an increasing fraction of the sample is excluded due to falling below the \citet{shetrone_apache_2026} abundance upper limits, indicated by the dotted gray line. The accreted population has an average ratio of $\langle\bracket[Mg]{Ce}\rangle=-0.09$, higher than the mean of the {\it in situ} population, $\langle\bracket[Mg]{Ce}\rangle=-0.20$, and in between the mean of the low- and high-Ia disks, as shown in the lower right panel. The {\it in situ} halo overlaps with the accreted halo trend at $\bracket[Mg]{Ce}\approx0$ between $-1\lesssim\bracket{Mg}\lesssim-0.8$, and at higher metallicities the {\it in situ} population bridges the space between the accreted halo and low-Ia disk.
 
