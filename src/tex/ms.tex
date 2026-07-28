@@ -77,8 +77,26 @@
 \affiliation{\ccappaffil}
 \email{}
 
+\author[0000-0003-0174-0564]{Andrew R.\ Casey}
+\affiliation{Center for Computational Astrophysics, Flatiron Institute, 162~Fifth~Ave., New~York, NY~10010,~USA}
+\affiliation{School of Physics and Astronomy, Monash University VIC 3800, Australia}
+\email{}
+
+\author[0000-0001-6476-0576]{Katia Cunha}
+\affiliation{Steward Observatory, University of Arizona, 933 North Cherry Avenue, Tucson, AZ 85721-0065, USA}
+\affiliation{Observat\'orio Nacional/MCTIC, R. Gen. Jos\'e Cristino, 77, 20921-400, Rio de Janeiro, Brazil}
+\email{}
+
 \author[0000-0002-0900-9760]{Jos\'e G.\ Fern\'andez-Trincado}
 \affiliation{Centro de investigaci\'on en Astronom\'ia, Facultad de Ingenier\'ia, Ciencia y Tecnolog\'ia, Universidad Bernardo O’Higgins, Av.\ Viel 1497, Santiago, 8370993, Chile}
+\email{}
+
+\author[0000-0003-1856-2151]{Danny Horta}
+\affiliation{Institute for Astronomy, University of Edinburgh, Royal Observatory, Blackford Hill, Edinburgh EH9 3HJ, UK}
+\email{}
+
+\author[0000-0002-6972-6411]{J.\ Eduardo M\'endez-Delgado}
+\affiliation{Universidad Nacional Aut\'onoma de M\'exico, Instituto de Astronom\'ia, A.P. 70-264, 04510 Ciudad de M\'exico, M\'exico}
 \email{}
 
 \author[0000-0002-1379-4204]{Alexandre Roman Lopes}
@@ -136,7 +154,7 @@ In detail, $s$-process nucleosynthesis is a complex process that depends on the 
 
 Galactic chemical evolution (GCE) models currently do not capture the full picture of $s$-process evolution. GCE models of the Milky Way that adopt standard AGB yields predict qualitatively different evolution than is observed. While most surveys find that $s$-process abundances are highest in young stars, GCE models predict that $[s/\alpha]$ should plateau or even decrease over time in the thin disk \citep[e.g.,][]{grisoni_modelling_2020,ratcliffe_chemical_2024,molero_modelling_2025}. Modifications to the AGB yields may improve the agreement with the data for some, but not all, elements \citep{ratcliffe_chemical_2024,molero_constraining_2025}. Therefore, theoretical models do not currently support the $[s/\alpha]$ chemical clock.
 
-In this paper, we aim to obtain a comprehensive view of the [Ce/Mg] abundance patterns in the Milky Way. We quantify the age--[Ce/Mg] and [Mg/H]--[Ce/Mg] relations as a function of metallicity, $\alpha$-enhancement, and Galactic position using data from the Milky Way Mapper (MWM; \todo{J.A. Johnson, in preparation}), a program of the Sloan Digital Sky Survey \citep[SDSS-V;][]{kollmeier_sdss-v_2017,kollmeier_sloan_2026}. We select Ce as our representative $s$-process element because of its availability in MWM's infrared spectra and previous studies in the literature. In Section \ref{sec:data}, we describe our observational dataset. In Section \ref{sec:results}, we present the chemical abundance trends in our Milky Way disk sample, and in Section \ref{sec:halo}, we present abundance trends in the halo. We discuss our results in Section \ref{sec:discussion} and summarize our conclusions in Section \ref{sec:conclusions}.
+In this paper, we aim to obtain a comprehensive view of the [Ce/Mg] abundance patterns in the Milky Way. We quantify the age--[Ce/Mg] and [Mg/H]--[Ce/Mg] relations as a function of metallicity, $\alpha$-enhancement, and Galactic position using data from the Milky Way Mapper (MWM; \todo{J.A. Johnson, in preparation}), a program of the Sloan Digital Sky Survey \citep[SDSS-V;][]{kollmeier_sdss-v_2017,kollmeier_sloan_2026}. We select Ce as our representative $s$-process element because of its availability in the near-infrared APOGEE spectra and previous studies in the literature. In Section \ref{sec:data}, we describe our observational dataset. In Section \ref{sec:results}, we present the chemical abundance trends in our Milky Way disk sample, and in Section \ref{sec:halo}, we present abundance trends in the halo. We discuss our results in Section \ref{sec:discussion} and summarize our conclusions in Section \ref{sec:conclusions}.
 
 % Paper goals
 % \begin{itemize}
@@ -174,7 +192,7 @@ We use MWM data from Data Release 19 \citep[DR19;][]{sdss_collaboration_nineteen
 The catalog includes all data from the previous Apache Point Observatory Galactic Evolution Experiment (APOGEE) DR17 \citep{abdurrouf_seventeenth_2022}. MWM DR19 data were obtained from the infrared APOGEE spectrographs \citep{wilson_apache_2019} mounted on the 2.5-meter Sloan Foundation Telescope \citep{gunn_25_2006} at Apache Point Observatory and the Ir{\'e}n{\'e}e du Pont Telescope \citep{bowen_optical_1973} at Las Campanas Observatory. 
 
 Atmospheric parameters and chemical abundances were determined with the APOGEE Stellar Parameter and Chemical Abundance Pipeline \citep[ASPCAP;][]{garcia_perez_aspcap_2016}, which compares a grid of synthetic spectra \citep{hubeny_tlusty_2021} to the observed spectra using $\chi^2$ minimization. The atomic and molecular line lists are presented in \citet{hasselquist_identification_2016}, \citet{cunha_adding_2017}, and \citet{smith_apogee_2021}. 
-Cerium abundances specifically are derived using Ce II lines present in the APOGEE spectral windows. \citet{cunha_adding_2017} identified eight such lines, but only three are used by ASPCAP for abundance determination in DR19: \num{15784.75}, \num{16376.48}, and $\SI{16595.18}{\angstrom}$. All DR19 abundances assume local thermodynamic equilibrium (LTE). The spectral synthesis is further described by \citet{holtzman_apogee_2018} and \citet{jonsson_apogee_2020}. \citet{meszaros_sdss-v_2025} describe the precision, accuracy, and systematics of the DR19 stellar parameters and abundances in detail.
+Cerium abundances specifically are derived using Ce II lines present in the APOGEE spectral windows. \citet{cunha_adding_2017} identified eight such lines, but only three are used by ASPCAP for abundance determination in DR19: $\lambda\num{15784.75}$, $\lambda\num{16376.48}$, and $\lambda\SI{16595.18}{\angstrom}$. All DR19 abundances assume local thermodynamic equilibrium (LTE). The spectral synthesis is further described by \citet{holtzman_apogee_2018} and \citet{jonsson_apogee_2020}. \citet{meszaros_sdss-v_2025} describe the precision, accuracy, and systematics of the DR19 stellar parameters and abundances in detail.
 
 % We select red giant branch (RGB; $1.0<\log(g)<3.5$) stars with $S/N>100$. We limit our sample to the ``optimal region'' for Ce abundances, $T_{\rm eff}>4000$ K and $\bracket{M}>-1.5$, defined by \citet{meszaros_sdss-v_2025}. We further remove stars with the BAD flag, any APOGEE spectrum flags, and abundance flags for Mg, Fe, and Ce, as well as stars observed in SDSS-IV outside the main sample (EXTRATARG flag). This produces a primary sample of \todo{121,322} stars. The right-hand panel of Figure \ref{fig:kiel-diagram} plots a Kiel diagram ($T_{\rm eff}$ vs $\log(g)$) of this sample, color-coded by [Ce/H]. A summary of our sample selection criteria is presented in Table \ref{tab:sample}.
 
@@ -185,11 +203,11 @@ We limit our study to red giant branch (RGB) stars because the Ce abundances in 
     \item $\bracket{M}>-1.5$ \citep[recommended by][]{meszaros_sdss-v_2025};
     \item $S/N>100$;
     \item No bad flag or spectrum flags;
-    \item No Mg, Fe, or Ce abundance flags (avoiding stars close to grid edges);
+    \item No Mg, Fe, or Ce abundance flags (avoiding stars close to theoretical measurement limit or grid edges);
     \item $\sigma_{\bracket{X}}<0.2\dex$ for Mg, Fe, and Ce;
-    \item No SDSS-IV EXTRATARG flag (limit to the APOGEE Main Red Star Sample).
+    \item No SDSS-IV EXTRATARG flag (limit DR17 targets to the APOGEE Main Red Star Sample).
 \end{itemize}
-This produces a primary sample of \todo{121,322} stars.\footnote{Out of the full sample of $\sim\num{900000}$ stars in DR19 \citep{meszaros_sdss-v_2025}, the largest reductions in sample size are due to the quality and targeting cuts ($\sim60\%$), RGB selection ($\sim58\%$), and $S/N$ requirement ($\sim26\%$), with smaller reductions due to the abundance quality cuts.} All of our stars have a radial velocity scatter $\sigma(v_{\rm rad})<1\kms$ and 84\% have $\sigma(v_{\rm rad})<0.1\kms$, indicating minimal contamination from variable stars or binaries.
+This produces a primary sample of \todo{121,322} stars.\footnote{Out of the $\sim\num{900000}$ total stars in DR19, the largest reductions in sample size are due to the quality and targeting cuts ($\sim60\%$), RGB selection ($\sim58\%$), and $S/N$ requirement ($\sim26\%$), with smaller reductions due to the abundance quality cuts.} All of our stars have a radial velocity scatter $\sigma(v_{\rm rad})<1\kms$ and 84\% have $\sigma(v_{\rm rad})<0.1\kms$, indicating minimal contamination from variable stars or binaries.
 
 The right-hand panel of Figure \ref{fig:kiel-diagram} plots a Kiel diagram ($T_{\rm eff}$ vs $\log(g)$) of this sample, color-coded by [Ce/H]. The abundances shown have not been corrected for trends with $\log(g)$ (see Section \ref{sec:logg-corrections}), but the corrected abundance patterns are similar. We have run our analysis on more limited samples, including a stricter $S/N$ requirement and narrower $\log(g)$ range, and found no significant difference in our results.
 
@@ -434,13 +452,6 @@ Overall, the data suggest that the [Ce/Mg] is influenced by both the star format
 \section{Halo Abundance Patterns}
 \label{sec:halo}
 
-\begin{figure*}
-    \centering
-    \includegraphics[width=0.8\linewidth]{figures/halo.pdf}
-    \caption{{\it Top left:} Kinematic selection for MW halo stars (Equation \ref{eq:halo-cut}). The 2-D histogram plots the density of stars on disk-like orbits, and the colored points plot stars with halo-like orbits. {\it Top right:} Chemical selection for accreted stars (Equation \ref{eq:accreted-cut}). The gray points fall outside of the chemical cuts or too close to the boundaries and are excluded from analysis. {\it Bottom left:} Abundance ratios (non-$\log(g)$-corrected) for {\it in situ} (orange diamonds) and accreted (turquoise circles) halo stars. The blue and pink contours indicate the density of high-Ia and low-Ia disk stars, respectively. The solid colored curves plot a rolling median for each of the four populations. The thin black curves plot the rolling median trends for three Milky Way satellites from \citet{hasselquist_apogee_2021} with updated DR19 zero-point offsets. The black dotted lines indicate the boundary where abundances are flagged for being too close to a grid edge, and the gray dotted line indicates the approximate region where the \citet{shetrone_apache_2026} upper limits dominate the sample. {\it Bottom right:} Normalized distributions of [Ce/Mg] for the four populations.}
-    \label{fig:halo}
-\end{figure*}
-
 In this section, we investigate [Ce/Mg] trends in the Milky Way's halo. Halo stars are older and lower-metallicity than our main disk sample, so they fall outside of the optimal parameter space of the StarFlow age catalog. As a result, we do not investigate trends with age in this section. Furthermore, we do not apply the corrective $\log(g)$ abundance offsets to the halo sample because many of the stars fall outside the metallicity range of the calibration sample (see Section \ref{sec:logg-corrections}). We additionally exclude a small number of stars with abundance flags for [Al/H] or [Mn/H].
 
 \subsection{Halo Selection}
@@ -462,7 +473,35 @@ and
 \end{equation}
 Because we use Mg as our reference element, we note that the sign convention in Equation \ref{eq:accreted-cut} is reversed from the typical convention in the literature, $\bracket[Mn]{Mg}$. Both cuts are illustrated in the top panels of Figure \ref{fig:halo}.
 
-We finally define a sample of stars belonging to the {\it Gaia} Sausage/Enceladus (GSE) population. GSE is a disrupted dwarf galaxy whose stars can be distinguished by their orbits \citep[e.g.,][]. \todo{Finish this section.}
+We finally define a sample of stars belonging to the {\it Gaia} Sausage/Enceladus (GSE) population. GSE is a disrupted dwarf galaxy whose stars can be distinguished by their orbits \citep[e.g.,][]{belokurov_co-formation_2018,helmi_merger_2018}. We define the GSE sub-sample using the criteria of \citet{feuillet_gse_2020}:
+$30\leq\sqrt{J_R}\leq\SI{50}{\kilo\parsec^{1/2}\kilo\meter^{1/2}\second^{-1/2}}$ and $-500\leq L_z\leq\SI{500}{\kilo\parsec\kilo\meter\per\second}$. Stars in GSE are removed from the accreted halo sub-sample so that the two populations can be examined independently. Table \ref{tab:halo-selection} summarizes the selection criteria for each of our halo sub-samples. The top two panels of Figure \ref{fig:halo} compare the halo-subsamples against the disk in orbital and chemical space.
+
+\begin{deluxetable*}{lClll}
+    \tablecaption{Selection criteria for the halo sub-samples plotted in Figure \ref{fig:halo}.\label{tab:halo-selection}}
+    \tablehead{
+        \colhead{Sub-sample} & \colhead{Selection Criteria} & \colhead{$N$} & \colhead{Source} & \colhead{Notes}
+    }
+    \startdata
+    GSE & 30\leq\sqrt{J_R}\leq\SI{50}{\kilo\parsec^{1/2}\kilo\meter^{1/2}\second^{-1/2}}  & - & \citet{feuillet_gse_2020} & \\
+    & -500\leq L_z\leq\SI{500}{\kilo\parsec\kilo\meter\per\second} & & & \\
+    \hline
+    Accreted halo & |L_z/J_{\rm tot}|\leq0.3  & - & \citet{feltzing_metal-weak_2023} & Excluding GSE stars \\
+    & \bracket[Mg]{Mn} \leq -0.65-2\times\bracket[Fe]{Al} & - & \citet{hawkins_using_2015} & \\
+    & R_{\rm gal} > 3\kpc & & & \\
+    \hline
+    {\it In situ} halo & |L_z/J_{\rm tot}|\leq0.3  & - & \citet{feltzing_metal-weak_2023} & \\
+    & -0.55-2\times\bracket[Fe]{Al} \leq \bracket[Mg]{Mn} \leq -0.2 & - & \citet{hawkins_using_2015} & \\
+    & R_{\rm gal} > 3\kpc & & & \\
+    Disk & L_z/J_{\rm tot}\geq0.6 & - & \citet{feltzing_metal-weak_2023} & \\
+    \enddata
+\end{deluxetable*}
+
+\begin{figure*}
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/halo.pdf}
+    \caption{{\it Top left:} Our halo sub-samples plotted in the orbital $E-L_z$ plane (see selection criteria in Table \ref{tab:halo-selection}). The 2-D histogram plots the density of stars on disk-like orbits, and the colored points plot stars with halo-like orbits. The gray points do not fall within either the halo or disk selections and are not plotted in other panels. {\it Top right:} Chemical selection for accreted stars (Equation \ref{eq:accreted-cut}). The gray points fall outside of the chemical cuts or too close to the boundaries and are excluded from analysis. {\it Bottom left:} Abundance ratios (non-$\log(g)$-corrected) for {\it in situ} halo stars (orange diamonds), accreted halo stars (turquoise circles), and GSE stars (cyan squares). The blue and pink contours indicate the density of high-Ia and low-Ia disk stars, respectively. The solid colored curves plot a rolling median for each of the five sub-samples. The thin black curves plot the rolling median trends for three Milky Way satellites from \citet{hasselquist_apogee_2021} with updated DR19 zero-point offsets. The black dotted lines indicate the boundary where abundances are flagged for being too close to a grid edge, and the gray dotted line indicates the approximate region where the \citet{shetrone_apache_2026} upper limits dominate the sample. {\it Bottom right:} Normalized distributions of [Ce/Mg] for the five sub-samples.}
+    \label{fig:halo}
+\end{figure*}
 
 \subsection{[Ce/Mg] Trends in the Halo}
 
@@ -537,6 +576,8 @@ L.D.\ thanks Dr.\ Giulia Cinquegrana, Dr.\ Madeleine McKenzie, Dr.\ Lucy Lu, Pro
 \todo{Funding acknowledgements.}
 
 J.G.F-T gratefully acknowledges the support provided by ANID Fondecyt Regular No. 1260371.
+
+J.E.M.-D. gratefully acknowledges support from the Secretaria de Ciencia, Humanidades, Tecnologia e Innovacion (SECIHTI) project CBF-2025-I-2048, ``Resolviendo la Fisica Interna de las Galaxias: De las Escalas Locales a la Estructura Global con el SDSS-V Local Volume Mapper'', and from the UNAM/DGAPA/PAPIIT project IA103326, ``DESIRED (DEep Spectra of ionised Regions Database): de las emisiones mas sutiles a la fisica fundamental del universo.''
 
 Funding for the Sloan Digital Sky Survey V has been provided by the Alfred P. Sloan Foundation, the Heising-Simons Foundation, the National Science Foundation, and the Participating Institutions. SDSS acknowledges support and resources from the Center for High-Performance Computing at the University of Utah. SDSS telescopes are located at Apache Point Observatory, funded by the Astrophysical Research Consortium and operated by New Mexico State University, and at Las Campanas Observatory, operated by the Carnegie Institution for Science. The SDSS web site is \url{www.sdss.org}.
 
