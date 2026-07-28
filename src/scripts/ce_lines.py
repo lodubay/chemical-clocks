@@ -215,9 +215,9 @@ def plot_spectrum_comparison(
         gridsize=100,
         cmap='binary_r', 
         norm=norm,
-        linewidths=0.01,
-        # reduce_C_function=logsum,
-        mincnt=1
+        linewidths=0.1,
+        mincnt=1,
+        rasterized=True
     )
     hb0 = kiel_ax.hexbin(
         mwm_sample['teff'], mwm_sample['logg'], 
