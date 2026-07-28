@@ -7,9 +7,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-from matplotlib.ticker import MultipleLocator
+from matplotlib.ticker import MultipleLocator, ScalarFormatter
 from matplotlib.lines import Line2D
-from matplotlib.colors import Normalize
+from matplotlib.colors import Normalize, LogNorm
 from astropy.table import Table
 from sdss_access import Access
 access = Access(release='dr19')
@@ -210,9 +210,9 @@ def plot_spectrum_comparison(
     # Plot Kiel diagram
     gs2 = GridSpec(2, 1, left=0.79, right=0.98, top=1., hspace=0.3)
     kiel_ax = fig.add_subplot(gs2[0])
-    norm = Normalize(vmin=1, vmax=600)
+    norm = LogNorm(vmin=1, vmax=200)
     hexbin_kwargs = dict(
-        gridsize=50,
+        gridsize=100,
         cmap='binary_r', 
         norm=norm,
         linewidths=0.01,
@@ -247,7 +247,7 @@ def plot_spectrum_comparison(
     # Plot abundance diagram
     cefe_ax = fig.add_subplot(gs2[1])
     xlim = (-1.5, 0.5)
-    ylim = (-1.2, 1.2)
+    ylim = (-1., 1.)
     hb1 = cefe_ax.hexbin(
         mwm_sample['fe_h'], mwm_sample['ce_fe'], 
         extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
@@ -271,7 +271,8 @@ def plot_spectrum_comparison(
     cefe_ax.yaxis.set_minor_locator(MultipleLocator(0.1))
     cefe_ax.set_xlabel('[Fe/H]')
     cefe_ax.set_ylabel('[Ce/Fe]', labelpad=-4)
-    plt.colorbar(hb1, ax=[kiel_ax, cefe_ax], label='Number of stars', pad=0.02, location='top', extend='max')
+    cbar = plt.colorbar(hb1, ax=[kiel_ax, cefe_ax], label='Number of stars', pad=0.02, location='top')#, extend='max')
+    cbar.ax.xaxis.set_major_formatter(ScalarFormatter())
 
     if verbose:
         print(mwm_sample.loc[sdss_id_list][['obj', 'snr', 'logg', 'm_h_atm', 'alpha_m_atm', 'fe_h', 'ce_fe']])
