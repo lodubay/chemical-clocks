@@ -30,7 +30,7 @@ def main(style='paper'):
         bins=age_bins, 
         color='k', 
         histtype='step', 
-        label='Full sample'
+        label='Full sample\n$N=%s$' % sample.shape[0]
     )
     axs[0].hist(
         sample_ages['age'], 
@@ -38,13 +38,28 @@ def main(style='paper'):
         color=good_age_color, 
         histtype='bar', 
         rwidth=rwidth,
-        label='Good ages'
+        label='Good ages\n$N=%s$' % sample_ages.shape[0]
     )
     axs[0].set_xlabel('Age [Gyr]')
     axs[0].set_xlim((min(age_bins), max(age_bins)))
     axs[0].xaxis.set_major_locator(MultipleLocator(5))
     axs[0].xaxis.set_minor_locator(MultipleLocator(1))
     colored_text_legend(axs[0], loc='upper right')
+    # Indicate sample sizes
+    # axs[0].text(
+    #     0.95, 0.9,
+    #     r'$N=%s$' % sample.shape[0],
+    #     color='k',
+    #     ha='right', va='top', 
+    #     transform=axs[0].transAxes,
+    # )
+    # axs[0].text(
+    #     0.95, 0.8,
+    #     r'$N=%s$' % sample_ages.shape[0],
+    #     color=good_age_color,
+    #     ha='right', va='top', 
+    #     transform=axs[0].transAxes,
+    # )
     # Second panel: [Fe/H] distributions
     feh_bins = np.arange(-1.5, 0.55, 0.05)
     axs[1].hist(
