@@ -10,7 +10,7 @@ from matplotlib.colors import Normalize, LogNorm, BoundaryNorm
 from matplotlib.ticker import MultipleLocator
 
 from utils import import_sample
-from plotting import ONE_COLUMN_WIDTH, ABUNDANCE_COLORMAP, AGE_COLORMAP
+from plotting import TWO_COLUMN_WIDTH, ABUNDANCE_COLORMAP, AGE_COLORMAP
 import paths
 
 def main(style='paper'):
@@ -22,76 +22,81 @@ def main(style='paper'):
     }[style]
     savedir.mkdir(exist_ok=True)
     fig, axs = plt.subplots(
-        2, 
-        figsize=(ONE_COLUMN_WIDTH, 1.5*ONE_COLUMN_WIDTH), 
-        sharey=True,
-        gridspec_kw={'hspace': 0.25, 'top': 0.95}
+        2, 3,
+        figsize=(TWO_COLUMN_WIDTH, 0.67*TWO_COLUMN_WIDTH), 
+        sharey=True, sharex='row',
+        gridspec_kw={'hspace': 0.25, 'wspace': 0.1, 'top': 0.9, 'left': 0.08, 'right': 0.98}
     )
+    axes_titles = ['Full sample', 'High-Ia', 'Low-Ia']
+    subsamples = [mwm_sample, mwm_sample[mwm_sample['low_alpha']], mwm_sample[mwm_sample['high_alpha']]]
 
     # First panel: [Ce/Mg] vs [Mg/H], color-coded by median age
     cmap = plt.get_cmap(AGE_COLORMAP)
     norm = BoundaryNorm(np.arange(0, 11, 1), cmap.N, extend='max')
     xlim = (-0.7, 0.5)
     ylim = (-0.9, 0.9)
-    axs[0].scatter(
-        mwm_sample['mg_h'], mwm_sample['ce_mg_corr'], 
-        c=mwm_sample['age'], cmap=cmap, norm=norm,
-        s=1, rasterized=True, edgecolors='none', marker='o', zorder=0
-    )
-    pc, contours = hexbin_contours(
-        axs[0], mwm_sample['mg_h'], mwm_sample['ce_mg_corr'], mwm_sample['age'],
-        gridsize=30, extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
-        cmap=cmap, norm=norm, mincnt=10, contours=4,
-    )
-    fig.colorbar(pc, ax=axs[0], label='Age [Gyr]')
-    # Indicate median abundance errors
-    axs[0].errorbar(
-        0.3, 0.7, 
-        xerr=mwm_sample['e_mg_h'].median(), 
-        yerr=mwm_sample['e_ce_mg'].median(), 
-        c='k', capsize=0, elinewidth=1,
-    )
-    axs[0].set_xlabel('[Mg/H]')
-    axs[0].set_ylabel('[Ce/Mg]')
-    axs[0].set_xlim(xlim)
-    axs[0].set_ylim(ylim)
-    axs[0].xaxis.set_major_locator(MultipleLocator(0.5))
-    axs[0].xaxis.set_minor_locator(MultipleLocator(0.1))
-    axs[0].yaxis.set_major_locator(MultipleLocator(0.5))
-    axs[0].yaxis.set_minor_locator(MultipleLocator(0.1))
+    for i, df in enumerate(subsamples):
+        axs[0,i].scatter(
+            df['mg_h'], df['ce_mg_corr'], 
+            c=df['age'], cmap=cmap, norm=norm,
+            s=1, rasterized=True, edgecolors='none', marker='o', zorder=0
+        )
+        pc, contours = hexbin_contours(
+            axs[0,i], df['mg_h'], df['ce_mg_corr'], df['age'],
+            gridsize=30, extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
+            cmap=cmap, norm=norm, mincnt=10, contours=4,
+        )
+        # Indicate median abundance errors
+        axs[0,i].errorbar(
+            0.3, 0.7, 
+            xerr=df['e_mg_h'].median(), 
+            yerr=df['e_ce_mg'].median(), 
+            c='k', capsize=0, elinewidth=1,
+        )
+        axs[0,i].set_xlabel('[Mg/H]')
+        axs[0,i].set_title(axes_titles[i])
+    axs[0,0].set_ylabel('[Ce/Mg]')
+    axs[0,0].set_xlim(xlim)
+    axs[0,0].set_ylim(ylim)
+    axs[0,0].xaxis.set_major_locator(MultipleLocator(0.5))
+    axs[0,0].xaxis.set_minor_locator(MultipleLocator(0.1))
+    axs[0,0].yaxis.set_major_locator(MultipleLocator(0.5))
+    axs[0,0].yaxis.set_minor_locator(MultipleLocator(0.1))
+    fig.colorbar(pc, ax=axs[0,:], label='Age [Gyr]', pad=0.02)
 
     # Second panel: [Ce/Mg] vs age, color-coded by [Fe/H]
     cmap = plt.get_cmap(ABUNDANCE_COLORMAP)
     norm = BoundaryNorm(np.arange(-0.6, 0.41, 0.1), cmap.N, extend='both')
     xlim = (0, 12)
-    axs[1].scatter(
-        mwm_sample['age'], mwm_sample['ce_mg_corr'], 
-        c=mwm_sample['fe_h_corr'], cmap=cmap, norm=norm,
-        s=1, rasterized=True, edgecolors='none', marker='o', zorder=0
-    )
-    pc, contours = hexbin_contours(
-        axs[1], mwm_sample['age'], mwm_sample['ce_mg_corr'], mwm_sample['fe_h_corr'],
-        gridsize=30, extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
-        cmap=cmap, norm=norm, mincnt=10, contours=4,
-    )
-    fig.colorbar(pc, ax=axs[1], label='[Fe/H]')
-    # Indicate median abundance errors
-    age_err_low = np.median(mwm_sample['age'] - mwm_sample['e_n_age'])
-    age_err_high = np.median(mwm_sample['e_p_age'] - mwm_sample['age'])
-    med_abund_err = mwm_sample['e_ce_h'].median()
-    axs[1].errorbar(
-        10, 0.7, 
-        xerr=[[age_err_low], [age_err_high]], 
-        yerr=med_abund_err, 
-        c='k', capsize=0, elinewidth=1,
-    )
-    axs[1].set_xlabel('Age [Gyr]')
-    axs[1].set_ylabel('[Ce/Mg]')
-    axs[1].set_xlim(xlim)
-    axs[1].xaxis.set_major_locator(MultipleLocator(5))
-    axs[1].xaxis.set_minor_locator(MultipleLocator(1))
-    axs[1].yaxis.set_major_locator(MultipleLocator(0.5))
-    axs[1].yaxis.set_minor_locator(MultipleLocator(0.1))
+    for i, df in enumerate(subsamples):
+        axs[1,i].scatter(
+            df['age'], df['ce_mg_corr'], 
+            c=df['fe_h_corr'], cmap=cmap, norm=norm,
+            s=1, rasterized=True, edgecolors='none', marker='o', zorder=0
+        )
+        pc, contours = hexbin_contours(
+            axs[1,i], df['age'], df['ce_mg_corr'], df['fe_h_corr'],
+            gridsize=30, extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
+            cmap=cmap, norm=norm, mincnt=10, contours=4,
+        )
+        # Indicate median abundance errors
+        age_err_low = np.median(df['age'] - df['e_n_age'])
+        age_err_high = np.median(df['e_p_age'] - df['age'])
+        med_abund_err = df['e_ce_h'].median()
+        axs[1,i].errorbar(
+            9, 0.7, 
+            xerr=[[age_err_low], [age_err_high]], 
+            yerr=med_abund_err, 
+            c='k', capsize=0, elinewidth=1,
+        )
+        axs[1,i].set_xlabel('Age [Gyr]')
+    axs[1,0].set_ylabel('[Ce/Mg]')
+    axs[1,0].set_xlim(xlim)
+    axs[1,0].xaxis.set_major_locator(MultipleLocator(5))
+    axs[1,0].xaxis.set_minor_locator(MultipleLocator(1))
+    axs[1,0].yaxis.set_major_locator(MultipleLocator(0.5))
+    axs[1,0].yaxis.set_minor_locator(MultipleLocator(0.1))
+    fig.colorbar(pc, ax=axs[1,:], label='[Fe/H]', pad=0.02)
 
     plt.savefig(savedir / 'cemg_mgh_age')
     plt.close()
