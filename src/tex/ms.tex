@@ -208,16 +208,16 @@ We limit our study to red giant branch (RGB) stars because the Ce abundances in 
     \item $\sigma_{\bracket{X}}<0.2\dex$ for Mg, Fe, and Ce;
     \item No SDSS-IV EXTRATARG flag (limit DR17 targets to the APOGEE Main Red Star Sample).
 \end{itemize}
-This produces a primary sample of \todo{121,322} stars.\footnote{Out of the $\sim\num{900000}$ total stars in DR19, the largest reductions in sample size are due to the quality and targeting cuts ($\sim60\%$), RGB selection ($\sim58\%$), and $S/N$ requirement ($\sim26\%$), with smaller reductions due to the abundance quality cuts.} All of our stars have a radial velocity scatter $\sigma(v_{\rm rad})<1\kms$ and 84\% have $\sigma(v_{\rm rad})<0.1\kms$, indicating minimal contamination from variable stars or binaries.
+This produces a primary sample of \todo{121,322} stars.\footnote{Out of the $\sim\num{900000}$ total stars in DR19, the largest reductions in sample size are due to the quality and targeting cuts ($\sim60\%$), RGB selection ($\sim58\%$), and $S/N$ requirement ($\sim26\%$), with smaller reductions due to the abundance quality cuts.} All of our stars have a radial velocity scatter $\sigma(v_{\rm rad})<1\kms$ and 84\% have $\sigma(v_{\rm rad})<0.1\kms$, indicating minimal contamination from variable stars or binaries. We have run our analysis on more limited samples, including a stricter $S/N$ requirement and narrower $\log(g)$ range, and found no significant difference in our results.
 
-The right-hand panel of Figure \ref{fig:kiel-diagram} plots a Kiel diagram ($T_{\rm eff}$ vs $\log(g)$) of this sample, color-coded by [Ce/H]. The abundances shown have not been corrected for trends with $\log(g)$ (see Section \ref{sec:logg-corrections}), but the corrected abundance patterns are similar. We have run our analysis on more limited samples, including a stricter $S/N$ requirement and narrower $\log(g)$ range, and found no significant difference in our results.
+% The right-hand panel of Figure \ref{fig:kiel-diagram} plots a Kiel diagram ($T_{\rm eff}$ vs $\log(g)$) of this sample, color-coded by [Ce/H]. The abundances shown have not been corrected for trends with $\log(g)$ (see Section \ref{sec:logg-corrections}), but the corrected abundance patterns are similar. 
 
-\begin{figure*}
-    \centering
-    \includegraphics[width=0.8\textwidth]{figures/kiel_diagram.pdf}
-    \caption{Kiel diagrams of our sample. {\it Left:} Comparison between our full sample (black) and the sample that exceeds the recommended age training density \citep[red;][]{stone-martinez_starflow_2025}. {\it Right:} Kiel diagram of our full sample, color-coded by [Ce/H] before corrective abundance offsets are applied.}
-    \label{fig:kiel-diagram}
-\end{figure*}
+% \begin{figure*}
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{figures/kiel_diagram.pdf}
+%     \caption{Kiel diagrams of our sample. {\it Left:} Comparison between our full sample (black) and the sample that exceeds the recommended age training density \citep[red;][]{stone-martinez_starflow_2025}. {\it Right:} Kiel diagram of our full sample, color-coded by [Ce/H] before corrective abundance offsets are applied.}
+%     \label{fig:kiel-diagram}
+% \end{figure*}
 
 \subsection{Kinematics and Orbits}
 
@@ -263,7 +263,7 @@ High-Ia stars lie above this boundary, while low-Ia stars lie below; we exclude 
 
 We use the ASPCAP [Ce/H] measurements provided in DR19, with additional offsets applied to correct for trends with stellar parameters (see Section \ref{sec:logg-corrections}). The ASPCAP parameters for giant stars in DR19 have a precision of $50-90$ K for $T_{\rm eff}$, $0.07-0.09\dex$ for $\log(g)$, and $0.02-0.04\dex$ for [M/H], [$\alpha$/M], and [Mg/H] \citep{meszaros_sdss-v_2025}. Due to its weaker lines, [Ce/H] is less precisely measured, with a median reported uncertainty  of $\sigma_{\bracket{Ce}}\approx0.047\dex$ for our sample. \citet{meszaros_sdss-v_2025} measured the scatter in [Ce/M] for open clusters, wide binaries, and the solar neighborhood, and estimated a precision of $\sim0.23\dex$ across all three methods. ASPCAP-derived abundance errors are known to be underestimated \citep[see][]{pinsonneault_apokasc-3_2025}, and the factor of $\sim5$ difference between the reported and externally-calibrated precision is comparable to other elements in DR19 \citep{meszaros_sdss-v_2025}.
 
-Figure \ref{fig:ce-lines-1} presents the spectra for 6 ``sibling'' stars with similar $\log(g)$, $T_{\rm eff}$, and [Fe/H] that span a range of [Ce/Fe]. All of the stars have $S/N\sim200$, close to the median $S/N$ of the full sample. Each of the three spectral windows used for Ce abundance determination are shown in the figure. The relative Ce enrichment is reflected in the difference between the observed flux and the global fit, which accounts for stellar parameters such as [M/H], $\log(g)$, and $T_{\rm eff}$, but not individual abundances. The [Ce/H] best-fit model is computed by re-scaling the model [M/H] to the individual element abundance, and therefore matches the data more closely near each of the the Ce II lines. The ASPCAP abundances are fit using $\chi^2$ minimization over all the lines simultaneously, so the quality of the fit varies between the individual windows for some stars. We also note that all three Ce II lines are blended with nearby lines: CO near $\SI{15784}{\angstrom}$, CN and Fe I near $\SI{16376}{\angstrom}$, and CN and Mg I near the $\SI{16595}{\angstrom}$ line \citep{cunha_adding_2017}.
+Figure \ref{fig:ce-lines-1} presents the spectra for 6 ``sibling'' stars with similar $\log(g)$, $T_{\rm eff}$, and [Fe/H] that span a range of [Ce/Fe]. All of the stars have $S/N\sim200$, close to the median $S/N$ of the full sample. Each of the three spectral windows used for Ce abundance determination are shown in the figure. The relative Ce enrichment is reflected in the difference between the observed flux and the global fit, which accounts for stellar parameters such as [M/H], $\log(g)$, and $T_{\rm eff}$, but not individual abundances. The [Ce/H] best-fit model is computed by re-scaling the model [M/H] to the individual element abundance, and therefore matches the data more closely near each of the the Ce II lines. The ASPCAP abundances are fit using $\chi^2$ minimization over all the lines simultaneously, so the quality of the fit varies between the individual windows for some stars. We also note that all three Ce II lines are blended with nearby lines: CO near $\lambda\SI{15784}{\angstrom}$, CN and Fe I near $\lambda\SI{16376}{\angstrom}$, and CN and Mg I near the $\lambda\SI{16595}{\angstrom}$ line \citep{cunha_adding_2017}.
 
 Figure \ref{fig:ce-lines-2} similarly presents the spectra for 6 selected stars spanning a range of $\log(g)$, $T_{\rm eff}$, and [Fe/H]. The top three spectra span a range of $\log(g)$ at similar [Fe/H] and [Ce/H], illustrating that the Ce II lines get fainter with increasing surface gravity but are still detectable at $\log(g)\approx3$. The bottom three spectra span a range of metallicity and $T_{\rm eff}$ at similar $\log(g)$. The lines are weak at $\bracket{Fe}\approx-1$ and strongly blended at $\bracket{Fe}\approx+0.3$, but are still fit well by the model at both extremes. Overall, Figures \ref{fig:ce-lines-1} and \ref{fig:ce-lines-2} demonstrate that the APOGEE spectra can accurately capture variation in [Ce/H] across the full parameter space in the sample, and that the ASPCAP Ce abundances for our high-quality sample are trustworthy.
 
@@ -309,21 +309,22 @@ We follow the procedure outlined in \citet{sit_chemical_2024} to remove $\log(g)
 Figure \ref{fig:logg-calibrations} shows the effect of the corrective offsets on [Ce/Mg] and [Fe/Mg]. The corrective offsets reduce variation in the Ce trends to the $\sim0.1\dex$ level, ensuring that abundances are consistent across the full range of $\log(g)$ in the sample. We see similar levels of improvement when applying the analysis in Figure \ref{fig:logg-calibrations} to specific regions of the Galaxy (e.g., inner disk, solar neighborhood, and outer disk). We have tested running our analysis on the un-corrected abundances and found minimal differences in our results. We have also compared our approach to that of \citet{meszaros_sdss-v_2025}, who correct for trends in $T_{\rm eff}$ within open clusters. While both approaches reduce abundance correlations with $T_{\rm eff}$, our method better reduces the correlations with $\log(g)$, allowing us to more accurately compare abundance trends across the Galactic disk. Throughout the remainder of this paper, we will use these corrected abundances unless otherwise noted.
 
 \subsection{Stellar Ages}
+\label{sec:ages}
 
 \subsubsection{The StarFlow Catalog}
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{}
-    \caption{Caption}
-    \label{fig:placeholder}
+    \includegraphics[width=\linewidth]{figures/sample_distributions.pdf}
+    \caption{Distributions of stellar age, [Fe/H], and guiding radius of our sample. The open black histogram plots the full sample described in Section \ref{sec:data}, and the filled red histogram includes only stars that exceed the recommended age training density \citep[Section \ref{sec:ages};][]{stone-martinez_starflow_2025}.}
+    \label{fig:sample-distributions}
 \end{figure}
 
 We use the StarFlow \citep{stone-martinez_starflow_2025} value-added catalog of stellar ages for MWM DR19. \citet{stone-martinez_starflow_2025} use a deep generative model trained on asteroseismic data to estimate ages for evolved stars. Specifically, they use stellar masses and ages from the APOKASC-3 \citep{pinsonneault_apokasc-3_2025} and APO-K2 \citep{schonhut-stasik_apo-k2_2024,warfield_apo-k2_2024} catalogs and MWM DR19 stellar parameters ($T_{\rm eff}$ and $\log(g)$) and abundances ([Fe/H], [C/Fe], and [N/Fe]). This makes StarFlow essentially a [C/N]-derived age catalog. The \citet{stone-martinez_starflow_2025} model retains information about the parameter space distribution of the training data and accounts for asymmetric uncertainties. 
 
-We adopt the recommended training space density threshold of $>3\times10^9$, resulting in estimated ages for \todo{104,710} stars. The remaining \todo{$\sim$18,000} stars have typically lower metallicity, including most stars with $\bracket{Fe}<-0.8$. Stars with $\bracket{Fe}<-1.2$ are excluded from the StarFlow catalog due to the sparse sampling of asteroseismic data at low metallicity. The left-hand panel of Figure \ref{fig:kiel-diagram} compares the Kiel diagram of this stellar age sample against our full sample.
+We adopt the recommended training space density threshold of $>3\times10^9$, resulting in estimated ages for \todo{104,710} stars. Figure \ref{fig:sample-distributions} compares the distributions of age, [Fe/H], and guiding radius for the stars with good ages against our full sample. The age quality cut eliminates \todo{$\sim$18,000} stars, including most $<1\Gyr$ old stars and nearly all stars with $\bracket{fe}<-0.8$. Stars with $\bracket{Fe}<-1.2$ are excluded from the StarFlow catalog entirely due to the sparse sampling of asteroseismic data at low metallicity. 
 
-The ``good age'' sample serves as the primary sample for this work. However, the age quality cut introduces a bias against low-metallicity stars. This effect is minor for disk stars, but it eliminates nearly all halo stars. For cases where we calibrate abundance trends as a function of metallicity (e.g., Sections \ref{sec:logg-corrections} and \ref{sec:galactic-trends}) or investigate the halo (Section \ref{sec:halo}), we instead use the full sample defined in Section \ref{sec:data}.
+The ``good age'' sample serves as the primary sample for this work. However, the age quality cut introduces a bias against low-metallicity stars, as illustrated in Figure \ref{fig:sample-distributions}. This effect is minor for disk stars, but it eliminates nearly all halo stars. For cases where we calibrate abundance trends as a function of metallicity (e.g., Sections \ref{sec:logg-corrections} and \ref{sec:galactic-trends}) or investigate the halo (Section \ref{sec:halo}), we instead use the full sample defined in Section \ref{sec:data}.
 
 \subsubsection{Age Trend Validation}
 
