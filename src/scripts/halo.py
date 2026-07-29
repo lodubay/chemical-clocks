@@ -14,7 +14,7 @@ from astropy.io import ascii
 import paths
 from plotting import TWO_COLUMN_WIDTH, colored_text_legend
 from colormaps import paultol
-from utils import import_sample, get_bin_centers, fits_to_pandas
+from utils import import_sample, get_bin_centers, fits_to_pandas, box_smooth
 from contours import plot_kde2D_contours
 
 DENSITY_COLORMAP = 'binary_r'
@@ -342,12 +342,13 @@ def main(style='paper', verbose=False):
     # labels = ['High-Ia Disk', 'Low-Ia Disk', insitu_label + ' Halo', 'Accreted Halo']
     for i, df in enumerate([high_ia, low_ia, insitu, accreted, gse]):
         hist, bin_edges = np.histogram(df['ce_mg'], cemg_bins, density=True)
+        hist_smooth = box_smooth(hist, bin_edges, 0.2)
         if i < 2:
             lw = 1
         else:
             lw = 2
         ax3.plot(
-            hist/hist.max(), get_bin_centers(bin_edges),
+            hist_smooth/hist_smooth.max(), get_bin_centers(bin_edges),
             c=colors[i], lw=lw, #label=labels[i]
         )
     ax3.set_xlabel('Density')

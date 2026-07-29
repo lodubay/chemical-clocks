@@ -224,10 +224,13 @@ def box_smooth(hist, bins, width):
         Width of the box-car smoothing function in data units
     """
     bin_width = bins[1] - bins[0]
-    box_width = int(width / bin_width)
-    box = np.ones(box_width) / box_width
-    hist_smooth = np.convolve(hist, box, mode='same')
-    return hist_smooth
+    if width > bin_width:
+        box_width = int(width / bin_width)
+        box = np.ones(box_width) / box_width
+        hist_smooth = np.convolve(hist, box, mode='same')
+        return hist_smooth
+    else:
+        raise ValueError('Smoothing width must be larger than the bin size.')
 
 
 def sample_rows(df, n, weights=None, reset=False, seed=RANDOM_SEED):
