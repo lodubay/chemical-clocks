@@ -6,6 +6,7 @@
 \usepackage{xcolor}
 \usepackage{amsmath}
 \usepackage[version=4]{mhchem}
+\usepackage{multirow}
 
 \usepackage{siunitx}
 \DeclareSIUnit\year{yr}
@@ -484,30 +485,33 @@ Because we use Mg as our reference element, we note that the sign convention in 
 We finally define a sample of stars belonging to the {\it Gaia} Sausage/Enceladus (GSE) population. GSE is a disrupted dwarf galaxy whose stars can be distinguished by their orbits \citep[e.g.,][]{belokurov_co-formation_2018,helmi_merger_2018}. We define the GSE sub-sample using the criteria of \citet{feuillet_gse_2020}:
 $30\leq\sqrt{J_R}\leq\SI{50}{\kilo\parsec^{1/2}\kilo\meter^{1/2}\second^{-1/2}}$ and $-500\leq L_z\leq\SI{500}{\kilo\parsec\kilo\meter\per\second}$. Stars in GSE are removed from the accreted halo sub-sample so that the two populations can be examined independently. Table \ref{tab:halo-selection} summarizes the selection criteria for each of our halo sub-samples. The top two panels of Figure \ref{fig:halo} compare the halo-subsamples against the disk in orbital and chemical space.
 
-\begin{deluxetable*}{lClll}
+\begin{deluxetable*}{lCcl}
     \tablecaption{Selection criteria for the halo sub-samples plotted in Figure \ref{fig:halo}.\label{tab:halo-selection}}
     \tablehead{
-        \colhead{Sub-sample} & \colhead{Selection Criteria} & \colhead{$N$} & \colhead{Source} & \colhead{Notes}
+        \colhead{Sub-sample} & \colhead{$N$} & \colhead{Selection Criteria} & \colhead{References}
     }
     \startdata
-    GSE & 30\leq\sqrt{J_R}\leq\SI{50}{\kilo\parsec^{1/2}\kilo\meter^{1/2}\second^{-1/2}}  & - & \citet{feuillet_gse_2020} & \\
-    & -500\leq L_z\leq\SI{500}{\kilo\parsec\kilo\meter\per\second} & & & \\
+    \multirow{3}{*}{GSE} & \multirow{3}{*}{192} & $30\leq\sqrt{J_R}\leq\SI{50}{\kilo\parsec^{1/2}\kilo\meter^{1/2}\second^{-1/2}}$   & \multirow{2}{*}{\citet{feuillet_gse_2020}} \\
+    & & $-500\leq L_z\leq\SI{500}{\kilo\parsec\kilo\meter\per\second}$ & \\
+    & & $\bracket[Mg]{Mn} \leq -0.65-2\times\bracket[Fe]{Al}$ & \citet{hawkins_using_2015} \\
     \hline
-    Accreted halo & |L_z/J_{\rm tot}|\leq0.3  & - & \citet{feltzing_metal-weak_2023} & Excluding GSE stars \\
-    & \bracket[Mg]{Mn} \leq -0.65-2\times\bracket[Fe]{Al} & - & \citet{hawkins_using_2015} & \\
-    & R_{\rm gal} > 3\kpc & & & \\
+    \multirow{3}{*}{Accreted halo\tablenotemark{a}}  & \multirow{3}{*}{301} & $|L_z/J_{\rm tot}|\leq0.3$ & \citet{feltzing_metal-weak_2023} \\
+    & & $\bracket[Mg]{Mn} \leq -0.65-2\times\bracket[Fe]{Al}$ & \citet{hawkins_using_2015} \\
+    & & $R_{\rm gal} > 3\kpc$ & \\
     \hline
-    {\it In situ} halo & |L_z/J_{\rm tot}|\leq0.3  & - & \citet{feltzing_metal-weak_2023} & \\
-    & -0.55-2\times\bracket[Fe]{Al} \leq \bracket[Mg]{Mn} \leq -0.2 & - & \citet{hawkins_using_2015} & \\
-    & R_{\rm gal} > 3\kpc & & & \\
-    Disk & L_z/J_{\rm tot}\geq0.6 & - & \citet{feltzing_metal-weak_2023} & \\
+    \multirow{3}{*}{{\it In situ} halo}  & \multirow{3}{*}{573} & $|L_z/J_{\rm tot}|\leq0.3$ & \citet{feltzing_metal-weak_2023} \\
+    & & $-0.55-2\times\bracket[Fe]{Al} \leq \bracket[Mg]{Mn} \leq -0.2$ & \citet{hawkins_using_2015} \\
+    & & $R_{\rm gal} > 3\kpc$ & \\
+    \hline
+    Disk & 116759 & $L_z/J_{\rm tot}\geq0.6$  & \citet{feltzing_metal-weak_2023} \\
     \enddata
+    \tablenotetext{a}{Excluding GSE stars.}
 \end{deluxetable*}
 
 \begin{figure*}
     \centering
     \includegraphics[width=0.8\linewidth]{figures/halo.pdf}
-    \caption{{\it Top left:} Our halo sub-samples plotted in the orbital $E-L_z$ plane (see selection criteria in Table \ref{tab:halo-selection}). The 2-D histogram plots the density of stars on disk-like orbits, and the colored points plot stars with halo-like orbits. The gray points do not fall within either the halo or disk selections and are not plotted in other panels. {\it Top right:} Chemical selection for accreted stars (Equation \ref{eq:accreted-cut}). The gray points fall outside of the chemical cuts or too close to the boundaries and are excluded from analysis. {\it Bottom left:} Abundance ratios (non-$\log(g)$-corrected) for {\it in situ} halo stars (orange diamonds), accreted halo stars (turquoise circles), and GSE stars (cyan squares). The blue and pink contours indicate the density of high-Ia and low-Ia disk stars, respectively. The solid colored curves plot a rolling median for each of the five sub-samples. The thin black curves plot the rolling median trends for three Milky Way satellites from \citet{hasselquist_apogee_2021} with updated DR19 zero-point offsets. The black dotted lines indicate the boundary where abundances are flagged for being too close to a grid edge, and the gray dotted line indicates the approximate region where the \citet{shetrone_apache_2026} upper limits dominate the sample. {\it Bottom right:} Normalized distributions of [Ce/Mg] for the five sub-samples.}
+    \caption{{\it Top left:} Our halo sub-samples plotted in the orbital $E-L_z$ plane (see selection criteria in Table \ref{tab:halo-selection}). The 2-D histogram plots the density of stars on disk-like orbits, and the colored points plot stars with halo-like orbits. The gray points do not fall within either the halo or disk selections and are not plotted in other panels. {\it Top right:} Chemical selection for accreted stars (Equation \ref{eq:accreted-cut}). The gray points fall outside of the chemical cuts or too close to the boundaries and are excluded from analysis. {\it Bottom left:} Abundance ratios (non-$\log(g)$-corrected) for {\it in situ} halo stars (orange diamonds), accreted halo stars (turquoise circles), and GSE stars (cyan squares). The blue and pink contours indicate the density of high-Ia and low-Ia disk stars, respectively. The solid colored curves plot a rolling median for each of the five sub-samples. The thin black curves plot the rolling median trends for three Milky Way satellites from \citet{hasselquist_apogee_2021} with updated DR19 zero-point offsets. The black dotted lines indicate the boundary where abundances are flagged for being too close to a grid edge, and the gray dotted line indicates the approximate region where the \citet{shetrone_apache_2026} upper limits dominate the sample. {\it Bottom right:} Normalized distributions of [Ce/Mg] for the five sub-samples. Distributions are boxcar-smoothed by 0.2 dex for clarity.}
     \label{fig:halo}
 \end{figure*}
 
