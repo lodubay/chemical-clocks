@@ -133,18 +133,9 @@ def main(style='paper', verbose=False):
             df['Lz']/1e3, df['E']/1e5, 
             c=colors[i], marker=markers[i], **scatter_kwargs
         )
-    ax0.text(
-        -2.5, -0.4, 'Halo', 
-        fontsize=plt.rcParams['axes.titlesize']
-    )
-    ax0.text(
-        2.5, -1.5, 'Disk', 
-        fontsize=plt.rcParams['axes.titlesize']
-    )
-    ax0.text(
-        -3, -2.2, 'Bulge',
-        fontsize=plt.rcParams['axes.titlesize']
-    )
+    ax0.text(-2., -0.5, 'Halo')
+    ax0.text(2.5, -1.5, 'Disk')
+    ax0.text(-2.5, -2.2, 'Bulge')
 
     # Chemical cut in Al/Fe - Mn/Mg plane
     ax1.set_xlabel('[Al/Fe]')
@@ -178,27 +169,22 @@ def main(style='paper', verbose=False):
     ax1.plot(alfe_arr, halo_chem_cut(alfe_arr), '-', color='k')
     ax1.plot(alfe_arr, insitu_chem_cut(alfe_arr), '-', color='k')
     ax1.text(
-        0.25, -1.1, 
+        0.6, -1.1, 
         'Low-Ia/\n%s' % insitu_label, 
         color='k',
-        fontsize=plt.rcParams['axes.titlesize'], 
-        # style='italic',
-        bbox={'color': 'w', 'pad': 1, 'alpha': 0.8}
+        ha='right',
     )
     ax1.text(
         -0.6, -1.1, 
         'Accreted', 
-        fontsize=plt.rcParams['axes.titlesize'], 
         color='k',
-        bbox={'color': 'w', 'pad': 1, 'alpha': 0.8}
     )
     ax1.text(
-        0.6, 0.35,
+        0.6, 0.55,
         'High-Ia\nDisk',
         color='k',
-        fontsize=plt.rcParams['axes.titlesize'], 
         ha='right',
-        bbox={'color': 'w', 'pad': 1, 'alpha': 0.8}
+        va='top',
     )
 
     # Set up second row
