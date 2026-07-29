@@ -47,9 +47,10 @@ def main(style='paper'):
     )
     fig.colorbar(pcm0, ax=axs[0], shrink=0.9, label='Number of stars')
     # Rolling median
+    window = 3000
     mwm_sorted_ages = mwm_ages.sort_values('age')[['age', 'ce_mg']]
     mwm_rolling_medians = mwm_sorted_ages.rolling(
-        3000, min_periods=1000, step=1000, on='age', center=True
+        window, min_periods=1000, step=1000, on='age', center=True
     ).median()
     axs[0].plot(
         mwm_rolling_medians['age'], mwm_rolling_medians['ce_mg'], 
@@ -61,19 +62,8 @@ def main(style='paper'):
         'k-', 
         label='Rolling median'
     )
-    # Plot median trend
-    # age_bin_edges = np.arange(-0.5, 12.6, 1)
-    # mwm_medians = binned_quantiles(
-    #     mwm_ages, 'ce_mg', 'age',
-    #     q=0.5, bin_edges=age_bin_edges, min_count=10
-    # )
-    # axs[0].plot(*mwm_medians, '-', color='w', linewidth=2)
-    # axs[0].plot(
-    #     *mwm_medians, '-', 
-    #     color='k', 
-    #     label='Median trend'
-    # )
     axs[0].set_title('(a) StarFlow', y=0.82)
+    axs[0].text(0.5, -0.7, 'Rolling window size: %s' % window)
 
     # APOKASC-3 catalog
     apokasc_csv_path = paths.data / 'catalogs/APOKASC3_MWM.csv'
@@ -105,11 +95,12 @@ def main(style='paper'):
         label='Rolling median'
     )
     # APOKASC Rolling median
+    window = 300
     apokasc3_sorted_ages = apokasc3.sort_values(
         'AgeBest'
     ).dropna(subset=['AgeBest', 'MWM_CE_MG'])[['AgeBest', 'MWM_CE_MG']]
     apokasc3_rolling_medians = apokasc3_sorted_ages.rolling(
-        300, min_periods=100, step=100, on='AgeBest', center=True
+        window, min_periods=100, step=100, on='AgeBest', center=True
     ).median()
     axs[1].plot(
         apokasc3_rolling_medians['AgeBest'], 
@@ -124,6 +115,7 @@ def main(style='paper'):
         label='Rolling median'
     )
     axs[1].set_title('(b) APOKASC-3', y=0.82)
+    axs[1].text(0.5, -0.7, 'Rolling window size: %s' % window)
 
     # OCCAM DR19 open clusters
     occam19 = pd.read_csv(paths.data / 'catalogs/occam_19cluster-rgb.csv')
@@ -166,7 +158,30 @@ def main(style='paper'):
         'k--', 
         label='Rolling median'
     )
+    # OCCAM Rolling median
+    window = 30
+    occam_sorted_ages = occam19.sort_values(
+        'CG_Age'
+    ).dropna(subset=['CG_Age', 'Ce_Mg'])[
+        ['CG_Age', 'Ce_Mg']
+    ]
+    occam_rolling_medians = occam_sorted_ages.rolling(
+        window, min_periods=10, step=10, on='CG_Age', center=True
+    ).median()
+    axs[2].plot(
+        occam_rolling_medians['CG_Age'], 
+        occam_rolling_medians['Ce_Mg'], 
+        'w-', 
+        linewidth=2
+    )
+    axs[2].plot(
+        occam_rolling_medians['CG_Age'], 
+        occam_rolling_medians['Ce_Mg'], 
+        'k-', 
+        label='Rolling median'
+    )
     axs[2].set_title('(c) OCCAM', y=0.82)
+    axs[2].text(0.5, -0.7, 'Rolling window size: %s' % window)
 
     # Compare with Casali et al. (2025) best-fit relations
     # xarr = np.arange(0, 11.1, 0.1)
