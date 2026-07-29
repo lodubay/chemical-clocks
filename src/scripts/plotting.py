@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.collections import PathCollection
 from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 
 # AASTeX plot widths in inches
 ONE_COLUMN_WIDTH = 3.25
@@ -148,12 +149,22 @@ def colored_text_legend(ax, show_handles=False, invert=False, **kwargs):
         leg = ax.legend(handles, labels, handlelength=0, handletextpad=0, markerscale=0, **kwargs)
         for line in leg.get_lines():
             line.set_visible(False)
+        for patch in leg.get_patches():
+            patch.set_visible(False)
     # Color-code legend text by line and point colors
     for handle, text in zip(handles, leg.get_texts()):
         if isinstance(handle, PathCollection):
             text.set_color(handle.get_facecolor()[0])
         elif isinstance(handle, Line2D):
             text.set_color(handle.get_color())
+        elif isinstance(handle, Patch):
+            # Set text color to be the facecolor, unless it's white
+            edgecolor = handle.get_edgecolor()
+            facecolor = handle.get_facecolor()
+            if facecolor == (0, 0, 0, 0):
+                text.set_color(edgecolor)
+            else:
+                text.set_color(facecolor)
     return leg
 
 
