@@ -267,8 +267,7 @@ Figure \ref{fig:ce-lines-1} presents the spectra for 6 ``sibling'' stars with si
 
 Figure \ref{fig:ce-lines-2} similarly presents the spectra for 6 selected stars spanning a range of $\log(g)$, $T_{\rm eff}$, and [Fe/H]. The top three spectra span a range of $\log(g)$ at similar [Fe/H] and [Ce/H], illustrating that the Ce II lines get fainter with increasing surface gravity but are still detectable at $\log(g)\approx3$. The bottom three spectra span a range of metallicity and $T_{\rm eff}$ at similar $\log(g)$. The lines are weak at $\bracket{Fe}\approx-1$ and strongly blended at $\bracket{Fe}\approx+0.3$, but are still fit well by the model at both extremes. Overall, Figures \ref{fig:ce-lines-1} and \ref{fig:ce-lines-2} demonstrate that the APOGEE spectra can accurately capture variation in [Ce/H] across the full parameter space in the sample, and that the ASPCAP Ce abundances for our high-quality sample are trustworthy.
 
-We note the presence of some likely artificial structures in low-density regions of the abundance space that are visible in diagnostic plots (not shown).
-We observe a series of ``ridges'' in the [Ce/Mg]--[Mg/H] abundance distribution between $-1.0\lesssim\bracket[Mg]{Ce}\lesssim-0.4$ that we speculate are due to lower-quality fits clustering near grid lines. \citet{meszaros_sdss-v_2025} noted a similar noding behavior for some stars with $\bracket{M}>0$ and $\bracket[M]{Ce}\approx-0.2$. This behavior is most noticeable for stars with $\log(g)>3.0$, where the Ce lines are weaker. These artifacts affect a small minority of stars in our sample (we estimate $\sim3\%$ at most), so while we make note of them here, we do not take further steps to remedy them. We have tested removing all stars with $\log(g)>2.5$ from our analysis and found minimal differences in our results.
+We note the presence of some likely artificial structures that are visible in the [Ce/Fe]--[Fe/H] panels of Figure \ref{fig:ce-lines-1} and \ref{fig:ce-lines-2}. A series of ridges appear in the low-[Ce/Fe] regime between $-0.7\lesssim\bracket{Fe}\lesssim0$, which we speculate are due to lower-quality fits clustering near grid lines. This behavior is most noticeable for stars with $\log(g)>3.0$, where the Ce lines are weaker. \citet{meszaros_sdss-v_2025} also noted a similar noding behavior for some stars with $\bracket{Fe}>0$ and $\bracket[Fe]{Ce}\approx-0.2$. These artifacts affect a small minority of stars in our sample (we estimate $\sim3\%$ at most), so while we make note of them here, we do not take further steps to remedy them. We have tested removing all stars with $\log(g)>2.5$ from our analysis and found minimal differences in our results.
 
 ASPCAP does not include a treatment for upper limits, so the reported abundances may in some cases be theoretically unmeasurable. By comparing a grid of synthetic spectra with and without each element, \citet{shetrone_apache_2026} calibrated a function to determine an upper limit on the abundance for a given $T_{\rm eff}$ and $S/N$. For most of the stars in our sample, the measured [Ce/H] is above this limit due to our $S/N>100$ requirement. However, at lower metallicities, a larger fraction of our sample falls below these upper limits, which affects our analysis of the Milky Way halo in Section \ref{sec:halo}. Therefore, we calculate upper limits on [Ce/H] for each star using the method of \citet{shetrone_apache_2026} and eliminate \todo{589} stars with reported abundances below the limit.
 
@@ -312,6 +311,13 @@ Figure \ref{fig:logg-calibrations} shows the effect of the corrective offsets on
 \subsection{Stellar Ages}
 
 \subsubsection{The StarFlow Catalog}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{}
+    \caption{Caption}
+    \label{fig:placeholder}
+\end{figure}
 
 We use the StarFlow \citep{stone-martinez_starflow_2025} value-added catalog of stellar ages for MWM DR19. \citet{stone-martinez_starflow_2025} use a deep generative model trained on asteroseismic data to estimate ages for evolved stars. Specifically, they use stellar masses and ages from the APOKASC-3 \citep{pinsonneault_apokasc-3_2025} and APO-K2 \citep{schonhut-stasik_apo-k2_2024,warfield_apo-k2_2024} catalogs and MWM DR19 stellar parameters ($T_{\rm eff}$ and $\log(g)$) and abundances ([Fe/H], [C/Fe], and [N/Fe]). This makes StarFlow essentially a [C/N]-derived age catalog. The \citet{stone-martinez_starflow_2025} model retains information about the parameter space distribution of the training data and accounts for asymmetric uncertainties. 
 
@@ -528,18 +534,18 @@ Our sample was not optimized for a representative census of the Milky Way halo, 
 \section{Discussion}
 \label{sec:discussion}
 
-\subsection{Connection to Yield Predictions}
+% \subsection{Connection to Yield Predictions}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{figures/ssp_yields.pdf}
-    \caption{The mass fraction of Ce produced by AGB stars for a $13.2\Gyr$ old simple stellar population as a function of metallicity. The blue curve represents a model adopting the \citet{cristallo_evolution_2011,cristallo_evolution_2015} yield tables, while the pink curve adopts the yields of \citet{karakas_stellar_2016} and \citet{karakas_heavy-element_2018}. The points indicate values of the metallicity grid for each study. Yields are linearly interpolated between grid points (solid curves) and extrapolated beyond the grid boundaries (dotted curves).}
-    \label{fig:yields}
-\end{figure}
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=\linewidth]{figures/ssp_yields.pdf}
+%     \caption{The mass fraction of Ce produced by AGB stars for a $13.2\Gyr$ old simple stellar population as a function of metallicity. The blue curve represents a model adopting the \citet{cristallo_evolution_2011,cristallo_evolution_2015} yield tables, while the pink curve adopts the yields of \citet{karakas_stellar_2016} and \citet{karakas_heavy-element_2018}. The points indicate values of the metallicity grid for each study. Yields are linearly interpolated between grid points (solid curves) and extrapolated beyond the grid boundaries (dotted curves).}
+%     \label{fig:yields}
+% \end{figure}
 
-Predicted nucleosynthetic yields for AGB stars vary substantially with metallicity. Figure \ref{fig:yields} shows the mass of Ce produced by AGB stars in a simple stellar population (SSP) over $13.2\Gyr$. We assume a \citet{kroupa_variation_2001} initial mass function and adopt two different yield sets: those of \citet{cristallo_evolution_2011,cristallo_evolution_2015}, and those of \citet{karakas_stellar_2016} and \citet{karakas_heavy-element_2018}. Because yield tables were computed for a finite number of masses and metallicities, we linearly interpolate between each grid point and extrapolate beyond the grid boundaries assuming the yield is 0 at $M=0$ and $Z=0$. 
+% Predicted nucleosynthetic yields for AGB stars vary substantially with metallicity. Figure \ref{fig:yields} shows the mass of Ce produced by AGB stars in a simple stellar population (SSP) over $13.2\Gyr$. We assume a \citet{kroupa_variation_2001} initial mass function and adopt two different yield sets: those of \citet{cristallo_evolution_2011,cristallo_evolution_2015}, and those of \citet{karakas_stellar_2016} and \citet{karakas_heavy-element_2018}. Because yield tables were computed for a finite number of masses and metallicities, we linearly interpolate between each grid point and extrapolate beyond the grid boundaries assuming the yield is 0 at $M=0$ and $Z=0$. 
 
-Both models in Figure \ref{fig:yields} predict a similar metallicity dependence on the yield. Up to a point, an increase in metallicity means an increase in the number of heavy nuclei to seed the $s$-process reactions, so the predicted yield increases. At the high-metallicity end, this trend reverses, and further increasing the metallicity {\it decreases} the predicted yield of Ce. This is because the neutron flux within the \ce{^13C} pocket is distributed across more heavy nuclei, so $s$-process reactions are only able to reach elements in the first peak \citep{karakas_dawes_2014}. Both models predict a sharp peak in the Ce enrichment at $\log_{\rm 10}(Z/Z_\odot)\approx-0.3$, which aligns with our observation that the Milky Way age--[Ce/Mg] relation has the steepest slope between $-0.3\leq\bracket{Fe}\leq0$ and highest normalization at $\bracket{Fe}=-0.2$ across multiple regions in the Galaxy (Figures \ref{fig:local-metallicity-trends} and \ref{fig:global-metallicity-fits}).
+% Both models in Figure \ref{fig:yields} predict a similar metallicity dependence on the yield. Up to a point, an increase in metallicity means an increase in the number of heavy nuclei to seed the $s$-process reactions, so the predicted yield increases. At the high-metallicity end, this trend reverses, and further increasing the metallicity {\it decreases} the predicted yield of Ce. This is because the neutron flux within the \ce{^13C} pocket is distributed across more heavy nuclei, so $s$-process reactions are only able to reach elements in the first peak \citep{karakas_dawes_2014}. Both models predict a sharp peak in the Ce enrichment at $\log_{\rm 10}(Z/Z_\odot)\approx-0.3$, which aligns with our observation that the Milky Way age--[Ce/Mg] relation has the steepest slope between $-0.3\leq\bracket{Fe}\leq0$ and highest normalization at $\bracket{Fe}=-0.2$ across multiple regions in the Galaxy (Figures \ref{fig:local-metallicity-trends} and \ref{fig:global-metallicity-fits}).
 
 \subsection{Effects of Radial Migration}
 
