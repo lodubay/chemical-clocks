@@ -126,7 +126,7 @@ def plot_spectrum_comparison(
     ax2 = fig.add_subplot(gs1[2])
     spec_axs = np.array([ax0, ax1, ax2])
     for i, ax in enumerate(spec_axs):
-        ax.set_title('%s Å' % CE_II_LINES[i])
+        ax.set_title(r'$\lambda%s$ Å' % CE_II_LINES[i])
         ax.axvline(
             CE_II_LINES[i],
             color=paultol.bright.colors[-1], 
