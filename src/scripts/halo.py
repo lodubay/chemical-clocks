@@ -67,6 +67,14 @@ def main(style='paper', verbose=False):
     insitu = data[ad_halo_mask & (~bulge_mask) & chem_insitu_mask]
     other_chem = data[ad_halo_mask & (~bulge_mask) & (~chem_insitu_mask) & (~chem_accreted_mask)]
     gse = data[feuillet_gse_mask & chem_accreted_mask]
+
+    # Print sub-sample sizes
+    if verbose:
+        print('Halo sub-sample sizes:')
+        labels = ['gse', 'accreted halo', 'in situ halo', 'disk']
+        subsamples = [gse, accreted, insitu, disk]
+        for label, subsample in zip(labels, subsamples):
+            print('\t%s: %s' % (label, subsample.shape[0]))
     
     # Set up figure
     plt.style.use(paths.styles / f'{style}.mplstyle')
