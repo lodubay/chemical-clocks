@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MultipleLocator
 from matplotlib.gridspec import GridSpec
-from scipy import stats
 
 from plotting import TWO_COLUMN_WIDTH, ABUNDANCE_COLORMAP
 from contours import plot_kde2D_contours
@@ -17,8 +16,6 @@ from utils import get_bin_centers, import_sample
 from global_metallicity_fits import fit_metallicity_bins
 import paths
 
-MET_COL = 'fe_h_corr' # Column with metallicity values
-MET_LABEL = '[Fe/H]'
 AGE_FIT_RANGE = (1, 8) # Range of ages to fit linear trend
 RLIM = (7, 9)
 ZLIM = (0, 0.5)
@@ -63,10 +60,9 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
     norm = BoundaryNorm(met_bins, cmap.N, extend='both')
 
     # Get best-fit regressions
-    fits, met_bin_centers = fit_metallicity_bins(
+    params, errors, met_bin_centers = fit_metallicity_bins(
         local_low_alpha, 
         met_bins, 
-        met_col=MET_COL, 
         age_fit_range=AGE_FIT_RANGE, 
         age_delta=AGE_DELTA
     )
@@ -89,8 +85,8 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
         met_center = np.mean(met_lim) # mean metallicity of bin
         color = cmap(norm(met_center))
         subset_low_alpha = local_sample[
-            (local_sample[MET_COL] >= met_lim[0]) &
-            (local_sample[MET_COL] < met_lim[1]) &
+            (local_sample['fe_h_corr'] >= met_lim[0]) &
+            (local_sample['fe_h_corr'] < met_lim[1]) &
             (local_sample['low_alpha'])
         ]
         ax.scatter(
@@ -109,8 +105,8 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
         #     s=3, marker='o', rasterized=True, facecolors='w', linewidths=0.5
         # )
         # Plot linear regression
-        regress = fits[i]
-        yfit = (age_arr - AGE_DELTA) * regress.slope + regress.intercept
+        p = params[i]
+        yfit = (age_arr - AGE_DELTA) * p[1] + p[0]
         ax.plot( # extends beyond fit region
             age_arr[age_arr < AGE_FIT_RANGE[0]], 
             yfit[age_arr < AGE_FIT_RANGE[0]], 
@@ -174,9 +170,8 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
     # Right panels: plot slope and intercept vs metallicity
     gs = GridSpec(2, 1, figure=fig, left=0.75, right=0.98, hspace=0)
     ax0 = fig.add_subplot(gs[0])
-    slopes = [f.slope for f in fits]
-    slope_errs = [f.stderr for f in fits]
-    met_bin_centers = get_bin_centers(met_bins)
+    slopes = params[:,1]
+    slope_errs = errors[:,1]
     ax0.plot(met_bin_centers, slopes, 'k-', label='This work')
     for i, met_mean in enumerate(met_bin_centers):
         ax0.errorbar(
@@ -186,8 +181,8 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
         )
     # Plot intercepts
     ax1 = fig.add_subplot(gs[1], sharex=ax0)
-    intercepts = [f.intercept for f in fits]
-    intercept_errs = [f.intercept_stderr for f in fits]
+    intercepts = params[:,0]
+    intercept_errs = errors[:,0]
     ax1.plot(met_bin_centers, intercepts, 'k-')
     for i, met_mean in enumerate(met_bin_centers):
         ax1.errorbar(
@@ -228,7 +223,7 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
     ax1.yaxis.set_major_locator(MultipleLocator(0.1))
     ax1.yaxis.set_minor_locator(MultipleLocator(0.02))
 
-    plt.savefig(savedir / 'local_metallicity_fits')
+    fig.savefig(savedir / 'local_metallicity_fits')
 
 
 def casali_fit(age, feh):

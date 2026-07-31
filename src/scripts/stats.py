@@ -3,6 +3,7 @@ Generic statistical routines for this project.
 """
 
 import numpy as np
+from scipy.stats import linregress
 from _globals import RANDOM_SEED
 
 def deming_regression(x_obs, y_obs, x_err, y_err):
@@ -123,6 +124,22 @@ def median_standard_error(x, B=1000, seed=RANDOM_SEED):
         return np.std(medians)
     else:
         return np.nan
+
+
+def bootstrap_linregress(x, y, xerr, yerr, N=1000, seed=RANDOM_SEED, **kwargs):
+    """
+    Perform a linear regression on N resampled data points.
+    
+    Assumes Gaussian errors in x and y for all data.
+    """
+    rng = np.random.default_rng(seed)
+    # Randomly perturb x-values by the error in x, N times total
+    xx = np.tile(x, (N, 1)) + rng.normal(scale=xerr, size=(N, len(x)))
+    # Repeat for y-values
+    yy = np.tile(y, (N, 1)) + rng.normal(scale=yerr, size=(N, len(y)))
+    # Linear regression for each row of xx and yy
+    regress = linregress(xx, yy, axis=1, **kwargs)
+    return regress
 
 
 def weighted_quantile(df, val, weight, quantile=0.5):

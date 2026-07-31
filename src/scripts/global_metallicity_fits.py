@@ -10,15 +10,14 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from matplotlib.colors import BoundaryNorm
 from matplotlib.cm import ScalarMappable
-from scipy import stats
+import statsmodels.api as sm
 
-from utils import import_sample
+from utils import import_sample, get_bin_centers
 from plotting import ONE_COLUMN_WIDTH, RADIUS_COLORMAP, insert_colorbar_axes
+# from stats import deming_regression, bootstrap_standard_error
 import paths
 
 ZLIM = (0, 0.5) # global z_max limits
-MET_COL = 'fe_h_corr' # Column with metallicity values
-MET_LABEL = '[Fe/H]'
 AGE_FIT_RANGE = (1, 8) # Range of ages to fit linear trend
 MIN_COUNT = 20 # Minimum number of stars in each bin for trend fitting
 AGE_DELTA = 5 # Gyr, linear age shift for regression
@@ -49,7 +48,6 @@ def main(style='paper', cmap=RADIUS_COLORMAP):
     )
     cmap = plt.get_cmap(cmap)
     norm = BoundaryNorm(radius_bin_edges, cmap.N)
-    # plt.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.95)
     cax = insert_colorbar_axes(fig, orientation='horizontal', pad=0.05)
 
     for j in range(len(radius_bin_edges)-1):
@@ -64,24 +62,24 @@ def main(style='paper', cmap=RADIUS_COLORMAP):
             (mwm_sample['low_alpha']) # restrict age trends to low-alpha only
         ]
         # Bin by metallicity and fit linear trend to stars
-        region_fits, mets = fit_metallicity_bins(region, met_bin_edges)
+        params, errors, mets = fit_metallicity_bins(region, met_bin_edges)
         # Plot fit slopes
-        slopes = np.array([f.slope for f in region_fits])
-        errors = np.array([f.stderr for f in region_fits])
+        slopes = params[:,1]
+        slope_errs = errors[:,1]
         axs[0].plot(
             mets, slopes, '.-',
             color=color,
             label=f'{int(mean_radius)} kpc'
         )
         axs[0].fill_between(
-            mets, slopes - errors, slopes + errors,
+            mets, slopes - slope_errs, slopes + slope_errs,
             color=color, 
             alpha=0.5, 
             edgecolor='none'
         )
         # Plot intercepts
-        intercepts = np.array([f.intercept for f in region_fits])
-        int_errs = np.array([f.intercept_stderr for f in region_fits])
+        intercepts = params[:,0]
+        int_errs = errors[:,0]
         axs[1].plot(mets, intercepts, '.-', color=color)
         axs[1].fill_between(
             mets, intercepts - int_errs, intercepts + int_errs,
@@ -118,7 +116,7 @@ def main(style='paper', cmap=RADIUS_COLORMAP):
     axs[1].yaxis.set_major_locator(MultipleLocator(0.1))
     axs[1].yaxis.set_minor_locator(MultipleLocator(0.02))
     axs[1].set_ylabel(r'[Ce/Mg] at $\tau=5$ Gyr')
-    axs[1].set_xlabel(MET_LABEL)
+    axs[1].set_xlabel('[Fe/H]')
     # colored_text_legend(ax, loc='center right', frameon=True)
 
     plt.savefig(savedir / 'global_metallicity_fits')
@@ -128,9 +126,6 @@ def fit_metallicity_bins(
         data, 
         bins, 
         min_count=MIN_COUNT, 
-        xcol='age', 
-        ycol='ce_mg_corr', 
-        met_col=MET_COL,
         age_fit_range=AGE_FIT_RANGE,
         age_delta=AGE_DELTA,
         **kwargs
@@ -141,48 +136,72 @@ def fit_metallicity_bins(
     Parameters
     ----------
     data : pandas.DataFrame
-    bins : array-like
+    bins : array-like of length N
         Metallicity bin edges
     min_count : int, optional [default: 20]
         Minimum number of stars in a bin required to calculate a fit.
-    xcol : str, optional [default: 'age']
-        Column for the independent fit variable.
-    ycol : str, optional [default: 'ce_mg_corr']
-        Column for the dependent fit variable.
-    met_col : str, optional [default: 'fe_h']
-        Column for the binning variable.
     age_fit_range : tuple of floats, optional [default: (1, 8)]
         Range of ages considered valid for fit procedure. Data outside this
         range will not contribute to the fit.
     age_delta : float, optional [default: 5]
         Linear age shift in Gyr to center regression
-    **kwargs passed to scipy.stats.linregress
+    **kwargs passed to statsmodels.WLS
     
     Returns
     -------
-    fits : list of LinregressResult instances
-        List of linear regression fits for each metallicity bin.
-    bin_centers : list
+    params : (N-1) x 2 array
+        Linear fit parameters for each metallicity bin. Intercepts are stored
+        in params[:,0], and slopes in params[:,1].
+    errors : (N-1) x 2 array
+        Standard errors on linear fit parameters.
+    bin_centers : (N-1) array
         Mean of each metallicity bin for which a fit was performed.
     """
-    fits = []
+    params = []
+    errors = []
     bin_centers = []
     for k in range(len(bins)-1):
         met_lim = bins[k:k+2]
         subset = data[
-            (data[met_col] >= met_lim[0]) & 
-            (data[met_col] < met_lim[1]) &
-            (data[xcol] >= age_fit_range[0]) &
-            (data[xcol] < age_fit_range[1])
+            (data['fe_h_corr'] >= met_lim[0]) & 
+            (data['fe_h_corr'] < met_lim[1]) &
+            (data['age'] >= age_fit_range[0]) &
+            (data['age'] < age_fit_range[1])
         ]
         if subset.shape[0] > min_count:
-            # Fit linear age trend
-            regress = stats.linregress(
-                subset[xcol] - age_delta, subset[ycol], **kwargs
-            )
-            fits.append(regress)
+            x = subset['age'].values - age_delta
+            X = x[:,np.newaxis]
+            X = sm.add_constant(X)
+            y = subset['ce_mg_corr'].values
+            xerr = subset['e_mean_age'].values
+            yerr = subset['e_ce_mg'].values
+            # dem_reg = deming_regression(x, y, xerr, yerr)
+            # dem_err = bootstrap_standard_error(deming_regression, x, y, xerr, yerr)
+            # params.append(dem_reg)
+            # errors.append(dem_err)
+
+            # Initial fit without xerr
+            weights = 1 / (yerr**2)
+            wls_model = sm.WLS(y, X, weights=weights)
+            results = wls_model.fit()
+
+            # Re-fit with x-errors, adopting previous best-fit slope, until
+            # old and new parameters converge within 1%
+            r = 1
+            i = 0
+            m = results.params[1]
+            while r > 0.01 and i < 10:
+                weights = 1 / (yerr**2 + m**2 * xerr**2)
+                wls_model = sm.WLS(y, X, weights=weights)
+                results = wls_model.fit()
+                i += 1
+                r = abs((results.params[1] - m) / m)
+                m = results.params[1]
+
+            params.append(results.params)
+            errors.append(results.bse)
             bin_centers.append(np.mean(met_lim))
-    return fits, bin_centers
+    return np.array(params), np.array(errors), np.array(bin_centers)
 
 
 if __name__ == '__main__':

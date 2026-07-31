@@ -29,15 +29,17 @@ def main():
     starflow = fits_to_pandas(
         paths.data / 'catalogs/StarFlow_summary_v1_0_1.fits'
     )
+    starflow['e_mean_age'] = 0.5*(starflow['e_p_age'] - starflow['e_n_age'])
     # Flag good ages
     starflow['good_age'] = (
         (starflow['training_density'] > 3e9) & # Stone-Martinez et al. (2025) recommendation
-        (starflow['age'] > 0)
+        (starflow['age'] > 0) & # avoid ages at prior bounds
+        (starflow['age'] < 14)
     )
     # ensure SDSS IDs are the same between DR19 and StarFlow in every row
     assert np.all(np.where(mwm_full['sdss_id'] == starflow['sdss_id'], 1, 0))
     mwm_full = mwm_full.join(
-        starflow[['age', 'e_p_age', 'e_n_age', 'training_density', 'good_age']]
+        starflow[['age', 'e_p_age', 'e_n_age', 'e_mean_age', 'training_density', 'good_age']]
     )
     # Drop contamination & confusion flag
     mwm_full.drop(labels='cc_flg', axis=1, inplace=True)
