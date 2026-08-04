@@ -75,6 +75,12 @@ def main(style='paper', verbose=False):
         subsamples = [gse, accreted, insitu, disk]
         for label, subsample in zip(labels, subsamples):
             print('\t%s: %s' % (label, subsample.shape[0]))
+
+        print('Median [Ce/Mg] per sub-sample:')
+        labels = ['gse', 'accreted halo', 'in situ halo']
+        subsamples = [gse, accreted, insitu]
+        for label, subsample in zip(labels, subsamples):
+            print('\t%s: %s' % (label, subsample['ce_mg'].median()))
     
     # Set up figure
     plt.style.use(paths.styles / f'{style}.mplstyle')
