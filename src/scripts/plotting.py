@@ -173,7 +173,7 @@ def setup_hayden_plot(
         zbins=ZBINS, 
         width=TWO_COLUMN_WIDTH, 
         row_label=r'z_{\rm max}',
-        col_label='R_g',
+        col_label=r'R_{\rm guide}',
         labelsize=None,
     ):
     """
