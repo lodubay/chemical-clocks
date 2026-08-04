@@ -16,6 +16,7 @@ import paths
 
 # SAMPLE_FRACTION = 0.25 # fraction of stars to plot in each panel
 SAMPLE_SIZE = 1000 # number of stars to plot in each panel, randomly sampled
+YCOL = 'ce_mg_corr'
 
 def main(style='paper'):
     plt.style.use(paths.styles / f'{style}.mplstyle')
@@ -34,11 +35,11 @@ def main(style='paper'):
     ]
     mg_bin_edges = np.arange(-0.75, 0.76, 0.1)
     local_low_alpha_medians = binned_quantiles(
-        local_sample[local_sample['low_alpha']], 'ce_mg_corr', 'mg_h', 
+        local_sample[local_sample['low_alpha']], YCOL, 'mg_h', 
         q=0.5, bin_edges=mg_bin_edges, min_count=10
     )
     local_high_alpha_medians = binned_quantiles(
-        local_sample[local_sample['high_alpha']], 'ce_mg_corr', 'mg_h', 
+        local_sample[local_sample['high_alpha']], YCOL, 'mg_h', 
         q=0.5, bin_edges=mg_bin_edges, min_count=10
     )
 
@@ -64,12 +65,12 @@ def main(style='paper'):
         sample = sample_rows(subset, SAMPLE_SIZE)
         low_alpha_sample = sample[sample['low_alpha']]
         ax.scatter(
-            low_alpha_sample['mg_h'], low_alpha_sample['ce_mg_corr'], 
+            low_alpha_sample['mg_h'], low_alpha_sample[YCOL], 
             c=low_alpha_color, **kwargs
         )
         high_alpha_sample = sample[sample['high_alpha']]
         ax.scatter(
-            high_alpha_sample['mg_h'], high_alpha_sample['ce_mg_corr'], 
+            high_alpha_sample['mg_h'], high_alpha_sample[YCOL], 
             c=high_alpha_color, **kwargs
         )
         # Plot local trends for comparison
@@ -85,7 +86,7 @@ def main(style='paper'):
         if low_alpha.shape[0] >= 100:
             ax.errorbar(
                 *binned_quantiles(
-                    low_alpha, 'ce_mg_corr', 'mg_h', 
+                    low_alpha, YCOL, 'mg_h', 
                     q=0.5, bin_edges=mg_bin_edges, min_count=10, 
                     est_errors=True
                 ), 
@@ -94,7 +95,7 @@ def main(style='paper'):
         if high_alpha.shape[0] >= 100:
             ax.errorbar(
                 *binned_quantiles(
-                    high_alpha, 'ce_mg_corr', 'mg_h', 
+                    high_alpha, YCOL, 'mg_h', 
                     q=0.5, bin_edges=mg_bin_edges, min_count=10,
                     est_errors=True
                 ), 
