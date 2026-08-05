@@ -10,7 +10,7 @@ from matplotlib.colors import BoundaryNorm
 from matplotlib.ticker import MultipleLocator
 from matplotlib.cm import ScalarMappable
 
-from utils import get_bin_centers, binned_quantiles, import_sample
+from utils import get_bin_centers, binned_quantiles, import_sample, alpha_cut
 from plotting import truncate_colormap, insert_colorbar_axes, ONE_COLUMN_WIDTH
 import paths
 
@@ -61,29 +61,35 @@ def main(style='paper', cmap_name='autumn'):
                 (calib_data['logg'] < logg_lim[1])
             ]
             # High-alpha median trends, binned by [Mg/H]
-            high_alpha_uncorr_med = binned_quantiles(
-                logg_subset[logg_subset['high_alpha']], ycol, 'mg_h', 
+            low_ia_uncorr_med = binned_quantiles(
+                logg_subset[logg_subset['low_ia']], ycol, 'mg_h', 
                 q=0.5, bin_edges=MgH_bin_edges, min_count=10, est_errors=True
             )
             ax.errorbar(
-                *high_alpha_uncorr_med, 
+                *low_ia_uncorr_med, 
                 fmt='o--', markersize=ms, 
                 capsize=0,
                 color=cmap(norm(logg_center)),
                 zorder=10-j
             )
             # Low-alpha median trends, binned by [Mg/H]
-            low_alpha_uncorr_med = binned_quantiles(
-                logg_subset[logg_subset['low_alpha']], ycol, 'mg_h', 
+            high_ia_uncorr_med = binned_quantiles(
+                logg_subset[logg_subset['high_ia']], ycol, 'mg_h', 
                 q=0.5, bin_edges=MgH_bin_edges, min_count=10, est_errors=True
             )
             ax.errorbar(
-                *low_alpha_uncorr_med, 
+                *high_ia_uncorr_med, 
                 fmt='s-', markersize=ms,
                 capsize=0,
                 color=cmap(norm(logg_center)),
                 zorder=10-j
             )
+    # Indicate low- and high-Ia cut
+    mgh_arr = np.arange(-1, 0.51, 0.01)
+    # Convert cut from [Fe/H] to [Mg/H]
+    alpha_cut_slope = 0.13
+    alpha_cut_mgh_scale = 1 - alpha_cut_slope
+    axs[1,0].plot(mgh_arr, alpha_cut(mgh_arr) / alpha_cut_mgh_scale, 'k--', lw=0.5)
     # Label populations
     axs[1,0].text(-0.7, 0.1, 'High-Ia')
     axs[1,0].text(0.05, -0.325, 'Low-Ia')

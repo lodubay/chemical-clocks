@@ -56,8 +56,8 @@ def main(style='paper', verbose=False):
 
     # Apply orbit selections
     disk = data[ad_disk_mask]
-    low_ia = disk[disk['high_alpha']]
-    high_ia = disk[disk['low_alpha']]
+    low_ia = disk[disk['low_ia']]
+    high_ia = disk[disk['high_ia']]
     intermediate = data[(~ad_disk_mask) & (~ad_halo_mask)]
     bulge = data[ad_halo_mask & bulge_mask]
     # halo = data[ad_halo_mask & (~bulge_mask)]

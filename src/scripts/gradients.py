@@ -31,8 +31,8 @@ def main(style='paper', cmap='jet'):
 
     # Select only low-alpha, near-midplane stars
     all_lowz = mwm_rgb[(mwm_rgb['z_max'] < 0.5)].copy()
-    all_low_alpha = all_lowz[(all_lowz['low_alpha'])].copy()
-    all_high_alpha = all_lowz[(all_lowz['high_alpha'])].copy()
+    all_high_ia = all_lowz[(all_lowz['high_ia'])].copy()
+    all_low_ia = all_lowz[(all_lowz['low_ia'])].copy()
     
     # Set up figure
     fig, axs = plt.subplots(
@@ -83,55 +83,55 @@ def main(style='paper', cmap='jet'):
             mean_age = np.mean(age_bin)
             color = age_cmap(age_norm(mean_age))
             # Plot high-alpha trends
-            high_alpha_subset = all_high_alpha[
-                (all_high_alpha['age'] >= age_bin[0]) &
-                (all_high_alpha['age'] < age_bin[1])
+            low_ia_subset = all_low_ia[
+                (all_low_ia['age'] >= age_bin[0]) &
+                (all_low_ia['age'] < age_bin[1])
             ]
-            high_alpha_medians = binned_quantiles(
-                high_alpha_subset, col, 'Rg',
+            low_ia_medians = binned_quantiles(
+                low_ia_subset, col, 'Rg',
                 q=0.5, bin_edges=radius_bin_edges, min_count=10, est_errors=True
             )
-            # axs[i].plot(*high_alpha_medians, '-', color='w', linewidth=2)
+            # axs[i].plot(*low_ia_medians, '-', color='w', linewidth=2)
             # axs[i].plot(
-            #     *high_alpha_medians, '--', 
+            #     *low_ia_medians, '--', 
             #     color=age_cmap(norm(mean_age)), 
             # )
             axs[i].plot(
-                *high_alpha_medians[:-1], '--', 
+                *low_ia_medians[:-1], '--', 
                 color=color, zorder=3
             )
             axs[i].fill_between(
-                high_alpha_medians[0],
-                high_alpha_medians[1]+high_alpha_medians[2],
-                high_alpha_medians[1]-high_alpha_medians[2],
+                low_ia_medians[0],
+                low_ia_medians[1]+low_ia_medians[2],
+                low_ia_medians[1]-low_ia_medians[2],
                 color=color,
                 edgecolor='none', alpha=0.5, zorder=1
             )
             # Plot low-alpha trends
-            low_alpha_subset = all_low_alpha[
-                (all_low_alpha['age'] >= age_bin[0]) &
-                (all_low_alpha['age'] < age_bin[1])
+            high_ia_subset = all_high_ia[
+                (all_high_ia['age'] >= age_bin[0]) &
+                (all_high_ia['age'] < age_bin[1])
             ]
-            low_alpha_medians = binned_quantiles(
-                low_alpha_subset, col, 'Rg',
+            high_ia_medians = binned_quantiles(
+                high_ia_subset, col, 'Rg',
                 q=0.5, bin_edges=radius_bin_edges, min_count=10, est_errors=True
             )
-            # axs[i].plot(*low_alpha_medians, '-', color='w', linewidth=2)
+            # axs[i].plot(*high_ia_medians, '-', color='w', linewidth=2)
             # axs[i].plot(
-            #     *low_alpha_medians, '-', 
+            #     *high_ia_medians, '-', 
             #     color=age_cmap(norm(mean_age)), 
             #     label=f'{int(mean_age)} Gyr'
             # )
             axs[i].plot(
-                *low_alpha_medians[:-1], '-', 
+                *high_ia_medians[:-1], '-', 
                 color=color, 
                 zorder=4, 
                 label=f'{int(mean_age)} Gyr'
             )
             axs[i].fill_between(
-                low_alpha_medians[0],
-                low_alpha_medians[1]+low_alpha_medians[2],
-                low_alpha_medians[1]-low_alpha_medians[2],
+                high_ia_medians[0],
+                high_ia_medians[1]+high_ia_medians[2],
+                high_ia_medians[1]-high_ia_medians[2],
                 color=color,
                 edgecolor='none', 
                 alpha=0.5, 

@@ -48,7 +48,7 @@ def import_sample(good_ages=True, cut_limits=True, verbose=False):
 
 def alpha_cut(feh):
     """
-    Dividing line between low- and high-alpha populations at a given [Fe/H].
+    Dividing line between low- and high-Ia populations at a given [Fe/H].
 
     Parameters
     ----------
@@ -58,13 +58,38 @@ def alpha_cut(feh):
     Returns
     -------
     numpy.ndarray
-        Values of [Mg/Fe] that divide low- and high-alpha populations.
+        Values of [Fe/Mg] that divide low- and high-Ia populations.
     """
     return np.where(
         feh >= 0.0,
-        0.09,
-        0.09 - 0.13*feh
+        -0.09,
+        -0.09 + 0.13*feh
     )
+
+
+# def alpha_cut(mgh):
+#     """
+#     Dividing line between low- and high-Ia populations at a given [Mg/H].
+
+#     Parameters
+#     ----------
+#     mgh : numpy.ndarray
+#         Array of [Mg/H] values.
+    
+#     Returns
+#     -------
+#     numpy.ndarray
+#         Values of [Fe/Mg] that divide low- and high-Ia populations.
+#     """
+#     return np.where(
+#         mgh >= 0.1,
+#         -0.08,
+#         np.where(
+#             mgh >= -0.3,
+#             -0.1 + 0.2*mgh,
+#             -0.16
+#         )
+#     )
 
 
 def vac2air(wl):

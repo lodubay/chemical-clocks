@@ -34,12 +34,12 @@ def main(style='paper'):
         (mwm_rgb['z_max'] < 0.5)
     ]
     mg_bin_edges = np.arange(-0.75, 0.76, 0.1)
-    local_low_alpha_medians = binned_quantiles(
-        local_sample[local_sample['low_alpha']], YCOL, 'mg_h', 
+    local_high_ia_medians = binned_quantiles(
+        local_sample[local_sample['high_ia']], YCOL, 'mg_h', 
         q=0.5, bin_edges=mg_bin_edges, min_count=10
     )
-    local_high_alpha_medians = binned_quantiles(
-        local_sample[local_sample['high_alpha']], YCOL, 'mg_h', 
+    local_low_ia_medians = binned_quantiles(
+        local_sample[local_sample['low_ia']], YCOL, 'mg_h', 
         q=0.5, bin_edges=mg_bin_edges, min_count=10
     )
 
@@ -47,8 +47,8 @@ def main(style='paper'):
     plt.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.95)
     # scatterplot style arguments
     kwargs = dict(s=1, marker='.', rasterized=True, edgecolor='none')
-    high_alpha_color = paultol.highcontrast.colors[2]
-    low_alpha_color = paultol.highcontrast.colors[0]
+    low_ia_color = paultol.highcontrast.colors[2]
+    high_ia_color = paultol.highcontrast.colors[0]
 
     for i, j, zlim, rlim in iterate_rz_bins():
         ax = axs[i,j]
@@ -58,65 +58,65 @@ def main(style='paper'):
             (mwm_rgb['z_max'] >= zlim[0]) &
             (mwm_rgb['z_max'] < zlim[1])
         ]
-        low_alpha = subset[subset['low_alpha']]
-        high_alpha = subset[subset['high_alpha']]
+        high_ia = subset[subset['high_ia']]
+        low_ia = subset[subset['low_ia']]
         # Scatter plot random sample of points
         # sample = sample_rows(subset, int(SAMPLE_FRACTION * subset.shape[0]))
         sample = sample_rows(subset, SAMPLE_SIZE)
-        low_alpha_sample = sample[sample['low_alpha']]
+        high_ia_sample = sample[sample['high_ia']]
         ax.scatter(
-            low_alpha_sample['mg_h'], low_alpha_sample[YCOL], 
-            c=low_alpha_color, **kwargs
+            high_ia_sample['mg_h'], high_ia_sample[YCOL], 
+            c=high_ia_color, **kwargs
         )
-        high_alpha_sample = sample[sample['high_alpha']]
+        low_ia_sample = sample[sample['low_ia']]
         ax.scatter(
-            high_alpha_sample['mg_h'], high_alpha_sample[YCOL], 
-            c=high_alpha_color, **kwargs
+            low_ia_sample['mg_h'], low_ia_sample[YCOL], 
+            c=low_ia_color, **kwargs
         )
         # Plot local trends for comparison
         ax.plot(
-            *local_low_alpha_medians, 
-            linestyle='--', color=low_alpha_color, label='High-Ia',
+            *local_high_ia_medians, 
+            linestyle='--', color=high_ia_color, label='High-Ia',
         )
         ax.plot(
-            *local_high_alpha_medians, 
-            linestyle='--', color=high_alpha_color, label='Low-Ia',
+            *local_low_ia_medians, 
+            linestyle='--', color=low_ia_color, label='Low-Ia',
         )
         # Plot median trends
-        if low_alpha.shape[0] >= 100:
+        if high_ia.shape[0] >= 100:
             ax.errorbar(
                 *binned_quantiles(
-                    low_alpha, YCOL, 'mg_h', 
+                    high_ia, YCOL, 'mg_h', 
                     q=0.5, bin_edges=mg_bin_edges, min_count=10, 
                     est_errors=True
                 ), 
-                fmt='s-', markersize=3, color=low_alpha_color, capsize=0
+                fmt='s-', markersize=3, color=high_ia_color, capsize=0
             )
-        if high_alpha.shape[0] >= 100:
+        if low_ia.shape[0] >= 100:
             ax.errorbar(
                 *binned_quantiles(
-                    high_alpha, YCOL, 'mg_h', 
+                    low_ia, YCOL, 'mg_h', 
                     q=0.5, bin_edges=mg_bin_edges, min_count=10,
                     est_errors=True
                 ), 
-                fmt='o-', markersize=3, color=high_alpha_color, capsize=0
+                fmt='o-', markersize=3, color=low_ia_color, capsize=0
             )
         # Indicate number of low- and high-Ia stars in region
         if style == 'paper':
             if i==j==0:
-                sample_size_high_alpha = r'$N=%s$' % high_alpha.shape[0]
-                sample_size_low_alpha = r'$N=%s$' % low_alpha.shape[0]
+                sample_size_low_ia = r'$N=%s$' % low_ia.shape[0]
+                sample_size_high_ia = r'$N=%s$' % high_ia.shape[0]
             else:
-                sample_size_high_alpha = str(high_alpha.shape[0])
-                sample_size_low_alpha = str(low_alpha.shape[0])
+                sample_size_low_ia = str(low_ia.shape[0])
+                sample_size_high_ia = str(high_ia.shape[0])
             ax.text(
-                0.91, 0.91, sample_size_low_alpha, 
-                color=low_alpha_color, 
+                0.91, 0.91, sample_size_high_ia, 
+                color=high_ia_color, 
                 ha='right', va='top', transform=ax.transAxes,
             )
             ax.text(
-                0.91, 0.79, sample_size_high_alpha, 
-                color=high_alpha_color, 
+                0.91, 0.79, sample_size_low_ia, 
+                color=low_ia_color, 
                 ha='right', va='top', transform=ax.transAxes,
             )
     # Indicate median abundance errors

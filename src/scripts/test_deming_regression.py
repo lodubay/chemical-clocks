@@ -59,7 +59,7 @@ snsm = sample[
     (sample['fe_h'] >= -0.1) &
     (sample['fe_h'] < 0.1) &
     (sample['good_age']) &
-    (sample['low_alpha'])
+    (sample['high_ia'])
 ].copy()
 
 # Parse data

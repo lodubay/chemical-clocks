@@ -222,7 +222,7 @@ def add_kinematics(df, id_name='sdss_id', verbose=False):
             'E','Lx','Ly','Lz','ecc',
             'z_max','Rg','orbit_flags']
     )
-    
+
     for i in kinematic_dr3.columns:
         if i=='sdss_id':
             kinematic_dr3[i] = [int(j) for j in kinematic_dr3[i]]
@@ -371,10 +371,10 @@ def apply_alpha_cut(df, buffer=0.02):
     Returns
     -------
     pandas.DataFrame
-        Same dataframe with two new boolean columns, 'high_alpha' and 'low_alpha'.
+        Same dataframe with two new boolean columns, 'low_ia' and 'high_ia'.
     """
-    df['low_alpha'] = df['mg_fe'] < alpha_cut(df['fe_h']) - buffer
-    df['high_alpha'] = df['mg_fe'] > alpha_cut(df['fe_h']) + buffer
+    df['low_ia'] = df['fe_mg'] < alpha_cut(df['fe_h']) - buffer
+    df['high_ia'] = df['fe_mg'] > alpha_cut(df['fe_h']) + buffer
     return df
     
 

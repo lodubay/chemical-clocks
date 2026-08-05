@@ -63,7 +63,7 @@ def main(style='paper', sample_fraction=SAMPLE_FRACTION):
         ax.set_title(labels[i], y=0.93, x=0.07, ha='left', va='top', pad=0)
 
     # Loop through low- and high-alpha populations
-    pops = ['low_alpha', 'high_alpha']
+    pops = ['high_ia', 'low_ia']
     colors = [paultol.highcontrast.colors[0], paultol.highcontrast.colors[2]]
     labels = ['High-Ia', 'Low-Ia']
     formats = ['s-', 'o-']
@@ -197,7 +197,7 @@ def residual_abundances(
             (catalog['Rg'] < rlim[1]) &
             (catalog['z_max'] >= zlim[0]) &
             (catalog['z_max'] < zlim[1]) &
-            (catalog['low_alpha'])
+            (catalog['high_ia'])
         ].copy()
         if subset.shape[0] >= 100:
             # Calculate median trend with [Mg/H]
@@ -211,15 +211,15 @@ def residual_abundances(
             )
             res_abund.append(subset[[newcol]].copy())
     # Calculate high-alpha residuals all together
-    all_high_alpha = catalog[catalog['high_alpha']].copy()
-    high_alpha_medians = binned_quantiles(
-        all_high_alpha, col, 'mg_h', 
+    all_low_ia = catalog[catalog['low_ia']].copy()
+    low_ia_medians = binned_quantiles(
+        all_low_ia, col, 'mg_h', 
         q=0.5, bin_edges=mg_bin_edges, min_count=10
     )
-    all_high_alpha[newcol] = all_high_alpha[col] - np.interp(
-        all_high_alpha['mg_h'], *high_alpha_medians
+    all_low_ia[newcol] = all_low_ia[col] - np.interp(
+        all_low_ia['mg_h'], *low_ia_medians
     )
-    res_abund.append(all_high_alpha[[newcol]].copy())
+    res_abund.append(all_low_ia[[newcol]].copy())
     # Join residual abundances to catalog DataFrame
     res_abund = pd.concat(res_abund)
     catalog = catalog.join(res_abund)

@@ -28,7 +28,7 @@ def main(style='paper'):
         gridspec_kw={'hspace': 0.25, 'wspace': 0.1, 'top': 0.9, 'left': 0.08, 'right': 0.98}
     )
     axes_titles = ['Full sample', 'High-Ia', 'Low-Ia']
-    subsamples = [mwm_sample, mwm_sample[mwm_sample['low_alpha']], mwm_sample[mwm_sample['high_alpha']]]
+    subsamples = [mwm_sample, mwm_sample[mwm_sample['high_ia']], mwm_sample[mwm_sample['low_ia']]]
 
     # First panel: [Ce/Mg] vs [Mg/H], color-coded by median age
     cmap = plt.get_cmap(AGE_COLORMAP)

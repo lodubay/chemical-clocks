@@ -52,8 +52,8 @@ def main(style='paper', cmap=RADIUS_COLORMAP, min_count=10):
     ylim = [(-0.5, 0.7), (-0.6, 0.6)]
 
     lowz_ages = all_lowz[all_lowz['good_age']].copy()
-    low_alpha_ages = lowz_ages[lowz_ages['low_alpha']]
-    high_alpha_ages = lowz_ages[lowz_ages['high_alpha']]
+    high_ia_ages = lowz_ages[lowz_ages['high_ia']]
+    low_ia_ages = lowz_ages[lowz_ages['low_ia']]
     for i, col in enumerate(['ce_mg_corr', 'delta_ce_h']):
         # Plot all stars
         pcm = axs[i].hexbin(
@@ -73,43 +73,43 @@ def main(style='paper', cmap=RADIUS_COLORMAP, min_count=10):
             radius_bin = radius_bin_edges[j:j+2]
             mean_radius = np.mean(radius_bin)
             # Plot low alpha trends
-            low_alpha_subset = low_alpha_ages[
-                (low_alpha_ages['Rg'] >= radius_bin[0]) &
-                (low_alpha_ages['Rg'] < radius_bin[1])
+            high_ia_subset = high_ia_ages[
+                (high_ia_ages['Rg'] >= radius_bin[0]) &
+                (high_ia_ages['Rg'] < radius_bin[1])
             ]
-            low_alpha_age_medians = binned_quantiles(
-                low_alpha_subset, col, 'age',
+            high_ia_age_medians = binned_quantiles(
+                high_ia_subset, col, 'age',
                 q=0.5, bin_edges=age_bin_edges, min_count=min_count, est_errors=True
             )
             axs[i].plot(
-                *low_alpha_age_medians[:-1], '-', 
+                *high_ia_age_medians[:-1], '-', 
                 color=radial_cmap(norm(mean_radius)), zorder=4,
                 label=f'{int(mean_radius)} kpc'
             )
             axs[i].fill_between(
-                low_alpha_age_medians[0],
-                low_alpha_age_medians[1]+low_alpha_age_medians[2],
-                low_alpha_age_medians[1]-low_alpha_age_medians[2],
+                high_ia_age_medians[0],
+                high_ia_age_medians[1]+high_ia_age_medians[2],
+                high_ia_age_medians[1]-high_ia_age_medians[2],
                 color=radial_cmap(norm(mean_radius)),
                 alpha=0.5, edgecolor='none', zorder=2
             )
             # Plot high alpha trends
-            high_alpha_subset = high_alpha_ages[
-                (high_alpha_ages['Rg'] >= radius_bin[0]) &
-                (high_alpha_ages['Rg'] < radius_bin[1])
+            low_ia_subset = low_ia_ages[
+                (low_ia_ages['Rg'] >= radius_bin[0]) &
+                (low_ia_ages['Rg'] < radius_bin[1])
             ]
-            high_alpha_age_medians = binned_quantiles(
-                high_alpha_subset, col, 'age',
+            low_ia_age_medians = binned_quantiles(
+                low_ia_subset, col, 'age',
                 q=0.5, bin_edges=age_bin_edges, min_count=min_count, est_errors=True
             )
             axs[i].plot(
-                *high_alpha_age_medians[:-1], '--', 
+                *low_ia_age_medians[:-1], '--', 
                 color=radial_cmap(norm(mean_radius)), zorder=3
             )
             axs[i].fill_between(
-                high_alpha_age_medians[0],
-                high_alpha_age_medians[1]+high_alpha_age_medians[2],
-                high_alpha_age_medians[1]-high_alpha_age_medians[2],
+                low_ia_age_medians[0],
+                low_ia_age_medians[1]+low_ia_age_medians[2],
+                low_ia_age_medians[1]-low_ia_age_medians[2],
                 color=radial_cmap(norm(mean_radius)),
                 edgecolor='none', alpha=0.5, zorder=1
             )

@@ -59,7 +59,7 @@ def main(style='paper', cmap=RADIUS_COLORMAP):
             (mwm_sample['Rg'] < rlim[1]) &
             (mwm_sample['z_max'] >= ZLIM[0]) &
             (mwm_sample['z_max'] < ZLIM[1]) &
-            (mwm_sample['low_alpha']) # restrict age trends to low-alpha only
+            (mwm_sample['high_ia']) # restrict age trends to low-alpha only
         ]
         # Bin by metallicity and fit linear trend to stars
         params, errors, mets = fit_metallicity_bins(region, met_bin_edges)

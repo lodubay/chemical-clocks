@@ -36,7 +36,7 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
         (local_sample['e_p_age'] - local_sample['age']) + 
         (local_sample['age'] - local_sample['e_n_age'])
     )
-    local_low_alpha = local_sample[local_sample['low_alpha']]
+    local_high_ia = local_sample[local_sample['high_ia']]
 
     # Set up figure
     plt.style.use(paths.styles / f'{style}.mplstyle')
@@ -61,7 +61,7 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
 
     # Get best-fit regressions
     params, errors, met_bin_centers = fit_metallicity_bins(
-        local_low_alpha, 
+        local_high_ia, 
         met_bins, 
         age_fit_range=AGE_FIT_RANGE, 
         age_delta=AGE_DELTA
@@ -84,23 +84,23 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
         met_lim = tuple(np.round(met_bins[i:i+2], 2))
         met_center = np.mean(met_lim) # mean metallicity of bin
         color = cmap(norm(met_center))
-        subset_low_alpha = local_sample[
+        subset_high_ia = local_sample[
             (local_sample['fe_h_corr'] >= met_lim[0]) &
             (local_sample['fe_h_corr'] < met_lim[1]) &
-            (local_sample['low_alpha'])
+            (local_sample['high_ia'])
         ]
         ax.scatter(
-            subset_low_alpha['age'], subset_low_alpha['ce_mg_corr'],
+            subset_high_ia['age'], subset_high_ia['ce_mg_corr'],
             color=color, s=3, marker='o', rasterized=True, edgecolor='none'
         )
         # Plot high-alpha stars for reference (not fit)
-        # subset_high_alpha = local_sample[
+        # subset_low_ia = local_sample[
         #     (local_sample[MET_COL] >= met_lim[0]) &
         #     (local_sample[MET_COL] < met_lim[1]) &
-        #     (~local_sample['low_alpha'])
+        #     (~local_sample['high_ia'])
         # ]
         # ax.scatter(
-        #     subset_high_alpha['age'], subset_high_alpha['ce_mg_corr'], 
+        #     subset_low_ia['age'], subset_low_ia['ce_mg_corr'], 
         #     edgecolors=color, 
         #     s=3, marker='o', rasterized=True, facecolors='w', linewidths=0.5
         # )
