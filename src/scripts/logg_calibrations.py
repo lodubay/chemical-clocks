@@ -89,7 +89,8 @@ def main(style='paper', cmap_name='autumn'):
     # Convert cut from [Fe/H] to [Mg/H]
     alpha_cut_slope = 0.13
     alpha_cut_mgh_scale = 1 - alpha_cut_slope
-    axs[1,0].plot(mgh_arr, alpha_cut(mgh_arr) / alpha_cut_mgh_scale, 'k--', lw=0.5)
+    for ax in axs[1]:
+        ax.plot(mgh_arr, alpha_cut(mgh_arr) / alpha_cut_mgh_scale, 'k--', lw=0.5)
     # Label populations
     axs[1,0].text(-0.7, 0.1, 'High-Ia')
     axs[1,0].text(0.05, -0.325, 'Low-Ia')

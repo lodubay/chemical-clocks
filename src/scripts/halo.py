@@ -55,11 +55,11 @@ def main(style='paper', verbose=False):
     )
 
     # Apply orbit selections
-    disk = data[ad_disk_mask]
+    disk = data[ad_disk_mask & (~bulge_mask)]
     low_ia = disk[disk['low_ia']]
     high_ia = disk[disk['high_ia']]
     intermediate = data[(~ad_disk_mask) & (~ad_halo_mask)]
-    bulge = data[ad_halo_mask & bulge_mask]
+    bulge = data[bulge_mask]
     # halo = data[ad_halo_mask & (~bulge_mask)]
 
     # Apply chemical selections
@@ -135,6 +135,7 @@ def main(style='paper', verbose=False):
         disk['Lz']/1e3, disk['E']/1e5,
         C=np.ones(disk.shape[0]),
         extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
+        zorder=2,
         **hexbin_kwargs
     )
     fig.colorbar(pc, ax=ax0, label=r'$\log N$ (disk)', pad=0., use_gridspec=True)
@@ -145,7 +146,7 @@ def main(style='paper', verbose=False):
     for i, df in enumerate(subsamples):
         ax0.scatter(
             df['Lz']/1e3, df['E']/1e5, 
-            c=colors[i], marker=markers[i], **scatter_kwargs
+            c=colors[i], marker=markers[i], zorder=i, **scatter_kwargs
         )
     ax0.text(-2., -0.5, 'Halo')
     ax0.text(2.5, -1.5, 'Disk')

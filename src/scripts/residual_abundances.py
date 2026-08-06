@@ -74,16 +74,19 @@ def main(style='paper', sample_fraction=SAMPLE_FRACTION):
         # Plot [Mg/H] vs [Ce/H]
         axs[0,0].scatter(
             sample_pop['mg_h'], sample_pop['ce_h_corr'], 
-            c=color, **kwargs
+            c=color, label=label, **kwargs
         )
         # Plot median trend with [Mg/H]
         local_pop_medians = binned_quantiles(
             local_pop, 'ce_h_corr', 'mg_h', 
-            q=0.5, bin_edges=mg_bin_edges, min_count=10
+            q=0.5, bin_edges=mg_bin_edges, min_count=10, est_errors=True
         )
-        axs[0,0].plot(
+        axs[0,0].errorbar(
             *local_pop_medians, 
-            fmt, color=color, label=label, ms=ms
+            fmt=fmt, 
+            color=color, 
+            ms=ms, 
+            capsize=0
         )
         # Plot [Ce/H] residuals vs [Mg/H]
         axs[1,0].scatter(
@@ -91,12 +94,24 @@ def main(style='paper', sample_fraction=SAMPLE_FRACTION):
             c=color, **kwargs
         )
         # Plot median and 1-sigma bands
-        for q, ls in zip([0.16, 0.5, 0.84], ['--', '-', '--']):
+        local_pop_medians = binned_quantiles(
+            local_pop, 'delta_ce_h', 'mg_h',
+            q=0.5, bin_edges=mg_bin_edges, min_count=10, est_errors=True
+        )
+        axs[1,0].errorbar(
+            *local_pop_medians, 
+            fmt=fmt, 
+            color=color, 
+            ms=ms, 
+            zorder=6, 
+            capsize=0
+        )
+        for q in [0.16, 0.84]:
             local_pop_quantile = binned_quantiles(
                 local_pop, 'delta_ce_h', 'mg_h',
                 q=q, bin_edges=mg_bin_edges, min_count=10
             )
-            axs[1,0].plot(*local_pop_quantile, ls, color=color, zorder=6)
+            axs[1,0].plot(*local_pop_quantile, ls='--', color=color, zorder=6)
         # Plot [Ce/H] vs age
         sample_pop_ages = sample_pop[sample_pop['good_age']]
         axs[0,1].scatter(
@@ -107,9 +122,16 @@ def main(style='paper', sample_fraction=SAMPLE_FRACTION):
         local_pop_ages = local_pop[local_pop['good_age']]
         pop_age_medians = binned_quantiles(
             local_pop_ages, 'ce_h_corr', 'age',
-            q=0.5, bin_edges=age_bin_edges, min_count=10
+            q=0.5, bin_edges=age_bin_edges, min_count=10, est_errors=True
         )
-        axs[0,1].plot(*pop_age_medians, fmt, color=color, zorder=6, ms=ms)
+        axs[0,1].errorbar(
+            *pop_age_medians, 
+            fmt=fmt, 
+            color=color, 
+            zorder=6, 
+            ms=ms,
+            capsize=0
+        )
         # Plot [Ce/H] residuals vs age
         axs[1,1].scatter(
             sample_pop_ages['age'], sample_pop_ages['delta_ce_h'],
@@ -118,9 +140,16 @@ def main(style='paper', sample_fraction=SAMPLE_FRACTION):
         # Plot median trends with age
         pop_res_age_medians = binned_quantiles(
             local_pop_ages, 'delta_ce_h', 'age',
-            q=0.5, bin_edges=age_bin_edges, min_count=10
+            q=0.5, bin_edges=age_bin_edges, min_count=10, est_errors=True
         )
-        axs[1,1].plot(*pop_res_age_medians, fmt, color=color, zorder=6, ms=ms)
+        axs[1,1].errorbar(
+            *pop_res_age_medians, 
+            fmt=fmt, 
+            color=color, 
+            zorder=6, 
+            ms=ms,
+            capsize=0
+        )
         
     # Horizontal lines for reference
     axs[1,0].plot([-0.7, 0.6], [0, 0], linestyle=':', color='gray', zorder=5)
