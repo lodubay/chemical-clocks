@@ -359,7 +359,7 @@ The OCCAM cluster ages are more informative because they are fully independent. 
 \section{Disk Age--Abundance Patterns}
 \label{sec:results}
 
-\subsection{Metallicity Dependence}
+\subsection{Global Metallicity Dependence}
 \label{sec:metallicity-trends}
 
 \begin{figure*}
@@ -369,11 +369,13 @@ The OCCAM cluster ages are more informative because they are fully independent. 
     \label{fig:cemg-mgh-age}
 \end{figure*}
 
-We first explore the global age--metallicity--[Ce/Mg] relation for our full sample. The top-left panel of Figure \ref{fig:cemg-mgh-age} shows the median stellar age as a function of [Mg/H] and [Ce/Mg]. A broad age trend is immediately apparent: stars with low [Ce/Mg] are on average the oldest in the sample, while stars with high [Ce/Mg] are the youngest. Stars with solar [Ce/Mg] have median ages of $\sim4-6\Gyr$, across a wide range of metallicity ($-0.5\lesssim\bracket{Mg}\lesssim+0.2$). The spread in [Ce/Mg] and age is broadest at $\bracket{Mg}\approx-0.2$, with most of the old, low-[Ce/Mg] stars belonging to the low-Ia population. The most Mg-rich stars occupy a narrower range of near-solar [Ce/Mg] with median ages of $\sim6-7\Gyr$, and some of the abundance bins with $\bracket[Mg]{Ce}>0$ are older on average than their low-[Ce/Mg] counterparts. 
+We first explore the global age--metallicity--[Ce/Mg] relation. The top-left panel of Figure \ref{fig:cemg-mgh-age} shows the median stellar age as a function of [Mg/H] and [Ce/Mg]. A broad age trend is immediately apparent: stars with low [Ce/Mg] are on average the oldest in the sample, while stars with high [Ce/Mg] are the youngest. Stars with solar [Ce/Mg] have median ages of $\sim4-6\Gyr$, across a wide range of metallicity ($-0.5\lesssim\bracket{Mg}\lesssim+0.2$). The spread in [Ce/Mg] and age is broadest at $\bracket{Mg}\approx-0.2$, with most of the old, low-[Ce/Mg] stars belonging to the low-Ia population. The most Mg-rich stars occupy a narrower range of near-solar [Ce/Mg] with median ages of $\sim6-7\Gyr$, and some of the abundance bins with $\bracket[Mg]{Ce}>0$ are older on average than their low-[Ce/Mg] counterparts. 
 
-The middle and right-hand panels of Figure \ref{fig:cemg-mgh-age} split the data into the high- and low-Ia populations (see Equation \ref{eq:alpha-cut}). The high-Ia population exhibits higher [Ce/Mg] ratios and a clear median age gradient, while the low-Ia population has lower [Ce/Mg] and a uniform median age. The two populations clearly occupy distinct parts of [Ce/Mg]--[Mg/H] space, although they overlap more than in [Fe/Mg], possibly due to the larger errors in [Ce/H].
+The middle and right-hand panels of Figure \ref{fig:cemg-mgh-age} split the data into the high- and low-Ia populations according to Equation \ref{eq:alpha-cut}. The high-Ia population exhibits higher [Ce/Mg] ratios and a clear median age gradient, while the low-Ia population has lower [Ce/Mg] and a uniform median age. The two populations clearly occupy distinct parts of [Ce/Mg]--[Mg/H] space, although they overlap more than in [Fe/Mg], possibly due to the larger abundance errors.
 
-The bottom panel of Figure \ref{fig:cemg-mgh-age} shows that the youngest stars span a broad range of [Ce/Mg] values, and that the median metallicity is inversely proportional to their [Ce/Mg]. For old stars, this trend is flipped, and stars with high [Ce/Mg] have higher metallicities on average than stars with lower [Ce/Mg]. The latter trend results from the transition from high-Ia to low-Ia-dominated space, and disappears when the two populations are plotted separately. The bottom middle panel shows that high-Ia, low-[Ce/Mg] stars tend to be metal-rich regardless of age. Figure \ref{fig:cemg-mgh-age} provides the first hints in these data that the global age--[Ce/Mg] trend has an additional dependence on metallicity.
+The bottom-left panel of Figure \ref{fig:cemg-mgh-age} shows that the youngest stars span a broad range of [Ce/Mg] values, and that the median metallicity is inversely proportional to their [Ce/Mg]. For old stars, this trend is flipped, and stars with high [Ce/Mg] have higher metallicities on average than stars with lower [Ce/Mg]. The latter trend results from the transition from high-Ia to low-Ia-dominated space, and disappears when the two populations are plotted separately. The bottom middle panel shows that high-Ia, low-[Ce/Mg] stars tend to be metal-rich at the old and young ends of the distribution. Figure \ref{fig:cemg-mgh-age} provides the first hints in these data that the global age--[Ce/Mg] trend has an additional dependence on metallicity.
+
+\subsection{Linear Fits}
 
 \begin{figure*}
     \centering
@@ -384,21 +386,18 @@ The bottom panel of Figure \ref{fig:cemg-mgh-age} shows that the youngest stars 
 
 To quantify the metallicity dependence in the solar neighborhood, we fit a linear trend to the high-Ia data in bins of metallicity.
 % Figure \ref{fig:local-metallicity-trends} shows how the age--[Ce/Mg] relation varies as a function of metallicity in the solar neighborhood. 
-In detail, we bin the stars by [Fe/H] with a width of $0.1\dex$ and fit a weighted least-squares regression in each bin. We weight each star by its error in [Ce/Mg] and age according to the weighting function
+We bin stars by [Fe/H] with a width of $0.1\dex$ and fit a weighted least-squares regression in each bin. We weight each star by its error in [Ce/Mg] and age according to the weighting function
 \begin{equation}
     w = 1 / (\sigma_{\bracket[Mg]{Ce}}^2 + b_0^2\sigma_{\rm age}^2),
 \end{equation}
 where $b$ is the slope computed without weighting by $\sigma_{\rm age}$. We iteratively compute the best-fit parameters, subsituting $b_0$ for the slope computed in the last iteration, until the value converges to $<1\%$.
 We caution that the StarFlow age uncertainties are non-Gaussian, and the Ce abundance uncertainties in MWM are likely underestimated (see discussion in Section \ref{sec:ce-abundances}), both of which could lead to systematic errors in our fits.
 
-We limit the sample in each bin to obtain the highest-quality fit. We only fit stars between $1-8\Gyr$ of age; outside this range, the StarFlow ages diverge from the asteroseismic test sample \citep[Figure 5,][]{stone-martinez_starflow_2025} and [C/N]-derived ages are generally less accurate \citep{roberts_cn_2026}. We limit our fits to high-Ia stars because the low-Ia population has a smaller age spread and shows different trends with [Mg/H] and $R_{\rm guide}$ (see Section \ref{sec:galactic-trends}). To reduce the degeneracy between the regression slope and intercept, we fit the intercept at age $\tau=5\Gyr$, closer to the middle of the sample.
+We limit the sample in each bin to obtain the highest-quality fit. We only fit stars between $1-8\Gyr$ of age; outside this range, the StarFlow ages diverge from the asteroseismic test sample \citep[Figure 5,][]{stone-martinez_starflow_2025} due to intrinsic limitations in the accuracy of [C/N]-derived ages \citep{roberts_cn_2026}. We limit our fits to high-Ia stars because the low-Ia population has a smaller age spread and shows different trends with [Mg/H] and $R_{\rm guide}$ (see Section \ref{sec:galactic-trends}). To reduce the degeneracy between the regression slope and intercept, we fit the intercept at age $\tau=5\Gyr$, closer to the middle of the sample.
 
-Both the slope and intercept of the fits vary with metallicity, as shown in Figure \ref{fig:local-metallicity-trends}. Metal-rich stars show shallow or flat slopes, with intercepts at or below Solar [Ce/Mg] at $\tau=5\Gyr$. Stars with slightly sub-solar metallicity ($-0.3\leq\bracket{M}\leq0.0$) have the steepest trends and the highest [Ce/Mg] at $\tau=5\Gyr$. We note that even in the optimal range of [Fe/H], with a slope of $-0.05\dex\kpc^{-1}$, the reported median [Ce/H] uncertainty of $0.05\dex$ places a floor of $1\Gyr$ on the precision of [Ce/Mg]-derived ages using MWM abundances. The situation is worse for metal-rich stars, where the flat age--[Ce/Mg] trend renders the chemical clock essentially useless.
+Both the slope and intercept of the fits vary with metallicity, as shown in Figure \ref{fig:local-metallicity-trends}. Metal-rich stars have shallow or flat slopes with $\bracket[Mg]{Ce}\leq0$ at $\tau=5\Gyr$. Stars with slightly sub-solar metallicity ($-0.3\leq\bracket{M}\leq0.0$) have the steepest trends and the highest [Ce/Mg] at $\tau=5\Gyr$. We note that even in the optimal range of [Fe/H], with a slope of $-0.05\dex\kpc^{-1}$, the reported median [Ce/H] uncertainty of $0.05\dex$ places a floor of $1\Gyr$ on the precision of [Ce/Mg]-derived ages using MWM abundances. The situation is worse for metal-rich stars, where the flat age--[Ce/Mg] is essentially useless as a chemical clock.
 
 We compare our fits against the metallicity-dependent age--[Ce/Mg] relation of \citet{casali_tracing_2025}, who calibrated their chemical clock using a small sample of {\it Kepler} field stars with asteroseismic ages and high-precision abundances. \citet{casali_tracing_2025} allowed their intercept to vary with [Fe/H] but not the slope, as illustrated in Figure \ref{fig:local-metallicity-trends}. This assumption does not account for the flattening of the relation at high metallicity and could lead to systematic effects in the estimated ages.
-
-\subsection{Trends across the Galaxy}
-\label{sec:galactic-trends}
 
 \begin{figure}
     \centering
@@ -407,7 +406,10 @@ We compare our fits against the metallicity-dependent age--[Ce/Mg] relation of \
     \label{fig:global-metallicity-fits}
 \end{figure}
 
-We repeat the analysis of Section \ref{sec:metallicity-trends} across six $2\kpc$-wide radial bins between $R_{\rm guide}=3-15\kpc$. Figure \ref{fig:global-metallicity-fits} plots the slope and intercept at $\tau=5\Gyr$ as a function of [Fe/H] for each of the radial bins. If the metallicity variation was universal, Figure \ref{fig:global-metallicity-fits} would show similar behavior in each bin. We observe similar patterns in some regimes, but not others. Metal-rich stars ($\bracket{Fe}\ge+0.2$) have shallow or flat trends across the disk, with similar slopes and intercepts. Stars on the metal-poor end ($\bracket{Fe}\leq-0.3$) also have slopes that agree within uncertainties, although the slope uncertainties are large due to smaller sample sizes and shorter age baselines in some of these bins. In between these regimes, near solar metallicity, the trends diverge, with outer-disk stars showing steeper slopes than their inner-disk counterparts. The intercept also diverges below solar metallicity, and at $\bracket{Fe}=-0.2$, the value at $\tau=5\Gyr$ differs by $\sim0.3\dex$ between the inner-most and outer-most radial bins.
+We repeat the linear fits across six $2\kpc$-wide radial bins between $R_{\rm guide}=3-15\kpc$. Figure \ref{fig:global-metallicity-fits} duplicates the procedure in Figure \ref{fig:local-metallicity-trends} for each of the radial bins. If the metallicity variation was universal, Figure \ref{fig:global-metallicity-fits} would show similar behavior in each bin. Instead, we observe similar patterns in some regimes, but not others. Metal-rich stars ($\bracket{Fe}\ge+0.2$) have shallow or flat trends across the disk, with similar slopes and intercepts. Stars on the metal-poor end ($\bracket{Fe}\leq-0.3$) also have slopes that agree within uncertainties, although the slope uncertainties are large due to smaller sample sizes and shorter age baselines in some of these bins. In between these regimes, near solar metallicity, the trends diverge, with outer-disk stars showing steeper slopes than their inner-disk counterparts. The intercept also diverges below solar metallicity, and at $\bracket{Fe}=-0.2$, the value at $\tau=5\Gyr$ differs by $\sim0.3\dex$ between the inner-most and outer-most radial bins.
+
+\subsection{Median Trends across the Galaxy}
+\label{sec:galactic-trends}
 
 \begin{figure*}
     \centering
@@ -417,7 +419,7 @@ We repeat the analysis of Section \ref{sec:metallicity-trends} across six $2\kpc
 \end{figure*}
 
 We next investigate positional variation in the [Ce/Mg]--[Mg/H] relation directly.
-Figure \ref{fig:median-trends-grid} shows how the [Ce/Mg] median trend with [Mg/H] changes with position in the Galaxy for the high- and low-Ia populations (see Section \ref{sec:alpha-pops}). The figure layout is inspired by \citet{hayden_chemical_2015}, but we use orbital parameters $R_{\rm guide}$ and $z_{\rm max}$ instead of present-day coordinates to better separate the chemical thin and thick disks. The standard errors of the median trend are small thanks to a large sample size of $N>1000$ in each region. We observe similar patterns when plotting [Ce/H] against [Mg/H], suggesting that it is Ce and not Mg that is driving these trends.
+Figure \ref{fig:median-trends-grid} shows how the [Ce/Mg] median trend with [Mg/H] changes with position in the Galaxy for the high- and low-Ia populations (see Section \ref{sec:alpha-pops}). The figure layout is inspired by \citet{hayden_chemical_2015}, but we use orbital parameters $R_{\rm guide}$ and $z_{\rm max}$ instead of present-day coordinates to better separate the chemical thin and thick disks. The standard errors of the median trend are small thanks to large sample sizes in each region. We observe similar patterns in the [Ce/H]--[Mg/H] plane, suggesting that it is Ce and not Mg that is driving these trends.
 
 In the solar neighborhood, the median [Ce/Mg] of high-Ia stars peaks at $\bracket{Mg}=-0.2$ and is lowest for the most metal-rich stars. The location of the trend maximum is consistent in most regions of the Galaxy, which suggests that this feature is driven by AGB physics rather than chemical evolution. The maximum [Ce/Mg] is lowest at small $R_{\rm guide}$ and highest at large $R_{\rm guide}$, mirroring the variation with the linear fit intercept in Figure \ref{fig:global-metallicity-fits}. This behavior may be consistent with [Ce/Mg] as a chemical clock: in the inside-out formation scenario of the Milky Way, the inner Galaxy formed first and is therefore dominated by older stars, while the outer Galaxy formed more recently \citep[e.g.,][]{larson_models_1976,bird_inside_2021}. However, differences in the star formation history between regions may also contribute to the trend variation. 
 
@@ -438,7 +440,7 @@ Overall, Figures \ref{fig:global-metallicity-fits} and \ref{fig:median-trends-gr
 \begin{figure}
     \centering
     \includegraphics[width=\linewidth]{figures/residual_abundances.pdf}
-    \caption{Demonstration of Ce residual abundance calculation for the solar neighborhood. Top row: median trend in [Ce/H] as a function of (a) [Mg/H] and (b) age for the high- and low-Ia populations. Bottom row: median trend in $\Delta$[Ce/H] as a function of (c) [Mg/H] and (d) age. Both populations show similar trends with age in [Ce/H] and $\Delta$[Ce/H].}
+    \caption{Demonstration of the residual abundance calculation for the solar neighborhood. Top row: median trend in [Ce/H] as a function of (a) [Mg/H] and (b) age for the high- and low-Ia populations. The format of each panel is similar to Figure \ref{fig:median-trends-grid}. Bottom row: median trend in $\Delta\bracket{Ce}$ as a function of (c) [Mg/H] and (d) age. In panel (c), the solid line plots the binned median trend and the dashed lines plot the 16th and 84th percentiles for each population. Both populations show similar trends with age in [Ce/H] and $\Delta\bracket{Ce}$.}
     \label{fig:residual-explainer}
 \end{figure}
 
