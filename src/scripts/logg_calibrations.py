@@ -36,7 +36,7 @@ def main(style='paper', cmap_name='autumn'):
     fig, axs = plt.subplots(
         2, 2, 
         sharex=True, sharey='row',
-        figsize=(ONE_COLUMN_WIDTH, 1.2 * ONE_COLUMN_WIDTH),
+        figsize=(ONE_COLUMN_WIDTH, 1.4 * ONE_COLUMN_WIDTH),
         gridspec_kw={'hspace': 0, 'wspace': 0}
     )
     cmap = truncate_colormap(plt.get_cmap(cmap_name), minval=0.1, maxval=0.9)
@@ -46,9 +46,10 @@ def main(style='paper', cmap_name='autumn'):
     for i, ycol in enumerate(['ce_mg', 'ce_mg_corr', 'fe_mg', 'fe_mg_corr']):
         ax = axs.flatten()[i]
         # 2D hexbin of all stars
-        ax.hexbin(
+        pcm = ax.hexbin(
             calib_data['mg_h'], calib_data[ycol], 
             extent=[*AXES_LIM['mg_h'], *AXES_LIM[ycol.replace('_corr', '')]], 
+            vmin=0, vmax=2000,
             **hexbin_kw
         )
         # Plot median trends binned by log(g)
@@ -94,19 +95,32 @@ def main(style='paper', cmap_name='autumn'):
     # Label populations
     axs[1,0].text(-0.7, 0.1, 'High-Ia')
     axs[1,0].text(0.05, -0.325, 'Low-Ia')
-    # Add colorbar
-    cax = insert_colorbar_axes(
+    # Add logg colorbar
+    logg_cax = insert_colorbar_axes(
         fig, 
         pad=0.06, width=0.03, 
         orientation='horizontal'
     )
     fig.colorbar(
         ScalarMappable(norm, cmap), 
-        cax=cax, 
+        cax=logg_cax, 
         label=r'$\log(g)$', 
         orientation='horizontal'
     )
-    cax.yaxis.set_inverted(True)
+    # Add density colorbar
+    density_cax = insert_colorbar_axes(
+        fig, 
+        pad=0.06, width=0.03, 
+        orientation='horizontal'
+    )
+    fig.colorbar(
+        pcm, 
+        cax=density_cax, 
+        label=r'Number of stars', 
+        extend='max',
+        orientation='horizontal'
+    )
+    logg_cax.yaxis.set_inverted(True)
     # Plot labels
     axs[0,0].set_title('No offsets')
     axs[0,1].set_title('With offsets')
