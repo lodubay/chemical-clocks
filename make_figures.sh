@@ -4,15 +4,16 @@
 cd ./src/scripts/
 
 # Generate MWM sample data table
+echo "Generating sample file..."
 python sample.py
 
 # Plots
 echo "Plotting Figure 1..."
-python kiel_diagram.py
+python logg_calibrations.py
 echo "Plotting Figures 2 and 3..."
 python ce_lines.py
 echo "Plotting Figure 4..."
-python logg_calibrations.py
+python sample_distributions.py
 echo "Plotting Figure 5..."
 python dataset_comparison.py
 echo "Plotting Figure 6..."
@@ -26,11 +27,9 @@ python median_trends_grid.py
 echo "Plotting Figure 10..."
 python residual_abundances.py
 echo "Plotting Figure 11..."
-python median_age_trends.py
+python residual_age_trends.py
 echo "Plotting Figure 12..."
 python gradients.py
 echo "Plotting Figure 13..."
 python halo.py
-echo "Plotting Figure 14..."
-python ssp_yields.py
 echo "Done!"
