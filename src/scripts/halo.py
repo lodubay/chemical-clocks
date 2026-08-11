@@ -315,10 +315,10 @@ def main(style='paper', verbose=False):
     # Indicate grid edges
     mgh_arr = np.arange(-2.5, 1.25, 0.25)
     ax2.plot(mgh_arr, -2.1 - mgh_arr, 'k:') # edge of stars flagged bad
-    ax2.plot(mgh_arr, -1.5 - mgh_arr, color='gray', ls=':') # indicates region of upper limits (approximate)
+    ax2.plot(mgh_arr, -1.4 - mgh_arr, color='gray', ls=':') # indicates region of upper limits (approximate)
     ax2.plot(mgh_arr, 0.9 - mgh_arr, 'k:') # edge of stars flagged bad
     ax2.text(-1.22, -0.95, 'Grid edge', ha='right')
-    ax2.text(-0.62, -0.95, 'Upper limits', ha='right')
+    ax2.text(-0.52, -0.95, 'Upper limits', ha='right')
     # Indicate median abundance error
     ax2.errorbar(
         0.3, -0.8, 
