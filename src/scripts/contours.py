@@ -96,12 +96,9 @@ def get_kde2D(data, xcol, ycol, bandwidth=0.03, overwrite=False, path=None, **kw
     -------
     xx, yy, logz: tuple of numpy.array
         Outputs of stats.kde2D()
-    """    
-    # Path to save 2D KDE for faster plot times
-    rlim = (round(data['Rg'].min(), 1), round(data['Rg'].max(), 1))
-    zlim = (round(data['z_max'].min(), 1), round(data['z_max'].max(), 1))
+    """
     if path is None:
-        path = kde2D_path(xcol, ycol, rlim, zlim)
+        path = kde2D_path(xcol, ycol)
     if path.exists() and not overwrite:
         xx, yy, logz = read_kde(path)
     else:
@@ -135,7 +132,7 @@ def save_kde(xx, yy, logz, path):
             np.savetxt(f, arr)
 
 
-def kde2D_path(xcol, ycol, galr_lim, absz_lim):
+def kde2D_path(xcol, ycol):
     """
     Generate file name for the KDE of the given region.
     
@@ -146,7 +143,8 @@ def kde2D_path(xcol, ycol, galr_lim, absz_lim):
     ycol : str
         Name of column with y-axis data
     """
-    kde_dir = '_'.join([''.join(xcol.split('_')).lower(),
-                        ''.join(ycol.split('_')).lower()])
-    filename = 'r%s-%s_z%s-%s.dat' % (galr_lim + absz_lim)
-    return paths.data / 'kde' / kde_dir / filename
+    filename = '_'.join([
+        ''.join(xcol.split('_')).lower(),
+        ''.join(ycol.split('_')).lower()
+    ])
+    return paths.data / 'kde' / f'{filename}.dat'

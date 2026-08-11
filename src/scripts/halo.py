@@ -261,7 +261,7 @@ def main(style='paper', verbose=False):
     subsamples = [low_ia, high_ia]
     colors = [low_ia_color, high_ia_color]
     labels = ['Low-Ia Disk', 'High-Ia Disk']
-    fnames = ['all_low_ia.dat', 'all_high_ia.dat']
+    fnames = ['mgh_cemg_low_ia.dat', 'mgh_cemg_high_ia.dat']
     for i, df in enumerate(subsamples):
         sorted_mgh = df.sort_values('mg_h')[['mg_h', 'ce_mg']]
         rolling_mgh = sorted_mgh.rolling(
@@ -284,8 +284,14 @@ def main(style='paper', verbose=False):
             label=labels[i]
         )
         plot_kde2D_contours(
-            ax2, df, 'mg_h', 'ce_mg', c=colors[i], lw=contour_linewidth,
-            path=paths.data / 'MWM' / 'kde' / 'mgh_cemg' / fnames[i]
+            ax2, 
+            df, 
+            'mg_h', 
+            'ce_mg', 
+            c=colors[i], 
+            lw=contour_linewidth,
+            overwrite=True,
+            path=paths.data / 'kde' / fnames[i]
         )
     # Compare Hasselquist et al. (2021) dwarf median trends
     dr17_dwarfs = get_hasselquist_dwarfs()

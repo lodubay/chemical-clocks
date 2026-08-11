@@ -74,7 +74,8 @@ def main(style='paper', cmap=ABUNDANCE_COLORMAP):
             ax, local_sample, 'age', 'ce_mg_corr', 
             enclosed=[0.8, 0.5, 0.2], bandwidth=0.2, c='gray', 
             plot_kwargs={'zorder':1},
-            overwrite=(i==0) # overwrite KDE calc the first time only
+            overwrite=(i==0), # overwrite KDE calc the first time only
+            path=paths.data / 'kde' / 'local_age_cemg.dat'
         )
         # ax.scatter(
         #     local_sample['age'], local_sample['ce_mg_corr'],
