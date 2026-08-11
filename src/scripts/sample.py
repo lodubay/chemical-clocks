@@ -254,7 +254,7 @@ def compute_upper_limits(df):
             df['teff'], df['snr'], **row.to_dict()
         )
         df['lim_%s_h_flag' % el] = (
-            df['%s_h' % el] - df['e_%s_h' % el] <= df['lim_%s_h' % el]
+            df['raw_%s_h' % el] - df['e_%s_h' % el] <= df['lim_%s_h' % el]
         ).astype(np.int64)
     return df
 
