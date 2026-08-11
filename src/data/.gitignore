@@ -1,3 +1,6 @@
 # Nothing in this folder should be tracked by git
 *
 !.gitignore
+# Small data files are ok
+!shetrone_dr17_limits.csv
+!*.npy

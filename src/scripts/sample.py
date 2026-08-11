@@ -8,6 +8,7 @@ from scipy.interpolate import interpn
 from astropy.io import fits
 import astropy.units as u
 import astropy.coordinates as coord
+import sdss_access
 
 from utils import fits_to_pandas, get_bin_centers, alpha_cut
 import paths
@@ -21,10 +22,8 @@ MET_CUT = -1.5 # Meszaros et al. (2025) recommendation for Ce
 def main():
     # Import full DR19 catalog (takes a while)
     print('Importing DR19 catalog...')
-    mwm_full = fits_to_pandas(
-        paths.data / 'catalogs/astraAllStarASPCAP-0.6.0.fits.gz', 
-        hdu=2
-    )
+    allstar_file = get_allstar()
+    mwm_full = fits_to_pandas(allstar_file, hdu=2)
     # Join row-matched StarFlow age catalog
     starflow = fits_to_pandas(
         paths.data / 'catalogs/StarFlow_summary_v1_0_1.fits'
@@ -111,6 +110,26 @@ def main():
     print('Exporting sample of %s stars (sample.csv)...' % sample.shape[0])
     sample.to_csv(paths.data / 'sample.csv', index=False)
     print('Done!')
+
+
+def get_allstar():
+    """Retrieve the path to the DR19 astraAllStarASPCAP file."""
+    sdss_path = sdss_access.path.Path(release='dr19', verbose=True)
+    allstar_file = sdss_path.full('astraAllStarASPCAP', v_astra='0.6.0')
+    access = sdss_access.Access(release='dr19', verbose=True)
+    if not sdss_path.exists('',full=allstar_file):
+        download_allstar(access)
+    allstar_file = sdss_path.full('astraAllStarASPCAP', v_astra='0.6.0')
+    return allstar_file
+
+
+def download_allstar(access):
+    """Download the DR19 astraAllStarASPCAP file."""
+    # if the file does not exist locally, this code will download the data.
+    access.remote()
+    access.add('astraAllStarASPCAP', v_astra='0.6.0')
+    access.set_stream()
+    access.commit()
 
 
 def abundance_ratio(catalog, elem1, elem2='fe_h'):
