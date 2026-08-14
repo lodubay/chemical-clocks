@@ -640,13 +640,20 @@ We acknowledge the land that The Ohio State University occupies is the ancestral
 \section{Abundance Calibration Procedure}
 \label{app:logg-calibration-procedure}
 
-Following \citet{sit_chemical_2024}, we define a calibration sample of stars in DR19 with $-0.75 < \bracket{Mg} < 0.45$, $3<R_{\rm gal}<13\kpc$, and $|z| < 2\kpc$, in addition to the cuts listed in Section \ref{sec:data}. Corrective offsets are applied to each individual [Fe/H] and [Ce/H] such that the global median [X/Mg] trend with [Mg/H] is the same over all $\log(g)$. [X/Mg] medians are calculated in $0.1\dex$-wide bins of [Mg/H] and $0.25\dex$-wide bins of $\log(g)$. Differences in the median values of each bin from a fiducial value (selected to be $\bracket{Mg} = 0$ and $\log(g) = 1.75$) are calculated separately for the low-Ia and high-Ia sequences. Then a number-weighted average of median differences over the two alpha sequences is calculated at each ([Mg/H], $\log(g)$) bin pair. The final offset value for a given star is calculated by interpolating the binned median differences to that star's [Mg/H] and $\log(g)$. We finally subtract a zero-point offset equal to the median difference between the corrected and un-corrected abundances for the entire sample, to avoid shifting the overall distribution of [Ce/H] and [Fe/H].
+Following \citet{sit_chemical_2024}, we define a calibration sample of stars in DR19 with $-0.75 < \bracket{Mg} < 0.45$, $3<R_{\rm gal}<13\kpc$, and $|z| < 2\kpc$, in addition to the cuts listed in Section \ref{sec:data}. Corrective offsets are applied to each individual [Fe/H] and [Ce/H] such that the global median [X/Mg] trend with [Mg/H] is the same over all $\log(g)$. [X/Mg] medians are calculated in $0.1\dex$-wide bins of [Mg/H] and $0.25\dex$-wide bins of $\log(g)$. Differences in the median values of each bin from a fiducial value (selected to be $\bracket{Mg} = 0$ and $\log(g) = 1.75$) are calculated separately for the low-Ia and high-Ia sequences. Then a number-weighted average of median differences over the two alpha sequences is calculated at each ([Mg/H], $\log(g)$) bin pair. The final offset value for a given star is calculated by interpolating the binned median differences to that star's [Mg/H] and $\log(g)$. We finally subtract a zero-point offset equal to the median difference between the corrected and un-corrected abundances for the entire sample, to avoid shifting the overall distribution of [Ce/H] and [Fe/H]. Tables \ref{tab:ce-offset-table} and \ref{tab:fe-offset-table} present the abundance offsets for Ce and Fe, respectively, before applying the final zero-point offset.
 
 \begin{table*}[]
     \centering
     \include{output/ce_offset_table.tex}
-    \caption{Caption}
+    \caption{Corrective offsets to [Ce/H] as a function of $\log(g)$ and [Mg/H].}
     \label{tab:ce-offset-table}
+\end{table*}
+
+\begin{table*}[]
+    \centering
+    \include{output/fe_offset_table.tex}
+    \caption{Corrective offsets to [Fe/H] as a function of $\log(g)$ and [Mg/H].}
+    \label{tab:fe-offset-table}
 \end{table*}
 
 \bibliography{references}
