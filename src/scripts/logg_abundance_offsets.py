@@ -35,22 +35,20 @@ def make_table(offsets_grid):
     logg_bin_centers = get_bin_centers(logg_bin_edges)
 
     # Generate LaTeX tables
-    fe_df = pd.DataFrame(
+    df = pd.DataFrame(
         offsets_grid, 
         index=pd.Series([f'{l:.2f}' for l in logg_bin_centers], name=r'$\log(g)'),
         columns=pd.Series([f'{m:.1f}' for m in MgH_bin_centers], name='[Mg/H]')
     )
-    latex_table = fe_df.to_latex(
+    latex_table = df.to_latex(
         column_format='r|' + 'c'*len(MgH_bin_centers),
         float_format='%.2g'
     )
-    latex_table = latex_table.replace('-0', '0')
-    # Add horizontal lines
-    latex_table_list = latex_table.split('\n')
-    latex_table_list.insert(1, '\\hline\\hline')
-    latex_table_list.insert(4, '\\hline')
-    latex_table_list.insert(-2, '\\hline')
-    latex_table = '\n'.join(latex_table_list)
+    latex_table = latex_table.replace('-0 ', '0 ')
+    # Replace \toprule, \midrule, \bottomrule with \hline
+    latex_table = latex_table.replace('\\toprule', '\\hline\\hline')
+    latex_table = latex_table.replace('\\midrule', '\\hline')
+    latex_table = latex_table.replace('\\bottomrule', '\\hline')
 
     return latex_table
 
