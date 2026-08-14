@@ -18,12 +18,10 @@ def main():
     ce_offsets = ce_offsets.T[2:]
 
     fe_table = make_table(fe_offsets)
-    print(fe_table)
     with open(paths.output / 'fe_offset_table.tex', 'w') as f:
         f.write(fe_table)
 
     ce_table = make_table(ce_offsets)
-    print(ce_table)
     with open(paths.output / 'ce_offset_table.tex', 'w') as f:
         f.write(ce_table)
 
@@ -37,7 +35,7 @@ def make_table(offsets_grid):
     # Generate LaTeX tables
     df = pd.DataFrame(
         offsets_grid, 
-        index=pd.Series([f'{l:.2f}' for l in logg_bin_centers], name=r'$\log(g)'),
+        index=pd.Series([f'{l:.2f}' for l in logg_bin_centers], name=r'$\log(g)$'),
         columns=pd.Series([f'{m:.1f}' for m in MgH_bin_centers], name='[Mg/H]')
     )
     latex_table = df.to_latex(
