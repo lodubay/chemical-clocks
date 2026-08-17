@@ -8,7 +8,6 @@ import numpy as np
 from numpy.random import default_rng
 import pandas as pd
 from astropy.table import Table
-import vice
 
 from stats import median_standard_error
 from _globals import RANDOM_SEED
