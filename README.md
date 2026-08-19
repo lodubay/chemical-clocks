@@ -1,23 +1,48 @@
-# Paper Template
+# Chemical Clocks in Milky Way Mapper
 
-This is a template repository for code-heavy papers. The directory structure is:
+Plotting scripts and LaTeX source code for Dubay et al. (in prep),
+"A Broken Clock is Right Twice a Day: [Ce/Mg] is Not a Universal Chemical Clock".
 
-`src/data` - Data files and model outputs that won't be tracked by git.
+To re-build the manuscript yourself, first ensure you have the right
+packages by creating a Conda environment from the `environment.yml` file:
+```
+$ conda env create -f environment.yml
+$ conda activate chemical-clocks
+```
 
-`src/extra` - Non-paper plots and output files that aren't tracked by git.
+The required data files are too big to be stored in this repository. The
+summary data file with all necessary information can be shared upon request.
+Place the `sample.csv` file within the `src/data` directory.
 
-`src/scripts` - Scripts and other code for generating paper figures and output files.
+To re-create all plots and tables in the manuscript, run the following:
+```
+$ bash make_figures.sh
+```
 
-`src/scripts/styles` - matplotlib style files for figure scripts.
+## Repository Structure
 
-`src/scripts/paths.py` - Links to the directory structure using Python's pathlib library.
+```
+.
+├── src
+│   ├── data                # Catalog files and model outputs (ignored by git)
+│   ├── extra               # Non-paper figures and other outputs (ignored by git)
+│   ├── scripts             # Python scripts for figures and tables
+│   ├── tex                 # LaTeX manuscript files
+│   ├── ├── figures         # Programatically-generated figures
+│   ├── ├── output          # Programatically-generated tables and other outputs
+├── make_figures.sh         # Script to produce all paper figures
+├── environment.yml         # Package dependencies
+├── LICENSE
+└── README.md
+```
 
-`src/tex` - LaTeX source directory.
+## Software Dependencies
 
-`src/tex/figures` - LaTeX figures, static or generated from scripts. Tracked by git.
-
-`src/tex/output` - Other script output such as tables. Tracked by git.
-
-`src/tex/ms.tex` - LaTeX manuscript file.
-
-`src/tex/references.bib` - Bibliography file.
+- numpy
+- pandas
+- matplotlib
+- astropy
+- scipy
+- scikit-learn
+- statsmodels
+- sdss-access
