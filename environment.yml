@@ -4,9 +4,9 @@ channels:
     - conda-forge
 dependencies:
     - python==3.12
-    - numpy>=2.0
+    - numpy==2.5
     - pandas==2.3
-    - matplotlib
+    - matplotlib==3.10
     - astropy
     - jupyterlab
     - scipy
