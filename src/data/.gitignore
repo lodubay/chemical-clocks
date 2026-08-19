@@ -1,7 +1,7 @@
 # Nothing in this folder should be tracked by git
 *
 !.gitignore
+!catalogs
 # Small data files are ok
 !shetrone_dr17_limits.csv
 !*.npy
-!catalogs/occam_19cluster-rgb.csv

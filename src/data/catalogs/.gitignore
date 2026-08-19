@@ -1,0 +1,5 @@
+# Nothing in this directory should be tracked by git
+*
+!.gitignore
+# Small files are ok
+!occam_19cluster-rgb.csv
