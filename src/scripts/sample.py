@@ -18,6 +18,20 @@ TEFF_CUT = (4000, 5500)
 ABUND_ERR_CUT = 0.2
 SNR_CUT = 100
 MET_CUT = -1.5 # Meszaros et al. (2025) recommendation for Ce
+# List of columns to include in the final sample
+SAMPLE_COLS = [
+    'sdss_id', 'sdss4_apogee_id', 'gaia_dr3_source_id', 'ra', 'dec', 'l', 'b', 
+    'telescope', 'field', 'snr', 'v_rad', 'e_v_rad',  'std_v_rad',
+    'teff', 'logg', 'm_h_atm',
+    'mg_h', 'e_mg_h', 'fe_h', 'fe_h_corr', 'e_fe_h', 
+    'ce_h', 'ce_h_corr', 'e_ce_h', 'lim_ce_h', 'lim_ce_h_flag',
+    'ce_mg', 'ce_mg_corr', 'e_ce_mg', 'ce_fe', 'ce_fe_corr', 'e_ce_fe', 
+    'mg_fe', 'mg_fe_corr', 'e_mg_fe', 'fe_mg', 'fe_mg_corr', 'e_fe_mg',
+    'al_fe', 'e_al_fe', 'al_h_flags', 'mn_mg', 'e_mn_mg', 'mn_h_flags',
+    'age', 'e_p_age', 'e_n_age', 'e_mean_age', 'training_density', 'good_age',
+    'galr', 'galphi', 'galz', 'E', 'Lz', 'Jr', 'Jz', 'Jtot', 'Rg', 'z_max',
+    'low_ia', 'high_ia',
+]
 
 def main():
     # Import full DR19 catalog (takes a while)
@@ -105,6 +119,8 @@ def main():
     sample = logg_calibrations(sample)
     # Apply [alpha/Fe] population cut
     sample = apply_alpha_cut(sample)
+    # Limit number of columns
+    sample = sample[SAMPLE_COLS].copy()
 
     # Export catalogs
     print('Exporting sample of %s stars (sample.csv)...' % sample.shape[0])
