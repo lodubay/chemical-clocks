@@ -4,3 +4,4 @@
 # Small data files are ok
 !shetrone_dr17_limits.csv
 !*.npy
+!catalogs/occam_19cluster-rgb.csv
