@@ -4,8 +4,12 @@
 cd ./src/scripts/
 
 # Generate MWM sample data table
-echo "Generating sample file..."
-python sample.py
+if [ -f ../data/sample.csv ]; then
+    echo "Found sample summary file!"
+else
+    echo "Generating sample file..."
+    python sample.py
+fi
 
 # Plots
 echo "Plotting Figure 1..."
