@@ -3,6 +3,7 @@ This script compares the age--[Ce/Mg] relations for MWM DR19 against the
 OCCAM DR19 open cluster sample and against APOKASC-3.
 """
 import argparse
+import urllib
 
 import numpy as np
 import pandas as pd
@@ -11,7 +12,7 @@ from matplotlib.colors import BoundaryNorm, LogNorm
 from matplotlib.ticker import MultipleLocator
 from astropy.io import ascii
 
-from sample import abundance_ratio
+from sample import abundance_ratio, get_allstar
 from utils import fits_to_pandas, import_sample
 from plotting import ONE_COLUMN_WIDTH, DENSITY_COLORMAP
 import paths
@@ -43,7 +44,7 @@ def main(style='paper'):
         gridsize=30,
         linewidths=0.2,
         extent=[xlim[0], xlim[1], ylim[0], ylim[1]],
-        vmin=0
+        mincnt=0
     )
     fig.colorbar(pcm0, ax=axs[0], shrink=0.9, label='Number of stars')
     # Rolling median
@@ -216,8 +217,12 @@ def casali_relation(age, feh):
     return -0.032 * age + 0.194 * feh + 0.092
 
 
-def join_apokasc_mwm():
+def join_apokasc_mwm(verbose=False):
     """Join APOKASC-3 catalogs with abundances and parameters from MWM DR19."""
+    # Download APOKASC-3 catalog
+    apokasc3_file = paths.data / 'catalogs' / 'apokasc3_rec_mrt.txt'
+    if not apokasc3_file.is_file():
+        get_apokasc3(apokasc3_file)
     # APOKASC-3 catalog
     apokasc3 = ascii.read(paths.data / 'catalogs/apokasc3_rec_mrt.txt').to_pandas()
     apokasc3['APOGEE_ID'] = apokasc3['2MASS'].str.replace('2MASS J', '2M')
@@ -233,10 +238,9 @@ def join_apokasc_mwm():
         apokasc3['AgeRC']
     )
     # Import full DR19 catalog
-    mwm_full = fits_to_pandas(
-        paths.data / 'catalogs/astraAllStarASPCAP-0.6.0.fits.gz', 
-        hdu=2
-    )
+    if verbose: print('Importing DR19 catalog...')
+    allstar_file = get_allstar()
+    mwm_full = fits_to_pandas(allstar_file, hdu=2)
     # drop duplicate SDSS-V IDs with the lowest SNR
     mwm_full.sort_values(['sdss_id', 'snr'], inplace=True, ascending=True)
     mwm_full.drop_duplicates(subset='sdss_id', keep='last', inplace=True)
@@ -258,6 +262,14 @@ def join_apokasc_mwm():
     )
     apokasc3.rename(columns={'ce_mg': 'MWM_CE_MG', 'e_ce_mg': 'MWM_CE_MG_ERR'}, inplace=True)
     return apokasc3
+
+
+def get_apokasc3(path):
+    url = 'https://content.cld.iop.org/journals/0067-0049/276/2/69/revision1/apjsad9feft4_mrt.txt'
+    with urllib.request.urlopen(url) as response:
+        dat = response.read()
+    with open(path, 'wb') as f:
+        f.write(dat)
 
 
 
