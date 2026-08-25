@@ -100,10 +100,10 @@ def main(style='paper'):
     axs[2].xaxis.set_major_locator(MultipleLocator(5))
     axs[2].xaxis.set_minor_locator(MultipleLocator(1))
     for ax in axs:
-        ax.yaxis.set_major_locator(MultipleLocator(5000))
+        ax.yaxis.set_major_locator(MultipleLocator(4000))
         ax.yaxis.set_minor_locator(MultipleLocator(1000))
         ax.set_ylabel(r'$N$', rotation='horizontal', labelpad=4)
-        ax.set_ylim((0, 11000))
+        ax.set_ylim((0, 9000))
     plt.savefig(paths.figures / 'sample_distributions')
     plt.close()
 

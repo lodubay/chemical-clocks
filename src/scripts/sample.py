@@ -13,7 +13,7 @@ import sdss_access
 from utils import fits_to_pandas, get_bin_centers, alpha_cut
 import paths
 
-LOGG_CUT = (1.0, 3.5)
+LOGG_CUT = (1.0, 3.0)
 TEFF_CUT = (4000, 5500)
 ABUND_ERR_CUT = 0.2
 SNR_CUT = 100
@@ -180,7 +180,13 @@ def abundance_ratio(catalog, elem1, elem2='fe_h'):
     return ratio, error
 
 
-def add_kinematics(df, id_name='sdss_id', verbose=False):
+def add_kinematics(
+        df, 
+        fitspath = paths.data / 'catalogs/sdssv-mwm-dr19-apogee-actions.fits', 
+        id_name='sdss_id', 
+        suffix='_kin',
+        verbose=False, 
+    ):
     """
     Join catalog with orbital parameters for Gaia source IDs.
 
@@ -188,8 +194,12 @@ def add_kinematics(df, id_name='sdss_id', verbose=False):
     ----------
     df : pandas.DataFrame
         DataFrame to join to the Gaia orbit catalog.
+    fitspath : str or pathlib.Path, optional
+        Path to DR19 orbits catalog
     id_name : str, optional
         Column name of Gaia source IDs in df. Default is 'source_id'.
+    suffix : str, optional
+        Suffix for overlapping column names. Default is '_kin'.
     verbose : bool, optional
         If True, print verbose output to terminal.
 
@@ -198,7 +208,6 @@ def add_kinematics(df, id_name='sdss_id', verbose=False):
     df : pandas.DataFrame
         Input DataFrame merged with Gaia orbit parameters.
     """
-    fitspath = paths.data / 'catalogs/sdssv-mwm-dr19-apogee-actions.fits'
     with fits.open(fitspath) as hdul:
         kinematic = hdul[1].data
     if verbose: print('Finished reading in data!')
@@ -248,7 +257,7 @@ def add_kinematics(df, id_name='sdss_id', verbose=False):
             kinematic_dr3.ecc,
             kinematic_dr3.z_max,
             kinematic_dr3.R_guide,
-            kinematic_dr3['flags']
+            kinematic_dr3['flags'],
         ), dtype=str).T,
         columns=[
             'sdss_id','galx','galy','galz','galr','galphi',
@@ -270,7 +279,7 @@ def add_kinematics(df, id_name='sdss_id', verbose=False):
 
     df = pd.merge(
         df, kinematic_dr3,
-        left_on=id_name, right_on='sdss_id', how='left'
+        left_on=id_name, right_on='sdss_id', how='left', suffixes=(None, suffix)
     )
     
     return df

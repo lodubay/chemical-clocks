@@ -296,7 +296,7 @@ def main(style='paper', verbose=False):
     # Compare Hasselquist et al. (2021) dwarf median trends
     dr17_dwarfs = get_hasselquist_dwarfs()
     textcoords = [
-        (-1.75, -0.18),
+        (-1.75, -0.17),
         (-1.8, 0.0),
         (-1.5, -0.2)
     ]
@@ -316,7 +316,7 @@ def main(style='paper', verbose=False):
             textcoords[i][0],
             textcoords[i][1],
             sys,
-            # bbox={'color': 'w', 'pad': 0.5, 'alpha': 1}
+            bbox={'color': 'w', 'pad': 0.5, 'alpha': 1}
         )
     # Indicate grid edges
     mgh_arr = np.arange(-2.5, 1.25, 0.25)

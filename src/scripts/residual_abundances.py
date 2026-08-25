@@ -56,7 +56,7 @@ def main(style='paper', sample_fraction=SAMPLE_FRACTION):
         gridspec_kw={'hspace': 0, 'wspace': 0}
     )
     # scatterplot style arguments
-    kwargs = dict(s=1, marker='.', rasterized=True, edgecolor='none')
+    kwargs = dict(s=2, marker='.', rasterized=True, edgecolor='none')
     # Label each panel
     labels = ['(a)', '(b)', '(c)', '(d)']
     for i, ax in enumerate(axs.flatten()):

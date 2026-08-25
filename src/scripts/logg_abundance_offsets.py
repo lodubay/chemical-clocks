@@ -13,9 +13,9 @@ def main():
     fe_offsets = np.load(paths.data / 'fe_offset_grid.npy')
     ce_offsets = np.load(paths.data / 'ce_offset_grid.npy')
 
-    # Cut rows with log(g) < 1
-    fe_offsets = fe_offsets.T[2:]
-    ce_offsets = ce_offsets.T[2:]
+    # Cut rows with log(g) < 1 and log(g) > 3
+    fe_offsets = fe_offsets.T[2:-1]
+    ce_offsets = ce_offsets.T[2:-1]
 
     fe_table = make_table(fe_offsets)
     with open(paths.output / 'fe_offset_table.tex', 'w') as f:
@@ -29,7 +29,7 @@ def make_table(offsets_grid):
     # Initialize grid of log(g), [Mg/H] values
     MgH_bin_edges = np.round(np.linspace(-0.75, 0.45, 13, endpoint=True), 2)
     MgH_bin_centers = get_bin_centers(MgH_bin_edges)
-    logg_bin_edges = np.linspace(1, 3.5, 6, endpoint=True)
+    logg_bin_edges = np.linspace(1.0, 3.0, 5, endpoint=True)
     logg_bin_centers = get_bin_centers(logg_bin_edges)
 
     # Generate LaTeX tables

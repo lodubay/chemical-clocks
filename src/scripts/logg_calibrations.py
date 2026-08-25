@@ -40,7 +40,7 @@ def main(style='paper', cmap_name='autumn'):
         gridspec_kw={'hspace': 0, 'wspace': 0}
     )
     cmap = truncate_colormap(plt.get_cmap(cmap_name), minval=0.1, maxval=0.9)
-    norm = BoundaryNorm(logg_bin_edges[2:], cmap.N)
+    norm = BoundaryNorm(logg_bin_edges[2:-1], cmap.N)
     hexbin_kw = dict(gridsize=20, linewidths=0.2, cmap='binary')
     ms = 2
     for i, ycol in enumerate(['ce_mg', 'ce_mg_corr', 'fe_mg', 'fe_mg_corr']):
@@ -53,8 +53,8 @@ def main(style='paper', cmap_name='autumn'):
             **hexbin_kw
         )
         # Plot median trends binned by log(g)
-        # Ignore log(g) < 1 as that is outside the sample cut
-        for j in range(2, logg_bin_centers.shape[0]):
+        # Ignore log(g) < 1 and log(g) > 3 as that is outside the sample cut
+        for j in range(2, logg_bin_centers.shape[0]-1):
             logg_lim = logg_bin_edges[j:j+2]
             logg_center = np.sum(logg_bin_edges[j:j+2])/2
             logg_subset = calib_data[
@@ -71,7 +71,8 @@ def main(style='paper', cmap_name='autumn'):
                 fmt='o--', markersize=ms, 
                 capsize=0,
                 color=cmap(norm(logg_center)),
-                zorder=10-j
+                zorder=10-j,
+                label=logg_center
             )
             # Low-alpha median trends, binned by [Mg/H]
             high_ia_uncorr_med = binned_quantiles(

@@ -46,7 +46,7 @@ def main(style='paper'):
     fig, axs = setup_hayden_plot()
     plt.subplots_adjust(left=0.1, right=0.95, bottom=0.1, top=0.95)
     # scatterplot style arguments
-    kwargs = dict(s=1, marker='.', rasterized=True, edgecolor='none')
+    kwargs = dict(s=2, marker='.', rasterized=True, edgecolor='none')
     low_ia_color = paultol.highcontrast.colors[2]
     high_ia_color = paultol.highcontrast.colors[0]
 
