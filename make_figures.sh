@@ -69,10 +69,21 @@ echo "Plotting Figure 12..."
 python gradients.py
 echo "Plotting Figure 13..."
 python halo.py
-echo "Done!"
+
+# Appendix figures
+echo "Plotting Figure 14..."
+python bawlas_comparison.py
+echo "Plotting Figure 15..."
+python age_trend_sensitivity.py
+echo "Plotting Figure 16..."
+python linear_fit_sensitivity.py
+echo "Plotting Figure 17..."
+python distance_source_sensitivity.py
 
 # Tables & other output
 echo "Generating Tables 2 and 3..."
 python logg_abundance_offsets.py
 echo "Generating sample size files..."
 python sample_size.py
+
+echo "Done!"
