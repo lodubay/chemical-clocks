@@ -25,7 +25,7 @@ def main(style='paper'):
     plt.rcParams['axes.prop_cycle'] = plt.cycler('color', paultol.bright.colors)
     fig, axs = plt.subplots(
         2, 
-        figsize=(ONE_COLUMN_WIDTH, 1.6*ONE_COLUMN_WIDTH), 
+        figsize=(ONE_COLUMN_WIDTH, 1.5*ONE_COLUMN_WIDTH), 
         sharex=True,
         gridspec_kw={'hspace': 0}
     )

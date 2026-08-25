@@ -111,7 +111,7 @@ def main(style='paper', cmap=RADIUS_COLORMAP):
     axs[0].xaxis.set_minor_locator(MultipleLocator(0.1))
     axs[0].yaxis.set_major_locator(MultipleLocator(0.05))
     axs[0].yaxis.set_minor_locator(MultipleLocator(0.01))
-    axs[0].set_ylabel('Slope [dex/Gyr]')
+    axs[0].set_ylabel(r'Slope [dex Gyr$^{-1}$]')
     axs[1].set_ylim((-0.2, 0.34))
     axs[1].yaxis.set_major_locator(MultipleLocator(0.1))
     axs[1].yaxis.set_minor_locator(MultipleLocator(0.02))
