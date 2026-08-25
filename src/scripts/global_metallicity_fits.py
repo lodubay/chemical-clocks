@@ -125,6 +125,11 @@ def main(style='paper', cmap=RADIUS_COLORMAP):
 def fit_metallicity_bins(
         data, 
         bins, 
+        xcol='age',
+        xerrcol='e_mean_age',
+        ycol='ce_mg_corr',
+        yerrcol='e_ce_mg',
+        metcol='fe_h_corr',
         min_count=MIN_COUNT, 
         age_fit_range=AGE_FIT_RANGE,
         age_delta=AGE_DELTA,
@@ -138,6 +143,16 @@ def fit_metallicity_bins(
     data : pandas.DataFrame
     bins : array-like of length N
         Metallicity bin edges
+    xcol : str, optional [default: 'age']
+        Column name of independent variable.
+    xerrcol : str, optional [default: 'e_mean_age']
+        Column name of error on the independent variable.
+    ycol : str, optional [default: 'ce_mg_corr']
+        Column name of dependent variable.
+    yerrcol : str, optional [default: 'e_ce_mg']
+        Column name of error on the dependent variable.
+    metcol : str, optional [default: 'fe_h_corr']
+        Column name of metallicity indicator.
     min_count : int, optional [default: 20]
         Minimum number of stars in a bin required to calculate a fit.
     age_fit_range : tuple of floats, optional [default: (1, 8)]
@@ -163,18 +178,18 @@ def fit_metallicity_bins(
     for k in range(len(bins)-1):
         met_lim = bins[k:k+2]
         subset = data[
-            (data['fe_h_corr'] >= met_lim[0]) & 
-            (data['fe_h_corr'] < met_lim[1]) &
-            (data['age'] >= age_fit_range[0]) &
-            (data['age'] < age_fit_range[1])
+            (data[metcol] >= met_lim[0]) & 
+            (data[metcol] < met_lim[1]) &
+            (data[xcol] >= age_fit_range[0]) &
+            (data[xcol] < age_fit_range[1])
         ]
         if subset.shape[0] > min_count:
             x = subset['age'].values - age_delta
             X = x[:,np.newaxis]
             X = sm.add_constant(X)
-            y = subset['ce_mg_corr'].values
-            xerr = subset['e_mean_age'].values
-            yerr = subset['e_ce_mg'].values
+            y = subset[ycol].values
+            xerr = subset[xerrcol].values
+            yerr = subset[yerrcol].values
             # dem_reg = deming_regression(x, y, xerr, yerr)
             # dem_err = bootstrap_standard_error(deming_regression, x, y, xerr, yerr)
             # params.append(dem_reg)

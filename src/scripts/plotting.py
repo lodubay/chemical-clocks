@@ -7,6 +7,7 @@ from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.collections import PathCollection
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
+from matplotlib.container import ErrorbarContainer
 
 # AASTeX plot widths in inches
 ONE_COLUMN_WIDTH = 3.25
@@ -146,6 +147,8 @@ def colored_text_legend(ax, show_handles=False, invert=False, **kwargs):
     if show_handles:
         leg = ax.legend(handles, labels, **kwargs)
     else:
+        # Remove errorbars and errorbar caps from handles
+        handles = [h[0] if isinstance(h, ErrorbarContainer) else h for h in handles]
         leg = ax.legend(handles, labels, handlelength=0, handletextpad=0, markerscale=0, **kwargs)
         for line in leg.get_lines():
             line.set_visible(False)
