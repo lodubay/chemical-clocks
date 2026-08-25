@@ -51,6 +51,17 @@ def main(style='paper', verbose=False, overwrite=False):
     savedir.mkdir(exist_ok=True)
     if verbose: print('Importing MWM sample file...')
     mwm_sample = import_sample(good_ages=False)
+    subset = mwm_sample[
+        (mwm_sample['snr'] > 180) &
+        (mwm_sample['snr'] < 220) &
+        (mwm_sample['fe_h'] > -0.25) &
+        (mwm_sample['fe_h'] < -0.15) &
+        (mwm_sample['ce_fe'] > 0.25) &
+        (mwm_sample['ce_fe'] < 0.35) &
+        (mwm_sample['logg'] < 1.6) &
+        (mwm_sample['logg'] > 1.4)
+    ]
+    print(subset[['snr', 'fe_h', 'ce_fe', 'logg']])
     # First figure: stars with similar log(g) and metallicity but different Ce
     if verbose: print('\nFigure 1: stellar siblings')
     sdss_id_list = [ # all have S/N~200
@@ -79,17 +90,17 @@ def main(style='paper', verbose=False, overwrite=False):
     # Second figure: exploring different log(g) and metallicity values
     if verbose: print('\nFigure 2: parameter space coverage')
     sdss_id_list = [ # All have S/N~200
-        58834996, # logg~3
+        56493283, # logg~3
         116336280, # logg~2.5
-        55254073, # logg~2
+        54639740, # logg~1.5
         70979365, # [Ce/Fe]~0, [Fe/H]~-1, logg~2
         62793899, # [Ce/Fe]~-0.3, [Fe/H]~-0.5, logg~2
         96579887, # [Ce/Fe]~0, [Fe/H]~+0.3, logg~2
     ]
     # Flux offsets per spectrum for each panel
     offsets = [
-        [0.175, 0.1, 0.05, -0.10, -0.15, -0.25],
-        [0.2, 0.15, 0.1, -0.05, -0.1, -0.125],
+        [0.2, 0.125, 0.1, -0.10, -0.15, -0.25],
+        [0.225, 0.175, 0.125, -0.05, -0.1, -0.125],
         [0.2, 0.15, 0.1, 0.025, -0.025, -0.125]
     ]
     plot_spectrum_comparison(
