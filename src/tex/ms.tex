@@ -25,6 +25,11 @@
 \newcommand{\osuaffil}{Department of Astronomy, The Ohio State University, 140 W. 18th Ave, Columbus, OH 43210, USA}
 \newcommand{\ccappaffil}{Center for Cosmology and AstroParticle Physics, The Ohio State University, 191 W. Woodruff Ave., Columbus, OH 43210, USA}
 
+% Paths for figures and tables (easily change from subfolder structure)
+\newcommand{\figpath}[1]{figures/#1}
+\newcommand{\outpath}[1]{output/#1}
+
+% Units and symbols
 \newcommand{\bracket}[2][H]{{\rm [#2/#1]}}
 \newcommand{\pc}{\,{\rm pc}}
 \newcommand{\kpc}{\,{\rm kpc}}
@@ -119,8 +124,7 @@
 \shortauthors{Dubay et al.}
 
 \begin{abstract}
-    The ratio of $s$-process to $\alpha$-element enrichment ($[s/\alpha]$) has been proposed as a ``chemical clock,'' or a means to estimate stellar ages. However, the age--$[s/\alpha]$ relation varies with metallicity and location in the Galaxy, and the observed trends are not well predicted by galactic chemical evolution models. We quantify the age--[Ce/Mg] correlation across the Galactic disk in over 100,000 red giant stars observed with APOGEE in the SDSS-V Milky Way Mapper survey. 
-    We find that the slope of the correlation varies significantly with metallicity and guiding radius in the chemical thin disk. The trend is steepest in the outer disk and below Solar metallicity, while the most metal-rich stars and those in the inner disk show no correlation with age. In contrast, [Ce/Mg] patterns in the chemical thick disk are consistent across the Galaxy. Halo stars have higher [Ce/Mg] than the chemical thick disk, suggesting that asymptotic giant branch (AGB) enrichment is important even at low metallicity. Overall, patterns in [Ce/Mg] trace both the local star formation history and AGB nucleosynthesis. The complex interplay between [Ce/Mg], age, metallicity, and Galactic position means that [Ce/Mg] (and by extension $[s/\alpha]$) is not a universal chemical clock. 
+    The ratio of $s$-process to $\alpha$-element enrichment ($[s/\alpha]$) has been proposed as a ``chemical clock,'' or a means to estimate stellar ages. However, the age--$[s/\alpha]$ relation varies with metallicity and location in the Galaxy, and the observed trends are not well predicted by galactic chemical evolution models. We quantify the age--[Ce/Mg] correlation across the Galactic disk in over 100,000 red giant stars observed with APOGEE in the SDSS-V Milky Way Mapper survey. We find that the slope of the correlation varies significantly with metallicity and guiding radius in the chemical thin disk. The trend is steepest in the outer disk and below Solar metallicity, while the most metal-rich stars and those in the inner disk show no correlation with age. In contrast, [Ce/Mg] patterns in the chemical thick disk are consistent across the Galaxy. Halo stars have higher [Ce/Mg] than the chemical thick disk, suggesting that asymptotic giant branch (AGB) enrichment is important even at low metallicity. Overall, patterns in [Ce/Mg] trace both the local star formation history and AGB nucleosynthesis. The complex interplay between [Ce/Mg], age, metallicity, and Galactic position means that [Ce/Mg] (and by extension $[s/\alpha]$) is not a universal chemical clock. 
 \end{abstract}
 
 \section{Introduction}
@@ -160,7 +164,7 @@ We limit our study to red giant branch (RGB) stars because the Ce abundances in 
     \item Uncalibrated [Ce/H] above theoretical upper limit (see Section \ref{sec:ce-abundances}).
     \item Age training space density $>3\times10^9$ (``good ages''; see Section \ref{sec:ages}).
 \end{itemize}
-This produces a primary sample of \input{output/good_ages.tex}stars.\footnote{Out of the $\sim\num{900000}$ total stars in DR19, the largest reductions in sample size are due to the quality and targeting cuts ($\sim60\%$), RGB selection ($\sim58\%$), and $S/N$ requirement ($\sim26\%$), with smaller reductions due to the abundance quality cuts.} In cases where stellar ages are not needed for our analysis, we omit the age quality cut for a slightly larger sample of \input{output/sample_size.tex}stars. All of our stars have radial velocity scatter $\sigma(v_{\rm rad})<1\kms$ and 84\% have $\sigma(v_{\rm rad})<0.1\kms$, indicating minimal contamination from variable stars or binaries. We also perform sensitivity tests by running our analysis on more limited samples, including a stricter $S/N$ limit, higher age quality cut, and narrower $\log(g)$ range, and found no significant difference in our results. Appendix \ref{app:sensitivity} presents the results of these sensitivity tests.
+This produces a primary sample of \input{\outpath{good_ages.tex}}stars.\footnote{Out of the $\sim\num{900000}$ total stars in DR19, the largest reductions in sample size are due to the quality and targeting cuts ($\sim60\%$), RGB selection ($\sim58\%$), and $S/N$ requirement ($\sim26\%$), with smaller reductions due to the abundance quality cuts.} In cases where stellar ages are not needed for our analysis, we omit the age quality cut for a slightly larger sample of \input{\outpath{sample_size.tex}}stars. All of our stars have radial velocity scatter $\sigma(v_{\rm rad})<1\kms$ and 84\% have $\sigma(v_{\rm rad})<0.1\kms$, indicating minimal contamination from variable stars or binaries. We also perform sensitivity tests by running our analysis on more limited samples, including a stricter $S/N$ limit, higher age quality cut, and narrower $\log(g)$ range, and found no significant difference in our results. Appendix \ref{app:sensitivity} presents the results of these sensitivity tests.
 
 \subsection{Positions, Kinematics, and Orbits}
 \label{sec:orbits}
@@ -191,7 +195,7 @@ High-Ia stars lie above this boundary, while low-Ia stars lie below. We exclude 
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figures/logg_calibrations.pdf}
+    \includegraphics[width=\linewidth]{\figpath{logg_calibrations.pdf}}
     \caption{Demonstration of corrective $\log(g)$ offsets applied to Ce and Fe abundances in our full sample. Each panel plots the median trend in [X/Mg] as a function of [Mg/H] in multiple $\log(g)$ bins. Separate trends are shown for low-Ia (circles, dashed lines) and high-Ia (squares, solid lines) populations. The right-hand panels use the base DR19 abundances, while the left-hand panels incorporate the corrective offsets. The dashed black line in the lower-left panel indicates the division between low- and high-Ia populations.}
     \label{fig:logg-calibrations}
 \end{figure}
@@ -205,7 +209,7 @@ We follow the procedure outlined in \citet{sit_chemical_2024} to remove $\log(g)
 
 \begin{figure*}[h]
     \centering
-    \includegraphics[width=\textwidth]{figures/ce_lines_1.pdf}
+    \includegraphics[width=\textwidth]{\figpath{ce_lines_1.pdf}}
     \caption{Ce II absorption lines in the APOGEE spectra for selected stars with similar $\log(g)$, $T_{\rm eff}$, [Fe/H], and $S/N\sim200$. From the top, the 2-MASS IDs for the selected stars are: (i) 2M04581987-0433056, (ii) 2M14415263+0953418, (iii) 2M20471037-0002171, (iv) 2M02183299+5434456, (v) 2M09413146+5939283, and (vi) 2M02390392+6132329. Open points plot the continuum-normalized observed flux, and solid (dashed) curves plot the [Ce/H] (global) best-fit model spectrum. Wavelengths are in the stellar rest frame and in air. 
     Stellar parameters are compared against the full sample in the right-hand panels.
     }
@@ -214,7 +218,7 @@ We follow the procedure outlined in \citet{sit_chemical_2024} to remove $\log(g)
 
 \begin{figure*}[h]
     \centering
-    \includegraphics[width=\textwidth]{figures/ce_lines_2.pdf}
+    \includegraphics[width=\textwidth]{\figpath{ce_lines_2.pdf}}
     \caption{Similar to Figure \ref{fig:ce-lines-1} for six additional stars with $S/N\sim200$ that span a range of (i--iii) $\log(g)$ and (iv--vi) [Fe/H]. From the top, the 2-MASS IDs for the selected stars are: (i) 2M09530814+6207498, (ii) 2M04364872+5016286, (iii) 2M01231384+6014386, (iv) 2M21314472-0350388, (v) 2M15025976+7827316, and (vi) 2M09112399-4841166.}
     \label{fig:ce-lines-2}
 \end{figure*}
@@ -225,7 +229,7 @@ Figure \ref{fig:ce-lines-1} presents the spectra for 6 ``sibling'' stars with si
 
 Figure \ref{fig:ce-lines-2} similarly presents the spectra for 6 selected stars spanning a range of $\log(g)$, $T_{\rm eff}$, and [Fe/H]. The top three spectra span a range of $\log(g)$ at similar [Fe/H] and [Ce/H], illustrating that the Ce II lines get fainter with increasing surface gravity but are still detectable at $\log(g)\approx3$. The bottom three spectra span a range of [Fe/H] and $T_{\rm eff}$ at similar $\log(g)$. The lines are weak at $\bracket{Fe}\approx-1$ and strongly blended at $\bracket{Fe}\approx+0.3$, but are still fit well by the model at both extremes. Overall, Figures \ref{fig:ce-lines-1} and \ref{fig:ce-lines-2} demonstrate that the APOGEE spectra can accurately capture variation in [Ce/H] across the full parameter space in the sample, and that the ASPCAP Ce abundances for our high-quality sample are trustworthy.
 
-ASPCAP does not include a treatment for upper limits, so the reported abundances may in some cases be theoretically unmeasurable. By comparing a grid of synthetic spectra with and without each element, \citet{shetrone_apache_2026} calibrated a function to determine an upper limit on the abundance for a given $T_{\rm eff}$ and $S/N$. For most of the stars in our sample, the measured [Ce/H] is above this limit due to our $S/N>100$ requirement. However, at lower metallicities, a larger fraction of our sample falls below these upper limits, which affects our analysis of the Milky Way halo in Section \ref{sec:halo}. Therefore, we calculate upper limits on [Ce/H] for each star using the method of \citet{shetrone_apache_2026} and eliminate \input{output/upper_limits.tex} stars with uncalibrated abundances below the limit. We also compare the ASPCAP abundances against the BAWLAS catalog \citep{hayes_bacchus_2022} in Appendix \ref{app:bawlas-comparison}.
+ASPCAP does not include a treatment for upper limits, so the reported abundances may in some cases be theoretically unmeasurable. By comparing a grid of synthetic spectra with and without each element, \citet{shetrone_apache_2026} calibrated a function to determine an upper limit on the abundance for a given $T_{\rm eff}$ and $S/N$. For most of the stars in our sample, the measured [Ce/H] is above this limit due to our $S/N>100$ requirement. However, at lower metallicities, a larger fraction of our sample falls below these upper limits, which affects our analysis of the Milky Way halo in Section \ref{sec:halo}. Therefore, we calculate upper limits on [Ce/H] for each star using the method of \citet{shetrone_apache_2026} and eliminate \input{\outpath{upper_limits.tex}} stars with uncalibrated abundances below the limit. We also compare the ASPCAP abundances against the BAWLAS catalog \citep{hayes_bacchus_2022} in Appendix \ref{app:bawlas-comparison}.
 
 \subsection{Stellar Ages}
 \label{sec:ages}
@@ -234,14 +238,14 @@ ASPCAP does not include a treatment for upper limits, so the reported abundances
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figures/sample_distributions.pdf}
+    \includegraphics[width=\linewidth]{\figpath{sample_distributions.pdf}}
     \caption{Distributions of stellar age, [Fe/H], and guiding radius of our sample. The open black histogram plots the full sample described in Section \ref{sec:data}, and the filled red histogram includes only stars that exceed the recommended age training density \citep[Section \ref{sec:ages};][]{stone-martinez_starflow_2025}.}
     \label{fig:sample-distributions}
 \end{figure}
 
 We use the StarFlow \citep{stone-martinez_starflow_2025} value-added catalog of stellar ages for MWM DR19. \citet{stone-martinez_starflow_2025} use a deep generative model trained on asteroseismic data to estimate ages for evolved stars. Specifically, they use stellar masses and ages from the APOGEE-Kepler Asteroseismic Catalog \citep[APOKASC-3][]{pinsonneault_apokasc-3_2025} and APO-K2 catalog \citep{schonhut-stasik_apo-k2_2024,warfield_apo-k2_2024} and MWM DR19 stellar parameters ($T_{\rm eff}$ and $\log(g)$) and abundances ([Fe/H], [C/Fe], and [N/Fe]). This makes StarFlow essentially a [C/N]-derived age catalog. The \citet{stone-martinez_starflow_2025} model retains information about the parameter space distribution of the training data and accounts for asymmetric uncertainties. 
 
-We adopt the recommended training space density threshold of $>3\times10^9$, resulting in good age estimates for \input{output/good_ages.tex} stars. Figure \ref{fig:sample-distributions} compares the distributions of age, [Fe/H], and guiding radius for the stars with good ages against our full sample. The age quality cut eliminates $\sim\num{16000}$ stars, including most $<1\Gyr$ old stars and nearly all stars with $\bracket{Fe}<-0.8$. Metal-poor stars are excluded from the StarFlow catalog entirely due to the sparse sampling of asteroseismic data. 
+We adopt the recommended training space density threshold of $>3\times10^9$, resulting in good age estimates for \input{\outpath{good_ages.tex}} stars. Figure \ref{fig:sample-distributions} compares the distributions of age, [Fe/H], and guiding radius for the stars with good ages against our full sample. The age quality cut eliminates $\sim\num{16000}$ stars, including most $<1\Gyr$ old stars and nearly all stars with $\bracket{Fe}<-0.8$. Metal-poor stars are excluded from the StarFlow catalog entirely due to the sparse sampling of asteroseismic data. 
 
 The ``good age'' sample serves as the primary sample for this work. However, the age quality cut introduces a bias against low-metallicity stars, as illustrated in Figure \ref{fig:sample-distributions}. This effect is minor for disk stars, but it eliminates nearly all halo stars. For cases where we calibrate abundance trends as a function of metallicity (e.g., Sections \ref{sec:logg-corrections} and \ref{sec:galactic-trends}) or investigate the halo (Section \ref{sec:halo}), we instead use the full sample defined in Section \ref{sec:data}.
 
@@ -249,7 +253,7 @@ The ``good age'' sample serves as the primary sample for this work. However, the
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figures/dataset_comparison.pdf}
+    \includegraphics[width=\linewidth]{\figpath{dataset_comparison.pdf}}
     \caption{Comparison of the age--[Ce/Mg] trend between MWM+StarFlow \citep{stone-martinez_starflow_2025}, APOKASC-3 \citep{pinsonneault_apokasc-3_2025}, and OCCAM \citep{otto_open_2026}. Each survey uses different age estimation techniques, but the abundances on the y-axis all come from MWM DR19. For the sake of comparison, we do not apply $\log(g)$ corrections to the abundances in this plot. The solid curves plot the running median [Ce/Mg] as a function of age for each data set, and the dashed curves plot the StarFlow running median for comparison. The APOKASC-3 sample is restricted to ``gold sample'' (highest quality) RGB and red clump stars. The OCCAM sample includes only stars with $\log(g)<3.5$.}
     \label{fig:dataset-comparison}
 \end{figure}
@@ -270,7 +274,7 @@ The OCCAM cluster ages are more informative because they are fully independent. 
 
 \begin{figure*}
     \centering
-    \includegraphics[width=\linewidth]{figures/cemg_mgh_age.pdf}
+    \includegraphics[width=\linewidth]{\figpath{cemg_mgh_age.pdf}}
     \caption{{\it Top row:} The distribution of abundances in the [Ce/Mg]--[Mg/H] plane color-coded by the median stellar age. The top-left panel plots the full sample, while the top-middle (top-right) panel plots the high-Ia (low-Ia) population only. Within each panel, each hexagonal bin contains a minimum of 10 stars; in lower-density regions, each star is plotted individually. The grayscale outlines represent linearly-spaced density contours, with the black contour encompassing the highest density of stars. The error bars in the upper right corner represent the median uncertainty in [Ce/Mg] and [Mg/H]. {\it Bottom row:} Similar, but showing the median stellar [Fe/H] as a function of [Ce/Mg] and age.}
     \label{fig:cemg-mgh-age}
 \end{figure*}
@@ -285,7 +289,7 @@ The bottom-left panel of Figure \ref{fig:cemg-mgh-age} shows that the youngest s
 
 \begin{figure*}
     \centering
-    \includegraphics[width=\textwidth]{figures/local_metallicity_fits.pdf}
+    \includegraphics[width=\textwidth]{\figpath{local_metallicity_fits.pdf}}
     \caption{The variation in the age--[Ce/Mg] relation as a function of metallicity for high-Ia stars in the solar neighborhood ($7\leq R_{\rm guide}<9\kpc$, $z_{\rm max}<0.5\kpc$). {\it Left:} Each panel plots the high-Ia stars within the given metallicity bin (colored points) against a Gaussian kernel density estimate for the full solar neighborhood sample (gray contours). The solid line shows the linear regression to the data in that metallicity bin, and the dashed line shows the extrapolated relation outside the fitted age range of $1-8\Gyr$. The $\odot$ symbol marks the location of the Sun. {\it Right:} The best-fit parameters in the solar neighborhood as a function of metallicity. The dashed line represents the \citet{casali_tracing_2025} age--[Ce/Mg]--[Fe/H] relation.}
     \label{fig:local-metallicity-trends}
 \end{figure*}
@@ -307,7 +311,7 @@ We compare our fits against the metallicity-dependent age--[Ce/Mg] relation of \
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figures/global_metallicity_fits.pdf}
+    \includegraphics[width=\linewidth]{\figpath{global_metallicity_fits.pdf}}
     \caption{Best-fit parameters for the linear regression to the age--[Ce/Mg] relation as a function of metallicity and guiding radius. All fits are restricted to high-Ia stars with $z_{\rm max}<0.5\kpc$. The shaded bands indicate the uncertainty in the best-fit parameters at each metallicity bin. The dark brown curve plots the relation in the solar neighborhood and is the same as Figure \ref{fig:local-metallicity-trends}. {\it Top:} The slope as a function of metallicity. The dotted gray line indicates a flat slope. {\it Bottom:} The intercept at $\tau=5\Gyr$ as a function of metallicity. The $\odot$ symbol marks the Sun's location.}
     \label{fig:global-metallicity-fits}
 \end{figure}
@@ -319,7 +323,7 @@ Figure \ref{fig:global-metallicity-fits} duplicates our linear fit procedure acr
 
 \begin{figure*}
     \centering
-    \includegraphics[width=\linewidth]{figures/median_trends_grid.pdf}
+    \includegraphics[width=\linewidth]{\figpath{median_trends_grid.pdf}}
     \caption{The median [Ce/Mg] as a function of [Mg/H] for high- and low-Ia populations (defined in Section \ref{sec:alpha-pops}) across the Galaxy. Each panel corresponds to a bin in $R_{\rm guide}$ (increasing left to right) and $z_{\rm max}$ (increasing bottom to top). The small blue (red) points plot individual abundances of high-Ia (low-Ia) stars. For visual clarity, only a random sample of 1,000 stars are plotted in each panel. The number of high- and low-Ia stars in each region is indicated in the top-right corner of each panel. The solid lines with large points plot the median [Ce/Mg] in bins of [Mg/H] for each region, with error bars indicating the bootstrapped standard error of the median. The dashed lines indicate the median trends in the Solar neighborhood ($7\leq R_{\rm guide}<9\kpc$, $z_{\rm max}<0.5\kpc$) for reference. The gray error bars in the top left panel (lower right corner) indicate the median abundance errors for the full DR19 sample.}
     \label{fig:median-trends-grid}
 \end{figure*}
@@ -344,7 +348,7 @@ Overall, Figures \ref{fig:global-metallicity-fits} and \ref{fig:median-trends-gr
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figures/residual_abundances.pdf}
+    \includegraphics[width=\linewidth]{\figpath{residual_abundances.pdf}}
     \caption{Demonstration of the residual abundance calculation for the solar neighborhood. Top row: median trend in [Ce/H] as a function of (a) [Mg/H] and (b) age for the high- and low-Ia populations. The format of each panel is similar to Figure \ref{fig:median-trends-grid}. Bottom row: median trend in $\Delta\bracket{Ce}$ as a function of (c) [Mg/H] and (d) age. In panel (c), the dashed lines plot the 16th and 84th percentiles. Both populations show similar trends with age in [Ce/H] and $\Delta\bracket{Ce}$.}
     \label{fig:residual-explainer}
 \end{figure}
@@ -359,7 +363,7 @@ We found in Section \ref{sec:galactic-trends} that abundance trends vary with po
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figures/residual_age_trends.pdf}
+    \includegraphics[width=\linewidth]{\figpath{residual_age_trends.pdf}}
     \caption{Median age--abundance trends in bins of guiding radius. Solid (dashed) lines plot the median trends in age bins of 1 Gyr for the high-Ia (low-Ia) sub-samples. Semi-transparent bands represent the standard error on the median abundance in each age bin. The underlying 2-D histogram plots the density of the full sample in age--abundance space. Stars are restricted to $z_{\rm max}<0.5$ kpc in both panels. The gray error bars in the top panel indicate the median age and abundance uncertainties.}
     \label{fig:median-age-trends}
 \end{figure}
@@ -374,7 +378,7 @@ The bottom panel of Figure \ref{fig:median-age-trends} shows the residual abunda
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figures/gradients.pdf}
+    \includegraphics[width=\linewidth]{\figpath{gradients.pdf}}
     \caption{Radial gradients of [Ce/H] and [Ce/Mg] as a function of stellar age. Solid (dashed) lines plot the median abundance in bins of guiding radius for the high-Ia (low-Ia) sub-sample, color-coded by stellar age. The shaded areas indicate the standard error of the median at each bin. Stars are restricted to $z_{\rm max}<0.5$ kpc for both sub-samples. The underlying 2-D histogram plots the density of stars in each bin of abundance and radius, normalized to 1 in each radial bin.}
     \label{fig:gradients}
 \end{figure}
@@ -425,7 +429,7 @@ In this section, we investigate [Ce/Mg] trends in the Milky Way halo. Halo stars
 
 \begin{figure*}
     \centering
-    \includegraphics[width=0.8\linewidth]{figures/halo.pdf}
+    \includegraphics[width=0.8\linewidth]{\figpath{halo.pdf}}
     \caption{{\it Top left:} Our halo sub-samples plotted in the orbital $E-L_z$ plane (see selection criteria in Table \ref{tab:halo-selection}). The 2-D histogram plots the density of stars on disk-like orbits, and the colored points plot stars with halo-like orbits. The gray points do not fall within either the halo or disk selections and are not plotted in other panels. {\it Top right:} Chemical selection for accreted stars. The gray points fall outside of the chemical cuts or too close to the boundaries and are excluded from analysis. {\it Bottom left:} Abundance ratios (non-$\log(g)$-corrected) for {\it in situ} halo stars (orange diamonds), accreted halo stars (turquoise circles), and GSE stars (cyan squares). The blue and pink contours indicate the density of high-Ia and low-Ia disk stars, respectively. The solid colored curves plot a rolling median for each of the five sub-samples. The thin black curves plot the rolling median trends for three Milky Way satellites from \citet{hasselquist_apogee_2021} with updated DR19 zero-point offsets. The black dotted lines indicate the boundary where abundances are flagged for being too close to a grid edge, and the gray dotted line indicates the approximate region where the \citet{shetrone_apache_2026} upper limits dominate the sample. {\it Bottom right:} Normalized distributions of [Ce/Mg] for the five sub-samples. Distributions are boxcar-smoothed by 0.2 dex for clarity.}
     \label{fig:halo}
 \end{figure*}
@@ -507,14 +511,14 @@ Following \citet{sit_chemical_2024}, we define a calibration sample of stars in 
 
 \begin{table*}[]
     \centering
-    \include{output/ce_offset_table.tex}
+    \include{\outpath{ce_offset_table.tex}}
     \caption{Corrective offsets to [Ce/H] as a function of $\log(g)$ and [Mg/H].}
     \label{tab:ce-offset-table}
 \end{table*}
 
 \begin{table*}[]
     \centering
-    \include{output/fe_offset_table.tex}
+    \include{\outpath{fe_offset_table.tex}}
     \caption{Corrective offsets to [Fe/H] as a function of $\log(g)$ and [Mg/H].}
     \label{tab:fe-offset-table}
 \end{table*}
@@ -526,7 +530,7 @@ We compare the DR19 ASPCAP [Ce/H] abundances with and without the corrective $\l
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figures/bawlas_comparison.pdf}
+    \includegraphics[width=\linewidth]{\figpath{bawlas_comparison.pdf}}
     \caption{Difference between DR19 ASPCAP and DR17 BAWLAS \citep{hayes_bacchus_2022} abundances. The solid (dashed) black line plots the binned median (16th and 84th percentiles) of the abundance differences. The dotted line indicates zero for reference. The gray points indicate individual stellar abundances, and we plot a random sample of \num{10000} stars for visual clarity. In the top (bottom) panel, DR19 abundances are presented with (without) the corrective $\log(g)$ abundance offsets (Section \ref{sec:logg-corrections}).}
     \label{fig:bawlas-comparison}
 \end{figure}
@@ -536,21 +540,21 @@ We compare the DR19 ASPCAP [Ce/H] abundances with and without the corrective $\l
 
 \begin{figure*}
     \centering
-    \includegraphics[width=\linewidth]{figures/age_trend_sensitivity.pdf}
+    \includegraphics[width=\linewidth]{\figpath{age_trend_sensitivity.pdf}}
     \caption{The age--[Ce/Mg] relation in bins of guiding radius for different sample selection criteria. Each panel is similar to the top panel of Figure \ref{fig:median-age-trends}, except the high- and low-Ia populations are not plotted separately here. {\it Top:} adopting the corrective $\log(g)$ abundance offsets (see Section \ref{sec:logg-corrections}), from left to right, the full sample with $z_{\rm max}<0.5\kpc$; a stricter age quality cut; a higher signal-to-noise cut; and a narrow $\log(g)$ range selecting the red clump. {\it Bottom:} adopting the original ASPCAP abundances, the left-most panel plots the full sample with $z_{\rm max}<0.5\kpc$, and the remaining three panels plot narrower bins in $\log(g)$. The dashed lines indicate the median trends in the upper-left panel.}
     \label{fig:age-trend-sensitivity}
 \end{figure*}
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figures/linear_fit_sensitivity.pdf}
+    \includegraphics[width=\linewidth]{\figpath{linear_fit_sensitivity.pdf}}
     \caption{Linear fit parameters to the age--[Ce/Mg] relation in the solar neighborhood for different sample selection choices (see Figure \ref{fig:local-metallicity-trends}).}
     \label{fig:linear-fit-sensitivity}
 \end{figure}
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{figures/distance_source_sensitivity.pdf}
+    \includegraphics[width=\linewidth]{\figpath{/distance_source_sensitivity.pdf}}
     \caption{Linear fit parameters to the age--[Ce/Mg] relation in bins of $R_{\rm guide}$ for two different orbital catalogs (see Figure \ref{fig:global-metallicity-fits}). The solid lines with points adopt a composite catalog of distances as described in Section \ref{sec:orbits}. The dashed lines plot the best-fit parameters for an alternate orbital catalog based on just the \citet{bailer-jones_estimating_2021} photo-geometric distances.}
     \label{fig:distance-source-sensitivity}
 \end{figure}
