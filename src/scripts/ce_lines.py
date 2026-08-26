@@ -51,17 +51,6 @@ def main(style='paper', verbose=False, overwrite=False):
     savedir.mkdir(exist_ok=True)
     if verbose: print('Importing MWM sample file...')
     mwm_sample = import_sample(good_ages=False)
-    subset = mwm_sample[
-        (mwm_sample['snr'] > 180) &
-        (mwm_sample['snr'] < 220) &
-        (mwm_sample['fe_h'] > -0.25) &
-        (mwm_sample['fe_h'] < -0.15) &
-        (mwm_sample['ce_fe'] > 0.25) &
-        (mwm_sample['ce_fe'] < 0.35) &
-        (mwm_sample['logg'] < 1.6) &
-        (mwm_sample['logg'] > 1.4)
-    ]
-    print(subset[['snr', 'fe_h', 'ce_fe', 'logg']])
     # First figure: stars with similar log(g) and metallicity but different Ce
     if verbose: print('\nFigure 1: stellar siblings')
     sdss_id_list = [ # all have S/N~200

@@ -20,9 +20,9 @@ SNR_CUT = 100
 MET_CUT = -1.5 # Meszaros et al. (2025) recommendation for Ce
 # List of columns to include in the final sample
 SAMPLE_COLS = [
-    'sdss_id', 'sdss4_apogee_id', 'gaia_dr3_source_id', 'ra', 'dec', 'l', 'b', 
-    'telescope', 'field', 'snr', 'v_rad', 'e_v_rad',  'std_v_rad',
-    'teff', 'logg', 'm_h_atm',
+    'sdss_id', 'obj', 'sdss4_apogee_id', 'gaia_dr3_source_id', 'ra', 'dec', 
+    'l', 'b', 'telescope', 'field', 'snr', 'v_rad', 'e_v_rad',  'std_v_rad',
+    'teff', 'logg', 'm_h_atm', 'alpha_m_atm',
     'mg_h', 'e_mg_h', 'fe_h', 'fe_h_corr', 'e_fe_h', 
     'ce_h', 'ce_h_corr', 'e_ce_h', 'lim_ce_h', 'lim_ce_h_flag',
     'ce_mg', 'ce_mg_corr', 'e_ce_mg', 'ce_fe', 'ce_fe_corr', 'e_ce_fe', 
